@@ -177,7 +177,7 @@ if ($stats) {
         </div>
     </div>
 
-    <div class="card">
+    <div class="card" style="background:linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(6,182,212,0.06) 100%); border:1px solid rgba(139,92,246,0.25);">
         <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
             <h6 class="mb-0" style="font-weight:700;"><i class="fas fa-futbol me-2" style="color:var(--accent);"></i><?= htmlspecialchars($dateFrom) ?><?= $dateFrom !== $dateTo ? ' — ' . htmlspecialchars($dateTo) : '' ?> <span class="text-muted" style="font-size:0.8rem;font-weight:400;">(<?= count($stats) ?> matches)</span></h6>
             <form class="date-range-form" method="get">
