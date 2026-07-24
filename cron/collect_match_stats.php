@@ -26,6 +26,39 @@ $maxFixtures = isset($opts['limit']) ? (int)$opts['limit'] : 9999;
 $logFile = __DIR__ . '/../logs/stats_collector_' . $date . '.log';
 if (!is_dir(dirname($logFile))) mkdir(dirname($logFile), 0755, true);
 
+$TOP_LEAGUE_IDS = [
+    39,   // Premier League (England)
+    140,  // La Liga (Spain)
+    135,  // Serie A (Italy)
+    78,   // Bundesliga (Germany)
+    61,   // Ligue 1 (France)
+    88,   // Eredivisie (Netherlands)
+    94,   // Primeira Liga (Portugal)
+    40,   // Championship (England)
+    71,   // Serie A (Brazil)
+    253,  // MLS (USA)
+    203,  // Turkish Super Lig
+    179,  // Scottish Premiership
+    144,  // Belgian Pro League
+    262,  // Liga MX (Mexico)
+    98,   // J1 League (Japan)
+    292,  // K League 1 (South Korea)
+    188,  // A-League (Australia)
+    103,  // Eliteserien (Norway)
+    113,  // Allsvenskan (Sweden)
+    119,  // Danish Superliga
+    106,  // Ekstraklasa (Poland)
+    204,  // Swiss Super League
+    283,  // Romanian Liga I
+    163,  // Bulgarian First League
+    196,  // Croatian HNL
+    111,  // Czech First League
+    207,  // Greek Super League
+    307,  // Saudi Pro League
+    244,  // Veikkausliiga (Finland)
+    169,  // Argentine Primera Division
+];
+
 function apiLog($msg) {
     global $logFile;
     $line = date('[Y-m-d H:i:s] ') . $msg;
@@ -85,15 +118,37 @@ if (!$fixturesResp || empty($fixturesResp['response'])) {
     apiLog("No fixtures found or API error. Response: " . json_encode($fixturesResp['errors'] ?? 'unknown'));
     exit(1);
 }
-$fixtures = $fixturesResp['response'];
-apiLog("Found " . count($fixtures) . " finished fixtures");
+$allFixtures = $fixturesResp['response'];
+apiLog("Found " . count($allFixtures) . " finished fixtures");
+
+usort($allFixtures, function($a, $b) use ($TOP_LEAGUE_IDS) {
+    $aP = array_search($a['league']['id'] ?? 0, $TOP_LEAGUE_IDS);
+    $bP = array_search($b['league']['id'] ?? 0, $TOP_LEAGUE_IDS);
+    $aP = $aP === false ? 999 : $aP;
+    $bP = $bP === false ? 999 : $bP;
+    return $aP <=> $bP;
+});
 
 $existingStmt = $db->prepare("SELECT id FROM match_statistics WHERE api_fixture_id = ?");
 
 try { $db->exec("ALTER TABLE match_statistics ADD COLUMN home_free_kicks INT DEFAULT NULL AFTER away_offsides, ADD COLUMN away_free_kicks INT DEFAULT NULL AFTER home_free_kicks"); } catch (Exception $e) {}
+try { $db->exec("ALTER TABLE match_statistics ADD COLUMN home_team_id INT DEFAULT NULL AFTER away_team_api, ADD COLUMN away_team_id INT DEFAULT NULL AFTER home_team_id"); } catch (Exception $e) {}
+try { $db->exec("ALTER TABLE match_statistics ADD INDEX idx_home_team_id (home_team_id), ADD INDEX idx_away_team_id (away_team_id)"); } catch (Exception $e) {}
+
+function resolveTeamIdForStats($db, $teamName) {
+    $norm = strtolower(trim($teamName));
+    $stmt = $db->prepare("SELECT id FROM teams WHERE normalized_name = ? LIMIT 1");
+    $stmt->execute([$norm]);
+    $id = $stmt->fetchColumn();
+    if (!$id) {
+        $db->prepare("INSERT IGNORE INTO teams (name, normalized_name) VALUES (?, ?)")->execute([$teamName, $norm]);
+        $id = $db->lastInsertId();
+    }
+    return $id;
+}
 
 $insertStmt = $db->prepare("INSERT INTO match_statistics
-    (api_fixture_id, match_date, league_name, league_id_api, home_team_api, away_team_api,
+    (api_fixture_id, match_date, league_name, league_id_api, home_team_api, away_team_api, home_team_id, away_team_id,
      home_score, away_score, referee, venue,
      home_shots_on_goal, away_shots_on_goal, home_shots_off_goal, away_shots_off_goal,
      home_total_shots, away_total_shots, home_blocked_shots, away_blocked_shots,
@@ -109,8 +164,9 @@ $insertStmt = $db->prepare("INSERT INTO match_statistics
      home_expected_goals, away_expected_goals,
      home_goals_prevented, away_goals_prevented,
      raw_statistics, raw_fixture)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     ON DUPLICATE KEY UPDATE
+     home_team_id=VALUES(home_team_id), away_team_id=VALUES(away_team_id),
      home_shots_on_goal=VALUES(home_shots_on_goal), away_shots_on_goal=VALUES(away_shots_on_goal),
      home_shots_off_goal=VALUES(home_shots_off_goal), away_shots_off_goal=VALUES(away_shots_off_goal),
      home_total_shots=VALUES(home_total_shots), away_total_shots=VALUES(away_total_shots),
@@ -141,7 +197,7 @@ $noStats = 0;
 $requestCount = 0;
 $checked = 0;
 
-foreach ($fixtures as $f) {
+foreach ($allFixtures as $f) {
     $fid = $f['fixture']['id'];
     $homeName = $f['teams']['home']['name'] ?? '';
     $awayName = $f['teams']['away']['name'] ?? '';
@@ -194,9 +250,12 @@ foreach ($fixtures as $f) {
     $referee = $f['fixture']['referee'] ?? null;
     $venue = $f['fixture']['venue']['name'] ?? null;
 
+    $homeTeamId = resolveTeamIdForStats($db, $homeName);
+    $awayTeamId = resolveTeamIdForStats($db, $awayName);
+
     try {
         $insertStmt->execute([
-            $fid, $date, $leagueName, $leagueIdApi, $homeName, $awayName,
+            $fid, $date, $leagueName, $leagueIdApi, $homeName, $awayName, $homeTeamId, $awayTeamId,
             $homeScore, $awayScore, $referee, $venue,
             parseStatInt($homeStats, 'Shots on Goal'), parseStatInt($awayStats, 'Shots on Goal'),
             parseStatInt($homeStats, 'Shots off Goal'), parseStatInt($awayStats, 'Shots off Goal'),

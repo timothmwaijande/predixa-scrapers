@@ -62,11 +62,15 @@ if ($idA && $idB) {
                ms.home_goals_prevented, ms.away_goals_prevented,
                ms.referee, ms.venue
         FROM match_results mr
-        LEFT JOIN match_statistics ms ON ms.match_date = mr.match_date
-            AND (
-                (ms.home_team_api = mr.home_team AND ms.away_team_api = mr.away_team)
-                OR (ms.home_team_api = mr.away_team AND ms.away_team_api = mr.home_team)
-            )
+        LEFT JOIN match_statistics ms ON (
+            (ms.home_team_id IS NOT NULL AND mr.home_team_id IS NOT NULL
+             AND ms.home_team_id = mr.home_team_id AND ms.away_team_id = mr.away_team_id)
+            OR (ms.home_team_id IS NOT NULL AND mr.home_team_id IS NOT NULL
+             AND ms.home_team_id = mr.away_team_id AND ms.away_team_id = mr.home_team_id)
+            OR (ms.match_date = mr.match_date
+             AND ((ms.home_team_api = mr.home_team AND ms.away_team_api = mr.away_team)
+                  OR (ms.home_team_api = mr.away_team AND ms.away_team_api = mr.home_team)))
+        )
         WHERE ((mr.home_team_id = ? AND mr.away_team_id = ?) OR (mr.home_team_id = ? AND mr.away_team_id = ?))
           AND mr.home_score IS NOT NULL AND mr.away_score IS NOT NULL
         ORDER BY mr.match_date DESC

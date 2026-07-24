@@ -1581,30 +1581,57 @@ class BayesianModel {
         if (!$this->db) return null;
         try {
             $lookback = date('Y-m-d', strtotime("-{$lookbackDays} days"));
-            $stmt = $this->db->prepare("
-                SELECT
-                    COUNT(*) as matches,
-                    AVG(CASE WHEN home_team_api = ? THEN home_expected_goals ELSE away_expected_goals END) as avg_xg_for,
-                    AVG(CASE WHEN home_team_api = ? THEN away_expected_goals ELSE home_expected_goals END) as avg_xg_against,
-                    AVG(CASE WHEN home_team_api = ? THEN home_shots_on_goal ELSE away_shots_on_goal END) as avg_sot_for,
-                    AVG(CASE WHEN home_team_api = ? THEN away_shots_on_goal ELSE home_shots_on_goal END) as avg_sot_against,
-                    AVG(CASE WHEN home_team_api = ? THEN home_total_shots ELSE away_total_shots END) as avg_shots_for,
-                    AVG(CASE WHEN home_team_api = ? THEN away_total_shots ELSE home_total_shots END) as avg_shots_against,
-                    AVG(CASE WHEN home_team_api = ? THEN CAST(REPLACE(home_ball_possession,'%','') AS DECIMAL) ELSE CAST(REPLACE(away_ball_possession,'%','') AS DECIMAL) END) as avg_possession,
-                    AVG(CASE WHEN home_team_api = ? THEN home_corner_kicks ELSE away_corner_kicks END) as avg_corners_for,
-                    AVG(CASE WHEN home_team_api = ? THEN home_fouls ELSE away_fouls END) as avg_fouls,
-                    AVG(CASE WHEN home_team_api = ? THEN home_yellow_cards + home_red_cards ELSE away_yellow_cards + away_red_cards END) as avg_cards,
-                    SUM(CASE WHEN home_team_api = ? AND away_score = 0 THEN 1 WHEN away_team_api = ? AND home_score = 0 THEN 1 ELSE 0 END) as clean_sheets,
-                    AVG(CASE WHEN home_team_api = ? THEN home_passes_accurate ELSE away_passes_accurate END) as avg_passes_accurate,
-                    AVG(CASE WHEN home_team_api = ? THEN home_total_passes ELSE away_total_passes END) as avg_passes_total,
-                    AVG(CASE WHEN home_team_api = ? THEN home_goals_prevented ELSE away_goals_prevented END) as avg_goals_prevented
-                FROM match_statistics
-                WHERE (home_team_api = ? OR away_team_api = ?)
-                  AND match_date >= ? AND match_date <= CURDATE()
-            ");
-            $params = array_fill(0, 17, $teamName);
-            $params[] = $lookback;
-            $stmt->execute($params);
+            $teamId = $this->resolveTeamId($teamName);
+
+            if ($teamId) {
+                $stmt = $this->db->prepare("
+                    SELECT
+                        COUNT(*) as matches,
+                        AVG(CASE WHEN home_team_id = ? THEN home_expected_goals ELSE away_expected_goals END) as avg_xg_for,
+                        AVG(CASE WHEN home_team_id = ? THEN away_expected_goals ELSE home_expected_goals END) as avg_xg_against,
+                        AVG(CASE WHEN home_team_id = ? THEN home_shots_on_goal ELSE away_shots_on_goal END) as avg_sot_for,
+                        AVG(CASE WHEN home_team_id = ? THEN away_shots_on_goal ELSE home_shots_on_goal END) as avg_sot_against,
+                        AVG(CASE WHEN home_team_id = ? THEN home_total_shots ELSE away_total_shots END) as avg_shots_for,
+                        AVG(CASE WHEN home_team_id = ? THEN away_total_shots ELSE home_total_shots END) as avg_shots_against,
+                        AVG(CASE WHEN home_team_id = ? THEN CAST(REPLACE(home_ball_possession,'%','') AS DECIMAL) ELSE CAST(REPLACE(away_ball_possession,'%','') AS DECIMAL) END) as avg_possession,
+                        AVG(CASE WHEN home_team_id = ? THEN home_corner_kicks ELSE away_corner_kicks END) as avg_corners_for,
+                        AVG(CASE WHEN home_team_id = ? THEN home_fouls ELSE away_fouls END) as avg_fouls,
+                        AVG(CASE WHEN home_team_id = ? THEN home_yellow_cards + home_red_cards ELSE away_yellow_cards + away_red_cards END) as avg_cards,
+                        SUM(CASE WHEN home_team_id = ? AND away_score = 0 THEN 1 WHEN away_team_id = ? AND home_score = 0 THEN 1 ELSE 0 END) as clean_sheets,
+                        AVG(CASE WHEN home_team_id = ? THEN home_passes_accurate ELSE away_passes_accurate END) as avg_passes_accurate,
+                        AVG(CASE WHEN home_team_id = ? THEN home_total_passes ELSE away_total_passes END) as avg_passes_total,
+                        AVG(CASE WHEN home_team_id = ? THEN home_goals_prevented ELSE away_goals_prevented END) as avg_goals_prevented
+                    FROM match_statistics
+                    WHERE (home_team_id = ? OR away_team_id = ?)
+                      AND match_date >= ? AND match_date <= CURDATE()
+                ");
+                $params = array_merge([$teamId], array_fill(0, 13, $teamId), [$lookback]);
+                $stmt->execute($params);
+            } else {
+                $stmt = $this->db->prepare("
+                    SELECT
+                        COUNT(*) as matches,
+                        AVG(CASE WHEN home_team_api = ? THEN home_expected_goals ELSE away_expected_goals END) as avg_xg_for,
+                        AVG(CASE WHEN home_team_api = ? THEN away_expected_goals ELSE home_expected_goals END) as avg_xg_against,
+                        AVG(CASE WHEN home_team_api = ? THEN home_shots_on_goal ELSE away_shots_on_goal END) as avg_sot_for,
+                        AVG(CASE WHEN home_team_api = ? THEN away_shots_on_goal ELSE home_shots_on_goal END) as avg_sot_against,
+                        AVG(CASE WHEN home_team_api = ? THEN home_total_shots ELSE away_total_shots END) as avg_shots_for,
+                        AVG(CASE WHEN home_team_api = ? THEN away_total_shots ELSE home_total_shots END) as avg_shots_against,
+                        AVG(CASE WHEN home_team_api = ? THEN CAST(REPLACE(home_ball_possession,'%','') AS DECIMAL) ELSE CAST(REPLACE(away_ball_possession,'%','') AS DECIMAL) END) as avg_possession,
+                        AVG(CASE WHEN home_team_api = ? THEN home_corner_kicks ELSE away_corner_kicks END) as avg_corners_for,
+                        AVG(CASE WHEN home_team_api = ? THEN home_fouls ELSE away_fouls END) as avg_fouls,
+                        AVG(CASE WHEN home_team_api = ? THEN home_yellow_cards + home_red_cards ELSE away_yellow_cards + away_red_cards END) as avg_cards,
+                        SUM(CASE WHEN home_team_api = ? AND away_score = 0 THEN 1 WHEN away_team_api = ? AND home_score = 0 THEN 1 ELSE 0 END) as clean_sheets,
+                        AVG(CASE WHEN home_team_api = ? THEN home_passes_accurate ELSE away_passes_accurate END) as avg_passes_accurate,
+                        AVG(CASE WHEN home_team_api = ? THEN home_total_passes ELSE away_total_passes END) as avg_passes_total,
+                        AVG(CASE WHEN home_team_api = ? THEN home_goals_prevented ELSE away_goals_prevented END) as avg_goals_prevented
+                    FROM match_statistics
+                    WHERE (home_team_api = ? OR away_team_api = ?)
+                      AND match_date >= ? AND match_date <= CURDATE()
+                ");
+                $params = array_merge([$teamName], array_fill(0, 13, $teamName), [$lookback]);
+                $stmt->execute($params);
+            }
             $r = $stmt->fetch();
             if (!$r || $r['matches'] < 2) return null;
 
