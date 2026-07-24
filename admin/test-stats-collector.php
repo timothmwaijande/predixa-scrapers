@@ -57,7 +57,7 @@ if ($stats) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         *{box-sizing:border-box;}
-        :root { --primary: #8B5CF6; --primary-light: #A78BFA; --accent: #06B6D4; --text: #E2E8F0; --muted: #8899AA; --border: #2a2e35; }
+        :root { --primary: #8B5CF6; --primary-light: #A78BFA; --accent: #06B6D4; --text: #E2E8F0; --muted: #8899AA; --border: #3d4455; }
         body { font-family: 'Inter', system-ui, sans-serif; background: linear-gradient(135deg, #1e2235 0%, #2a3045 100%); min-height: 100vh; color: var(--text); padding: 16px; }
         .container-fluid { max-width: 1400px; margin: 0 auto; }
         h4 { font-weight: 800; }
@@ -73,7 +73,7 @@ if ($stats) {
         .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(139,92,246,0.15); color: var(--text); background: rgba(40,48,68,0.95); }
         .form-control::placeholder { color: #6B7280; }
         .btn-outline-secondary { background: rgba(35,42,60,0.9); border: 1px solid var(--border); color: var(--muted); }
-        .btn-outline-secondary:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-outline-secondary:hover { background: rgba(50,58,80,0.95); border-color: #5a6270; color: #fff; }
 
         .league-group { border: 1px solid rgba(139,92,246,0.25); border-radius: 12px; margin-bottom: 14px; overflow: hidden; background: linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(6,182,212,0.06) 100%); }
         .league-header { padding: 12px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; transition: background 0.15s; background: linear-gradient(135deg, rgba(139,92,246,0.14) 0%, rgba(6,182,212,0.08) 100%); }
