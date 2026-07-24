@@ -343,6 +343,11 @@ function render() {
             html += '<div class="stat-item"><div class="stat-label-small">YC</div><div class="stat-values">' + (ycTotal > 0 ? '<span class="home-val">' + nv(m.home_yellow_cards) + '</span> / <span class="away-val">' + nv(m.away_yellow_cards) + '</span>' : '-') + '</div></div>';
             html += '<div class="stat-item"><div class="stat-label-small">Poss</div><div class="stat-values"><span class="home-val">' + (m.home_ball_possession || '-') + '</span> / <span class="away-val">' + (m.away_ball_possession || '-') + '</span></div></div>';
             html += '<div class="stat-item"><div class="stat-label-small">xG</div><div class="stat-values">' + (m.home_expected_goals != null ? '<span class="home-val">' + parseFloat(m.home_expected_goals).toFixed(2) + '</span> / <span class="away-val">' + parseFloat(m.away_expected_goals).toFixed(2) + '</span>' : '-') + '</div></div>';
+            html += '<div class="stat-item"><div class="stat-label-small">GK Saves</div><div class="stat-values"><span class="home-val">' + nv(m.home_goalkeeper_saves) + '</span> / <span class="away-val">' + nv(m.away_goalkeeper_saves) + '</span></div></div>';
+            html += '<div class="stat-item"><div class="stat-label-small">Pass Acc</div><div class="stat-values"><span class="home-val">' + nv(m.home_pass_accuracy) + '</span> / <span class="away-val">' + nv(m.away_pass_accuracy) + '</span></div></div>';
+            if (m.home_goals_prevented != null || m.away_goals_prevented != null) {
+                html += '<div class="stat-item"><div class="stat-label-small">GP</div><div class="stat-values"><span class="home-val">' + (m.home_goals_prevented != null ? parseFloat(m.home_goals_prevented).toFixed(2) : '-') + '</span> / <span class="away-val">' + (m.away_goals_prevented != null ? parseFloat(m.away_goals_prevented).toFixed(2) : '-') + '</span></div></div>';
+            }
             html += '<div class="stat-item"><div class="stat-label-small">Ref</div><div class="stat-values" style="font-size:0.7rem;color:var(--muted);">' + esc(m.referee || '-') + '</div></div>';
             html += '</div>';
 
@@ -356,11 +361,8 @@ function render() {
                 ['Offsides', nv(m.home_offsides), nv(m.away_offsides)],
                 ['Free Kicks', nv(m.home_free_kicks), nv(m.away_free_kicks)],
                 ['Red Cards', ((m.home_red_cards||0)*1 + (m.away_red_cards||0)*1 > 0 ? nv(m.home_red_cards) + ' / ' + nv(m.away_red_cards) : null)],
-                ['GK Saves', nv(m.home_goalkeeper_saves), nv(m.away_goalkeeper_saves)],
                 ['Total Passes', nv(m.home_total_passes), nv(m.away_total_passes)],
                 ['Passes Accurate', nv(m.home_passes_accurate), nv(m.away_passes_accurate)],
-                ['Pass Accuracy', nv(m.home_pass_accuracy), nv(m.away_pass_accuracy)],
-                ['Goals Prevented', m.home_goals_prevented != null ? parseFloat(m.home_goals_prevented).toFixed(2) : null, m.away_goals_prevented != null ? parseFloat(m.away_goals_prevented).toFixed(2) : null],
                 ['Venue', esc(m.venue || '-'), ''],
             ];
             detailRows.forEach(dr => {
