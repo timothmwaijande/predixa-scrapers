@@ -8,11 +8,11 @@ $db = getDB();
 if (!$db) { die("DB connection failed"); }
 
 $todaySources = [];
-$wp = $db->query("SELECT DISTINCT match_name, match_time FROM web_picks WHERE DATE(detected_at) >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)")->fetchAll(PDO::FETCH_ASSOC);
+$wp = $db->query("SELECT DISTINCT match_name, match_time FROM web_picks WHERE DATE(detected_at) = CURDATE()")->fetchAll(PDO::FETCH_ASSOC);
 foreach ($wp as $r) { $todaySources[$r['match_name']] = $r['match_time'] ?: ''; }
-$sr = $db->query("SELECT DISTINCT match_name, match_time FROM scraper_results WHERE DATE(detected_at) >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)")->fetchAll(PDO::FETCH_ASSOC);
+$sr = $db->query("SELECT DISTINCT match_name, match_time FROM scraper_results WHERE DATE(detected_at) = CURDATE()")->fetchAll(PDO::FETCH_ASSOC);
 foreach ($sr as $r) { if (!isset($todaySources[$r['match_name']])) $todaySources[$r['match_name']] = $r['match_time'] ?: ''; }
-$afp = $db->query("SELECT DISTINCT match_name, match_time FROM admin_featured_picks WHERE DATE(created_at) >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)")->fetchAll(PDO::FETCH_ASSOC);
+$afp = $db->query("SELECT DISTINCT match_name, match_time FROM admin_featured_picks WHERE DATE(created_at) = CURDATE()")->fetchAll(PDO::FETCH_ASSOC);
 foreach ($afp as $r) { if (!isset($todaySources[$r['match_name']])) $todaySources[$r['match_name']] = $r['match_time'] ?: ''; }
 
 $resulted = [];
@@ -24,7 +24,7 @@ $picks = $db->query("
            bp.value_pick, bp.home_team, bp.away_team, bp.match_date, bp.match_time,
            bp.market_odds_1, bp.market_odds_x, bp.market_odds_2
     FROM bayesian_predictions bp
-    WHERE bp.match_date IN (CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 DAY))
+    WHERE bp.match_date = CURDATE()
       AND bp.recommended_pick IS NOT NULL AND bp.recommended_pick != ''
     ORDER BY bp.confidence DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
