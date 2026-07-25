@@ -15,16 +15,20 @@ foreach ($sr as $r) { if (!isset($todaySources[$r['match_name']])) $todaySources
 $afp = $db->query("SELECT DISTINCT match_name, match_time FROM admin_featured_picks WHERE DATE(created_at) = CURDATE()")->fetchAll(PDO::FETCH_ASSOC);
 foreach ($afp as $r) { if (!isset($todaySources[$r['match_name']])) $todaySources[$r['match_name']] = $r['match_time'] ?: ''; }
 
+function normalizeTeam($n) { return trim(preg_replace('/\s+(if|fk|sk|fc|sc|cf|ac|as)$/i', '', preg_replace('/^(if|fk|sk|fc|sc|cf|ac|as)\s+/i', '', strtolower(trim($n))))); }
 $resulted = [];
 $mr = $db->query("SELECT home_team, away_team FROM match_results WHERE match_date <= CURDATE()")->fetchAll(PDO::FETCH_ASSOC);
-foreach ($mr as $r) { $resulted[mb_strtolower($r['home_team']) . '|' . mb_strtolower($r['away_team'])] = true; }
+foreach ($mr as $r) { $resulted[normalizeTeam($r['home_team']) . '|' . normalizeTeam($r['away_team'])] = true; }
+$yesterdayPair = [];
+$yp = $db->query("SELECT home_team, away_team FROM bayesian_predictions WHERE match_date = DATE_SUB(CURDATE(), INTERVAL 1 DAY)")->fetchAll(PDO::FETCH_ASSOC);
+foreach ($yp as $r) { $yesterdayPair[normalizeTeam($r['home_team']) . '|' . normalizeTeam($r['away_team'])] = true; }
 
 $picks = $db->query("
     SELECT bp.match_name, bp.league, bp.confidence, bp.recommended_pick,
-           bp.value_pick, bp.home_team, bp.away_team, bp.match_date, bp.match_time,
+           bp.value_pick, bp.home_team, bp.away_team, bp.match_date,
            bp.market_odds_1, bp.market_odds_x, bp.market_odds_2
     FROM bayesian_predictions bp
-    WHERE bp.match_date = CURDATE()
+    WHERE bp.match_date IN (CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 DAY))
       AND bp.recommended_pick IS NOT NULL AND bp.recommended_pick != ''
     ORDER BY bp.confidence DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
@@ -32,9 +36,11 @@ $picks = $db->query("
 $now = new DateTime();
 $candidates = [];
 foreach ($picks as $p) {
-    $normKey = mb_strtolower($p['home_team']) . '|' . mb_strtolower($p['away_team']);
+    if (!isset($todaySources[$p['match_name']])) continue;
+    $normKey = normalizeTeam($p['home_team']) . '|' . normalizeTeam($p['away_team']);
     if (isset($resulted[$normKey])) continue;
-    $matchTime = $p['match_time'] ?: ($todaySources[$p['match_name']] ?? '');
+    if (isset($yesterdayPair[$normKey])) continue;
+    $matchTime = $todaySources[$p['match_name']];
     if ($matchTime) {
         try {
             $ko = new DateTime($matchTime);
@@ -71,7 +77,7 @@ usort($candidates, fn($a, $b) => $b['probability'] <=> $a['probability']);
 $seen = [];
 $unique = [];
 foreach ($candidates as $c) {
-    $key = $c['match_name'];
+    $key = $c['match_name'] . '|' . $c['pick_value'];
     if (isset($seen[$key])) continue;
     $seen[$key] = true;
     $unique[] = $c;
@@ -131,8 +137,8 @@ a:hover { color: var(--accent); }
 
 <div class="page-header">
     <div class="container">
-        <h1><i class="fas fa-robot me-2" style="color:#22C55E;"></i>Value Picks</h1>
-        <p style="color:var(--text-muted);font-size:1rem;max-width:700px;">Prediction model value picks · <?= count($unique) ?> picks · <?= date('jS F Y') ?> · EAT (GMT+3)</p>
+        <h1><i class="fas fa-robot me-2" style="color:#22C55E;"></i>Data Model Picks</h1>
+        <p style="color:var(--text-muted);font-size:1rem;max-width:700px;">Statistical picks from the prediction model · <?= count($unique) ?> picks · <?= date('jS F Y') ?> · EAT (GMT+3)</p>
     </div>
 </div>
 
@@ -162,7 +168,7 @@ a:hover { color: var(--accent); }
         $probClass = $prob >= 70 ? 'high' : ($prob >= 50 ? 'medium' : 'low');
         $dataConfClass = $dataConf >= 60 ? 'high' : ($dataConf >= 30 ? 'medium' : 'low');
         $hasOdds = $c['best_odds'] > 0;
-        $ev = $hasOdds ? round(($c['probability'] / 100) / (1/$c['best_odds']), 2) : 0;
+        $ev = $hasOdds ? round($c['probability'] / (1/$c['best_odds']), 2) : 0;
         $isValue = $hasOdds && $ev > 1;
     ?>
     <div class="pick-card" data-match="<?= htmlspecialchars($c['match_name']) ?>">
