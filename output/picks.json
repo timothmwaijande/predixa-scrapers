@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-07-25T08:03:40.086Z",
-  "started_at": "2026-07-25T08:03:19.500Z",
+  "generated_at": "2026-07-25T11:10:16.907Z",
+  "started_at": "2026-07-25T11:07:45.656Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
       "status": "ok",
-      "count": 0
+      "count": 19
     },
     "adibet": {
       "status": "ok",
@@ -21,13 +21,185 @@
     },
     "wp_tables": {
       "status": "ok",
-      "count": 24
+      "count": 0
     }
   },
   "sources_detail": [
     {
       "source": "allnigeriafootball",
-      "picks": []
+      "picks": [
+        {
+          "match": "Kristiansund BK vs IK Start",
+          "home": "Kristiansund BK",
+          "away": "IK Start",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "Norway Eliteserien",
+          "time": "15:00"
+        },
+        {
+          "match": "Viktoria Plzen vs Slovan Liberec",
+          "home": "Viktoria Plzen",
+          "away": "Slovan Liberec",
+          "pick": "Home(DNB)Plzen",
+          "odds": "",
+          "league": "Czechia 1. Liga",
+          "time": "16:00"
+        },
+        {
+          "match": "FC Zbrojovka Brno vs Sparta Prague",
+          "home": "FC Zbrojovka Brno",
+          "away": "Sparta Prague",
+          "pick": "X2",
+          "odds": "",
+          "league": "Czechia 1. Liga",
+          "time": "19:00"
+        },
+        {
+          "match": "Degerfors IF vs Djurgardens IF",
+          "home": "Degerfors IF",
+          "away": "Djurgardens IF",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "Sweden Allsvenskan",
+          "time": "14:00"
+        },
+        {
+          "match": "Kalmar FF vs Mjallby AIF",
+          "home": "Kalmar FF",
+          "away": "Mjallby AIF",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "Sweden Allsvenskan",
+          "time": "16:30"
+        },
+        {
+          "match": "CA Paranaense PR vs Internacional RS",
+          "home": "CA Paranaense PR",
+          "away": "Internacional RS",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Brazil Brasileiro Serie A",
+          "time": "22:30"
+        },
+        {
+          "match": "Santos FC vs Chapecoense SC",
+          "home": "Santos FC",
+          "away": "Chapecoense SC",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "Brazil Brasileiro Serie A",
+          "time": "22:30"
+        },
+        {
+          "match": "Liaoning Tieren vs Qingdao West Coast",
+          "home": "Liaoning Tieren",
+          "away": "Qingdao West Coast",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "Chinese Super League",
+          "time": "12:35"
+        },
+        {
+          "match": "Dinamo Moscow vs Krylia Sovetov Samara",
+          "home": "Dinamo Moscow",
+          "away": "Krylia Sovetov Samara",
+          "pick": "Home(DNB)Dinamo Moscow",
+          "odds": "",
+          "league": "Russia Premier League",
+          "time": "12:00"
+        },
+        {
+          "match": "Spartak Moscow vs Rodina Moscow",
+          "home": "Spartak Moscow",
+          "away": "Rodina Moscow",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "Russia Premier League",
+          "time": "18:45"
+        },
+        {
+          "match": "Estudiantes Río Cuarto vs CA Tigre",
+          "home": "Estudiantes Río Cuarto",
+          "away": "CA Tigre",
+          "pick": "Under 2.5",
+          "odds": "",
+          "league": "Argentina Primera LPF",
+          "time": "18:45"
+        },
+        {
+          "match": "Newell&#8217;s Old Boys vs Talleres de Córdoba",
+          "home": "Newell&#8217;s Old Boys",
+          "away": "Talleres de Córdoba",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Argentina Primera LPF",
+          "time": "21:00"
+        },
+        {
+          "match": "River Plate (ARG) vs Barracas Central",
+          "home": "River Plate (ARG)",
+          "away": "Barracas Central",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Argentina Primera LPF",
+          "time": "23:15"
+        },
+        {
+          "match": "RB Leipzig vs FC Ingolstadt 04",
+          "home": "RB Leipzig",
+          "away": "FC Ingolstadt 04",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "Club Friendly Games",
+          "time": "10:30"
+        },
+        {
+          "match": "Fortuna D vs Borussia Dortmund",
+          "home": "Fortuna D",
+          "away": "Borussia Dortmund",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "Club Friendly Games",
+          "time": "12:00"
+        },
+        {
+          "match": "CAS Defensores de Belgrano vs Gimnasia de Chivilcoy",
+          "home": "CAS Defensores de Belgrano",
+          "away": "Gimnasia de Chivilcoy",
+          "pick": "Under 2.5",
+          "odds": "",
+          "league": "Argentina Torneo Federal A",
+          "time": "19:00"
+        },
+        {
+          "match": "Chattanooga FC vs Philadelphia Union II",
+          "home": "Chattanooga FC",
+          "away": "Philadelphia Union II",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "USA MLS Next Pro",
+          "time": "00:00"
+        },
+        {
+          "match": "CS Belgrano vs Escobar FC",
+          "home": "CS Belgrano",
+          "away": "Escobar FC",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Argentina Torneo Federal A",
+          "time": "00:35"
+        },
+        {
+          "match": "New York Red Bulls II vs Crown Legacy FC",
+          "home": "New York Red Bulls II",
+          "away": "Crown Legacy FC",
+          "pick": "Over 2.5",
+          "odds": "",
+          "league": "USA MLS Next Pro",
+          "time": "00:00"
+        }
+      ]
     },
     {
       "source": "adibet",
@@ -53,224 +225,7 @@
     },
     {
       "source": "wp_tables",
-      "picks": [
-        {
-          "match": "Arhus vs Brondby",
-          "home": "Arhus",
-          "away": "Brondby",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "IR vs Fylkir",
-          "home": "IR",
-          "away": "Fylkir",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Kalmar vs Mjallby",
-          "home": "Kalmar",
-          "away": "Mjallby",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Stromgodset vs Lyn",
-          "home": "Stromgodset",
-          "away": "Lyn",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Servette vs Basel",
-          "home": "Servette",
-          "away": "Basel",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Stromgodset vs Lyn",
-          "home": "Stromgodset",
-          "away": "Lyn",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Lokomotiv Sofia vs Levski Sofia",
-          "home": "Lokomotiv Sofia",
-          "away": "Levski Sofia",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Servette vs Basel",
-          "home": "Servette",
-          "away": "Basel",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "IR vs Fylkir",
-          "home": "IR",
-          "away": "Fylkir",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Stromgodset vs Lyn",
-          "home": "Stromgodset",
-          "away": "Lyn",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "IR vs Fylkir",
-          "home": "IR",
-          "away": "Fylkir",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Degerfors vs Djurgarden",
-          "home": "Degerfors",
-          "away": "Djurgarden",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Stromgodset vs Lyn",
-          "home": "Stromgodset",
-          "away": "Lyn",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Lokomotiv Sofia vs Levski Sofia",
-          "home": "Lokomotiv Sofia",
-          "away": "Levski Sofia",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Servette vs Basel",
-          "home": "Servette",
-          "away": "Basel",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "IR vs Fylkir",
-          "home": "IR",
-          "away": "Fylkir",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Stromgodset vs Lyn",
-          "home": "Stromgodset",
-          "away": "Lyn",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "IR vs Fylkir",
-          "home": "IR",
-          "away": "Fylkir",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Degerfors vs Djurgarden",
-          "home": "Degerfors",
-          "away": "Djurgarden",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Arhus vs Brondby",
-          "home": "Arhus",
-          "away": "Brondby",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "IR vs Fylkir",
-          "home": "IR",
-          "away": "Fylkir",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Kalmar vs Mjallby",
-          "home": "Kalmar",
-          "away": "Mjallby",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Stromgodset vs Lyn",
-          "home": "Stromgodset",
-          "away": "Lyn",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Servette vs Basel",
-          "home": "Servette",
-          "away": "Basel",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        }
-      ]
+      "picks": []
     }
   ],
   "intersections": []
