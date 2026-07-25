@@ -774,10 +774,11 @@ foreach ($merged as &$p) {
     $base = (float)($p['win_rate_low'] ?? 0);
     $score = $base;
 
-    // EV edge boost
+    // EV edge boost (getBankerEVValue returns decimal like 0.08 for 8% edge)
     $ev = getBankerEVValue($p);
-    if ($ev !== null && $ev > 5) {
-        $score += min($ev - 5, 10);
+    if ($ev !== null && $ev > 0.05) {
+        $evPercent = $ev * 100;
+        $score += min($evPercent - 5, 10);
     }
 
     // Bayesian agreement boost

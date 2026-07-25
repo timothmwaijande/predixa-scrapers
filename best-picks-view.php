@@ -8,11 +8,11 @@ $db = getDB();
 if (!$db) { die("DB connection failed"); }
 
 $todaySources = [];
-$wp = $db->query("SELECT DISTINCT match_name, match_time FROM web_picks WHERE DATE(detected_at) = CURDATE()")->fetchAll(PDO::FETCH_ASSOC);
+$wp = $db->query("SELECT DISTINCT match_name, match_time FROM web_picks WHERE DATE(detected_at) >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)")->fetchAll(PDO::FETCH_ASSOC);
 foreach ($wp as $r) { $todaySources[$r['match_name']] = $r['match_time'] ?: ''; }
-$sr = $db->query("SELECT DISTINCT match_name, match_time FROM scraper_results WHERE DATE(detected_at) = CURDATE()")->fetchAll(PDO::FETCH_ASSOC);
+$sr = $db->query("SELECT DISTINCT match_name, match_time FROM scraper_results WHERE DATE(detected_at) >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)")->fetchAll(PDO::FETCH_ASSOC);
 foreach ($sr as $r) { if (!isset($todaySources[$r['match_name']])) $todaySources[$r['match_name']] = $r['match_time'] ?: ''; }
-$afp = $db->query("SELECT DISTINCT match_name, match_time FROM admin_featured_picks WHERE DATE(created_at) = CURDATE()")->fetchAll(PDO::FETCH_ASSOC);
+$afp = $db->query("SELECT DISTINCT match_name, match_time FROM admin_featured_picks WHERE DATE(created_at) >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)")->fetchAll(PDO::FETCH_ASSOC);
 foreach ($afp as $r) { if (!isset($todaySources[$r['match_name']])) $todaySources[$r['match_name']] = $r['match_time'] ?: ''; }
 
 $resulted = [];
@@ -32,7 +32,6 @@ $picks = $db->query("
 $now = new DateTime();
 $candidates = [];
 foreach ($picks as $p) {
-    if (!isset($todaySources[$p['match_name']])) continue;
     $normKey = mb_strtolower($p['home_team']) . '|' . mb_strtolower($p['away_team']);
     if (isset($resulted[$normKey])) continue;
     $matchTime = $p['match_time'] ?: ($todaySources[$p['match_name']] ?? '');

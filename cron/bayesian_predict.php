@@ -45,14 +45,14 @@ try {
             foreach ($predictions as $pred) {
                 $bestMatch = null;
                 $bestScore = 0;
-                $hNorm = strtolower(trim(preg_replace('/[^a-z0-9]/', '', $pred['home_team'])));
-                $aNorm = strtolower(trim(preg_replace('/[^a-z0-9]/', '', $pred['away_team'])));
-                $lNorm = strtolower(trim(preg_replace('/[^a-z0-9]/', '', $pred['league'] ?? '')));
+                $hNorm = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $pred['home_team'])));
+                $aNorm = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $pred['away_team'])));
+                $lNorm = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $pred['league'] ?? '')));
 
                 foreach ($oddsDrops as $odds) {
-                    $ohNorm = strtolower(trim(preg_replace('/[^a-z0-9]/', '', $odds['Home_Team'])));
-                    $oaNorm = strtolower(trim(preg_replace('/[^a-z0-9]/', '', $odds['Away_Team'])));
-                    $olNorm = strtolower(trim(preg_replace('/[^a-z0-9]/', '', $odds['League'] ?? '')));
+                    $ohNorm = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $odds['Home_Team'])));
+                    $oaNorm = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $odds['Away_Team'])));
+                    $olNorm = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $odds['League'] ?? '')));
                     $score = 0;
                     if ($hNorm === $ohNorm && $aNorm === $oaNorm) $score += 2;
                     elseif ($hNorm === $oaNorm && $aNorm === $ohNorm) $score += 1;
