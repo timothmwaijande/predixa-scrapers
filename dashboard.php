@@ -843,53 +843,55 @@ try {
         ORDER BY bp.confidence DESC
     ")->fetchAll(PDO::FETCH_ASSOC);
 
+    $bpSeen = [];
     foreach ($bayesianPicks as $bp) {
-        // Must be detected today by a source
-        if (!isset($todaySrc[$bp['match_name']])) continue;
-        // Skip if same normalized pair was predicted yesterday
         if (isset($yestPair[$norm($bp['home_team']) . '|' . $norm($bp['away_team'])])) continue;
+        if (isset($bpSeen[$bp['match_name']])) continue;
 
+        $bestPick = null;
+        $bestProb = 0;
         $recs = explode(',', $bp['recommended_pick']);
         foreach ($recs as $rec) {
             $rec = trim($rec);
             $parts = explode(':', $rec);
             if (count($parts) !== 2) continue;
-            $pickType = $parts[0];
-            $pickProb = (float)$parts[1];
-
-            $key = $bp['match_name'] . '|' . $pickType;
-            if (in_array($key, $seenKeys)) continue;
-
-            $bestOdds = 0;
-            $mv = strtoupper($pickType);
-            if ($mv === '1') $bestOdds = (float)($bp['market_odds_1'] ?? 0);
-            elseif ($mv === 'X') $bestOdds = (float)($bp['market_odds_x'] ?? 0);
-            elseif ($mv === '2') $bestOdds = (float)($bp['market_odds_2'] ?? 0);
-
-            $merged[] = [
-                'match_name' => $bp['match_name'],
-                'pick_value' => $pickType,
-                'actual_odds' => $bestOdds,
-                'odds' => $bestOdds,
-                'pattern_badge' => 'VALUE',
-                'match_time' => '',
-                '_blended_conf' => round($pickProb),
-                'is_bayesian' => true,
-                'home_odds' => (float)($bp['market_odds_1'] ?? 0),
-                'draw_odds' => (float)($bp['market_odds_x'] ?? 0),
-                'away_odds' => (float)($bp['market_odds_2'] ?? 0),
-                'fav_delta' => 0,
-                'opp_delta' => 0,
-                'draw_delta' => 0,
-                'is_home_fav' => true,
-                'league' => $bp['league'] ?? '',
-                'win_rate_low' => 0,
-                'details' => 'Bayesian Model Prediction',
-                'safety_notes' => '',
-                'risk_tier' => '',
-            ];
-            $seenKeys[] = $key;
+            $prob = (float)$parts[1];
+            if ($prob > $bestProb) {
+                $bestProb = $prob;
+                $bestPick = trim($parts[0]);
+            }
         }
+        if (!$bestPick) continue;
+        $bpSeen[$bp['match_name']] = true;
+
+        $bestOdds = 0;
+        $mv = strtoupper($bestPick);
+        if ($mv === '1') $bestOdds = (float)($bp['market_odds_1'] ?? 0);
+        elseif ($mv === 'X') $bestOdds = (float)($bp['market_odds_x'] ?? 0);
+        elseif ($mv === '2') $bestOdds = (float)($bp['market_odds_2'] ?? 0);
+
+        $merged[] = [
+            'match_name' => $bp['match_name'],
+            'pick_value' => $bestPick,
+            'actual_odds' => $bestOdds,
+            'odds' => $bestOdds,
+            'pattern_badge' => 'VALUE',
+            'match_time' => '',
+            '_blended_conf' => round($bestProb),
+            'is_bayesian' => true,
+            'home_odds' => (float)($bp['market_odds_1'] ?? 0),
+            'draw_odds' => (float)($bp['market_odds_x'] ?? 0),
+            'away_odds' => (float)($bp['market_odds_2'] ?? 0),
+            'fav_delta' => 0,
+            'opp_delta' => 0,
+            'draw_delta' => 0,
+            'is_home_fav' => true,
+            'league' => $bp['league'] ?? '',
+            'win_rate_low' => 0,
+            'details' => 'Bayesian Model Prediction',
+            'safety_notes' => '',
+            'risk_tier' => '',
+        ];
     }
 } catch (Exception $e) {}
 
