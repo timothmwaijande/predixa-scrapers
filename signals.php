@@ -27,6 +27,44 @@ foreach ($matches as $m) {
 usort($analyzed, fn($a, $b) => $b['maxConf'] <=> $a['maxConf']);
 $analyzed = deduplicateSignals($analyzed);
 
+// Load Bayesian picks for "Best Picks" section
+$bayesianPicks = [];
+if ($db) {
+    $norm = function($n) { return trim(preg_replace('/\s+(if|fk|sk|fc|sc|cf|ac|as)$/i', '', preg_replace('/^(if|fk|sk|fc|sc|cf|ac|as)\s+/i', '', strtolower(trim($n))))); };
+    $todaySrc = [];
+    foreach (['web_picks' => 'detected_at', 'scraper_results' => 'detected_at', 'admin_featured_picks' => 'created_at'] as $tbl => $col) {
+        $q = $db->query("SELECT DISTINCT match_name FROM $tbl WHERE DATE($col) = CURDATE()");
+        if ($q) foreach ($q->fetchAll(PDO::FETCH_ASSOC) as $r) $todaySrc[$r['match_name']] = true;
+    }
+    $yestPair = [];
+    $q = $db->query("SELECT home_team, away_team FROM bayesian_predictions WHERE match_date = DATE_SUB(CURDATE(), INTERVAL 1 DAY)");
+    if ($q) foreach ($q->fetchAll(PDO::FETCH_ASSOC) as $r) $yestPair[$norm($r['home_team']) . '|' . $norm($r['away_team'])] = true;
+
+    $allBp = $db->query("SELECT bp.match_name, bp.recommended_pick, bp.confidence, bp.league, bp.home_team, bp.away_team, bp.market_odds_1, bp.market_odds_x, bp.market_odds_2 FROM bayesian_predictions bp WHERE bp.match_date = CURDATE() AND bp.recommended_pick IS NOT NULL AND bp.recommended_pick != '' ORDER BY bp.confidence DESC")->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($allBp as $bp) {
+        if (isset($yestPair[$norm($bp['home_team']) . '|' . $norm($bp['away_team'])])) continue;
+        $recs = explode(',', $bp['recommended_pick']);
+        foreach ($recs as $rec) {
+            $rec = trim($rec);
+            $parts = explode(':', $rec);
+            if (count($parts) !== 2) continue;
+            $bestOdds = 0;
+            $mv = strtoupper(trim($parts[0]));
+            if ($mv === '1') $bestOdds = (float)($bp['market_odds_1'] ?? 0);
+            elseif ($mv === 'X') $bestOdds = (float)($bp['market_odds_x'] ?? 0);
+            elseif ($mv === '2') $bestOdds = (float)($bp['market_odds_2'] ?? 0);
+            $bayesianPicks[] = [
+                'match_name' => $bp['match_name'],
+                'pick_value' => trim($parts[0]),
+                'probability' => (float)trim($parts[1]),
+                'confidence' => (float)$bp['confidence'],
+                'best_odds' => $bestOdds,
+                'league' => $bp['league'] ?? '',
+            ];
+        }
+    }
+}
+
 // Verified boost
 foreach ($analyzed as &$a) {
     addVerifiedBoost($a['signals'], $a['match'], false);
@@ -180,7 +218,7 @@ footer a:hover { color: var(--primary); }
 <a class="nav-link dropdown-toggle" href="javascript:void(0)" role="button" data-bs-toggle="dropdown">Free Tools</a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="dropping-odds"><i class="fas fa-arrow-down me-1" style="color:#EF4444;"></i> Dropping Odds</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-chart-line me-1" style="color:#FBBF24;"></i> Performance</a></li>
+                        <li><a class="dropdown-item" href="track-record"><i class="fas fa-chart-line me-1" style="color:#FBBF24;"></i> Performance</a></li>
                         <li><a class="dropdown-item" href="betting-school"><i class="fas fa-book-open me-1" style="color:#fff;"></i> Betting School</a></li>
                         <li><a class="dropdown-item" href="pikka"><i class="fas fa-futbol me-1" style="color:#6366F1;"></i> Pikka</a></li>
                     </ul>
@@ -475,6 +513,32 @@ footer a:hover { color: var(--primary); }
 
     </div>
 
+    <?php if (!empty($bayesianPicks)): ?>
+    <div class="my-4" style="background:linear-gradient(135deg, rgba(34,197,94,0.08) 0%, rgba(139,92,246,0.06) 100%);border:1px solid rgba(34,197,94,0.25);border-radius:12px;padding:18px;">
+        <h6 style="font-weight:700;color:#22C55E;"><i class="fas fa-robot me-1"></i>Value Picks</h6>
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:10px;">Statistical value bets identified by the prediction model — potentially undervalued by bookmakers.</p>
+        <div class="d-flex flex-wrap gap-2">
+        <?php foreach ($bayesianPicks as $bp):
+            $bpConf = round($bp['probability']);
+            $bpCls = $bpConf >= 60 ? 'high' : ($bpConf >= 40 ? 'medium' : 'low');
+            $hasBpOdds = $bp['best_odds'] > 0;
+        ?>
+            <div style="flex:1;min-width:160px;max-width:220px;background:linear-gradient(135deg, rgba(34,197,94,0.12) 0%, rgba(139,92,246,0.08) 100%);border:1px solid rgba(34,197,94,0.3);border-radius:10px;padding:8px 10px;">
+                <div class="d-flex align-items-center gap-1 mb-1">
+                    <span style="font-size:0.65rem;font-weight:600;color:#22C55E;"><?= htmlspecialchars($bp['pick_value']) ?></span>
+                    <span class="conf-ring <?= $bpCls ?>" style="width:22px;height:22px;font-size:0.55rem;margin-left:auto;"><?= $bpConf ?></span>
+                </div>
+                <div style="font-size:0.72rem;font-weight:600;line-height:1.2;"><?= htmlspecialchars($bp['match_name']) ?></div>
+                <div style="font-size:0.68rem;color:var(--text-muted);">
+                    <?= $bp['probability'] ?>% prob
+                    <?php if ($hasBpOdds): ?> &middot; @<?= number_format($bp['best_odds'], 2) ?><?php endif; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <?php endif; ?>
 </div>
 </div>
@@ -569,7 +633,7 @@ footer a:hover { color: var(--primary); }
                 <h6 class="mb-3" style="font-weight:700;color:var(--text);">Free Tools</h6>
                 <ul class="list-unstyled" style="font-size:0.85rem;">
 <li class="mb-2"><a href="dropping-odds" style="color:var(--muted);text-decoration:none;"><i class="fas fa-arrow-trend-down me-1" style="color:#EF4444;"></i> Dropping Odds</a></li>
-                    <li class="mb-2"><a href="#" style="color:var(--muted);text-decoration:none;"><i class="fas fa-chart-line me-1" style="color:#FBBF24;"></i> Performance</a></li>
+                    <li class="mb-2"><a href="track-record" style="color:var(--muted);text-decoration:none;"><i class="fas fa-chart-line me-1" style="color:#FBBF24;"></i> Performance</a></li>
                     <li class="mb-2"><a href="betting-school" style="color:var(--muted);text-decoration:none;"><i class="fas fa-book me-1" style="color:#8B5CF6;"></i> Betting School</a></li>
                     <li class="mb-2"><a href="pikka" style="color:var(--muted);text-decoration:none;"><i class="fas fa-futbol me-1" style="color:#6366F1;"></i> Pikka</a></li>
                     <li class="mb-2"><a href="https://www.begambleaware.org/" target="_blank" rel="noopener noreferrer" style="color:var(--muted);text-decoration:none;"><i class="fas fa-shield-halved me-1" style="color:#10B981;"></i> Responsible Gambling</a></li>
