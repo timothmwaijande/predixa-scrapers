@@ -41,27 +41,37 @@ if ($db) {
     if ($q) foreach ($q->fetchAll(PDO::FETCH_ASSOC) as $r) $yestPair[$norm($r['home_team']) . '|' . $norm($r['away_team'])] = true;
 
     $allBp = $db->query("SELECT bp.match_name, bp.recommended_pick, bp.confidence, bp.league, bp.home_team, bp.away_team, bp.market_odds_1, bp.market_odds_x, bp.market_odds_2 FROM bayesian_predictions bp WHERE bp.match_date = CURDATE() AND bp.recommended_pick IS NOT NULL AND bp.recommended_pick != '' ORDER BY bp.confidence DESC")->fetchAll(PDO::FETCH_ASSOC);
+    $bpSeen = [];
     foreach ($allBp as $bp) {
         if (isset($yestPair[$norm($bp['home_team']) . '|' . $norm($bp['away_team'])])) continue;
+        $bestPick = null;
+        $bestProb = 0;
         $recs = explode(',', $bp['recommended_pick']);
         foreach ($recs as $rec) {
             $rec = trim($rec);
             $parts = explode(':', $rec);
             if (count($parts) !== 2) continue;
-            $bestOdds = 0;
-            $mv = strtoupper(trim($parts[0]));
-            if ($mv === '1') $bestOdds = (float)($bp['market_odds_1'] ?? 0);
-            elseif ($mv === 'X') $bestOdds = (float)($bp['market_odds_x'] ?? 0);
-            elseif ($mv === '2') $bestOdds = (float)($bp['market_odds_2'] ?? 0);
-            $bayesianPicks[] = [
-                'match_name' => $bp['match_name'],
-                'pick_value' => trim($parts[0]),
-                'probability' => (float)trim($parts[1]),
-                'confidence' => (float)$bp['confidence'],
-                'best_odds' => $bestOdds,
-                'league' => $bp['league'] ?? '',
-            ];
+            $prob = (float)trim($parts[1]);
+            if ($prob > $bestProb) {
+                $bestProb = $prob;
+                $bestPick = trim($parts[0]);
+            }
         }
+        if (!$bestPick || isset($bpSeen[$bp['match_name']])) continue;
+        $bpSeen[$bp['match_name']] = true;
+        $bestOdds = 0;
+        $mv = strtoupper($bestPick);
+        if ($mv === '1') $bestOdds = (float)($bp['market_odds_1'] ?? 0);
+        elseif ($mv === 'X') $bestOdds = (float)($bp['market_odds_x'] ?? 0);
+        elseif ($mv === '2') $bestOdds = (float)($bp['market_odds_2'] ?? 0);
+        $bayesianPicks[] = [
+            'match_name' => $bp['match_name'],
+            'pick_value' => $bestPick,
+            'probability' => $bestProb,
+            'confidence' => (float)$bp['confidence'],
+            'best_odds' => $bestOdds,
+            'league' => $bp['league'] ?? '',
+        ];
     }
 }
 

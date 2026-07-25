@@ -71,7 +71,7 @@ usort($candidates, fn($a, $b) => $b['probability'] <=> $a['probability']);
 $seen = [];
 $unique = [];
 foreach ($candidates as $c) {
-    $key = $c['match_name'] . '|' . $c['pick_value'];
+    $key = $c['match_name'];
     if (isset($seen[$key])) continue;
     $seen[$key] = true;
     $unique[] = $c;
