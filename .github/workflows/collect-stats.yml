@@ -2,14 +2,37 @@ name: Collect Match Stats
 
 on:
   schedule:
-    - cron: '0 6 * * *'
+    - cron: '0 6 * * *'    # Morning: collect yesterday + 1 backfill
+    - cron: '0 14 * * *'   # Afternoon: retry yesterday + 1 backfill
+    - cron: '0 22 * * *'   # Night: retry yesterday + 1 backfill
   workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Collection mode'
+        required: false
+        default: 'full'
+        type: choice
+        options:
+          - full
+          - backfill
+          - target
 
 jobs:
   collect-stats:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger stats collection (all matches, synchronous)
+      - name: Determine mode
+        id: mode
         run: |
-          curl -s "https://predixa.co.tz/cron/run_stats.php?key=${{ secrets.STATS_SECRET_KEY }}" || echo "Collection failed"
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "mode=full" >> $GITHUB_OUTPUT
+          else
+            echo "mode=${{ inputs.mode || 'full' }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Trigger stats collection
+        run: |
+          MODE="${{ steps.mode.outputs.mode }}"
+          echo "Running in $MODE mode - collecting yesterday + 1 backfill"
+          curl -s "https://predixa.co.tz/cron/run_stats.php?key=${{ secrets.STATS_SECRET_KEY }}&mode=$MODE" || echo "Collection failed"
         continue-on-error: true

@@ -93,11 +93,12 @@ if ($stats) {
         .match-card .team.away { text-align: left; color: #67e8f9; }
         .match-card .vs-badge { flex-shrink: 0; text-align: center; }
         .match-card .score-display { font-weight: 800; font-size: 1.1rem; color: #fff; background: rgba(139,92,246,0.3); border: 1px solid rgba(139,92,246,0.35); border-radius: 8px; padding: 4px 12px; min-width: 52px; }
-        .match-card .date-badge { font-size: 0.68rem; color: var(--muted); text-align: center; margin-top: 2px; }
+        .match-card .match-meta { font-size: 0.65rem; color: var(--text); text-align: center; margin-top: 4px; }
 
-        .match-card .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 4px 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(139,92,246,0.15); }
+        .match-card .stats-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(139,92,246,0.15); }
+        .match-card .stats-grid-expand { margin-top: 0; padding-top: 0; border-top: none; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(139,92,246,0.15); }
         .match-card .stat-item { text-align: center; padding: 4px 0; }
-        .match-card .stat-item .stat-label-small { font-size: 0.6rem; text-transform: uppercase; color: var(--muted); letter-spacing: 0.3px; margin-bottom: 1px; }
+        .match-card .stat-item .stat-label-small { font-size: 0.6rem; text-transform: uppercase; color: var(--text); letter-spacing: 0.3px; margin-bottom: 1px; }
         .match-card .stat-item .stat-values { font-size: 0.78rem; font-weight: 600; }
         .match-card .home-val { color: var(--primary-light); }
         .match-card .away-val { color: var(--accent); }
@@ -139,7 +140,7 @@ if ($stats) {
         .date-range-form { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
         .date-range-form label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; margin-bottom: 0; }
         .text-muted { color: var(--muted) !important; }
-        @media(max-width:768px) { .match-card .team { font-size: 0.78rem; } .stat-big { font-size: 1.2rem; } .match-card .stats-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media(max-width:768px) { .match-card .team { font-size: 0.78rem; } .stat-big { font-size: 1.2rem; } .match-card .stats-grid, .match-card .stats-grid-expand { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); } }
     </style>
 </head>
 <body>
@@ -207,6 +208,11 @@ if ($stats) {
                 <button onclick="expandAll()" class="btn btn-sm btn-outline-secondary" style="font-size:0.75rem;"><i class="fas fa-expand-alt me-1"></i>Expand All</button>
                 <button onclick="collapseAll()" class="btn btn-sm btn-outline-secondary" style="font-size:0.75rem;"><i class="fas fa-compress-alt me-1"></i>Collapse All</button>
             </div>
+        </div>
+
+        <div style="font-size:0.7rem;color:var(--text);padding:6px 10px;margin-bottom:10px;background:rgba(255,255,255,0.03);border-radius:6px;line-height:1.6;">
+            <strong>Key:</strong>
+            SOT = Shots on Target &nbsp;|&nbsp; YC = Yellow Cards &nbsp;|&nbsp; Poss = Possession &nbsp;|&nbsp; xG = Expected Goals &nbsp;|&nbsp; GK Sv = Goalkeeper Saves &nbsp;|&nbsp; Pass% = Pass Accuracy &nbsp;|&nbsp; Ref = Referee &nbsp;|&nbsp; GP = Goals Prevented
         </div>
 
         <div id="leagueContainer"></div>
@@ -305,11 +311,13 @@ function render() {
         }
 
         if (!leaguePages[lname]) leaguePages[lname] = 0;
-        const totalPages = Math.ceil(matches.length / PER_PAGE);
+        const showAll = !!sortState['showAll_' + lname];
+        const perPage = showAll ? matches.length : PER_PAGE;
+        const totalPages = Math.ceil(matches.length / perPage);
         if (leaguePages[lname] >= totalPages) leaguePages[lname] = Math.max(0, totalPages - 1);
         const page = leaguePages[lname];
-        const start = page * PER_PAGE;
-        const pageMatches = matches.slice(start, start + PER_PAGE);
+        const start = page * perPage;
+        const pageMatches = showAll ? matches : matches.slice(start, start + perPage);
         const isCollapsed = sortState['collapsed_' + lname] ? 'collapsed' : '';
 
         html += '<div class="league-group" data-league="' + esc(lname) + '">';
@@ -329,10 +337,10 @@ function render() {
             html += '<div class="team home" title="' + esc(m.home_team_api) + '">' + hl(m.home_team_api, q) + '</div>';
             html += '<div class="vs-badge">';
             html += '<div class="score-display">' + m.home_score + ' - ' + m.away_score + '</div>';
-            if (IS_RANGE) html += '<div class="date-badge">' + m.match_date + '</div>';
             html += '</div>';
             html += '<div class="team away" title="' + esc(m.away_team_api) + '">' + hl(m.away_team_api, q) + '</div>';
             html += '</div>';
+            html += '<div class="match-meta">Match Date: ' + esc(m.match_date) + (m.venue ? ' &middot; Venue: ' + esc(m.venue) : '') + '</div>';
 
             html += '<div class="stats-grid">';
             html += '<div class="stat-item"><div class="stat-label-small">SOT</div><div class="stat-values"><span class="home-val">' + nv(m.home_shots_on_goal) + '</span> / <span class="away-val">' + nv(m.away_shots_on_goal) + '</span></div></div>';
@@ -343,27 +351,22 @@ function render() {
             html += '<div class="stat-item"><div class="stat-label-small">YC</div><div class="stat-values">' + (ycTotal > 0 ? '<span class="home-val">' + nv(m.home_yellow_cards) + '</span> / <span class="away-val">' + nv(m.away_yellow_cards) + '</span>' : '-') + '</div></div>';
             html += '<div class="stat-item"><div class="stat-label-small">Poss</div><div class="stat-values"><span class="home-val">' + (m.home_ball_possession || '-') + '</span> / <span class="away-val">' + (m.away_ball_possession || '-') + '</span></div></div>';
             html += '<div class="stat-item"><div class="stat-label-small">xG</div><div class="stat-values">' + (m.home_expected_goals != null ? '<span class="home-val">' + parseFloat(m.home_expected_goals).toFixed(2) + '</span> / <span class="away-val">' + parseFloat(m.away_expected_goals).toFixed(2) + '</span>' : '-') + '</div></div>';
-            html += '<div class="stat-item"><div class="stat-label-small">GK Saves</div><div class="stat-values"><span class="home-val">' + nv(m.home_goalkeeper_saves) + '</span> / <span class="away-val">' + nv(m.away_goalkeeper_saves) + '</span></div></div>';
-            html += '<div class="stat-item"><div class="stat-label-small">Pass Acc</div><div class="stat-values"><span class="home-val">' + nv(m.home_pass_accuracy) + '</span> / <span class="away-val">' + nv(m.away_pass_accuracy) + '</span></div></div>';
-            if (m.home_goals_prevented != null || m.away_goals_prevented != null) {
-                html += '<div class="stat-item"><div class="stat-label-small">GP</div><div class="stat-values"><span class="home-val">' + (m.home_goals_prevented != null ? parseFloat(m.home_goals_prevented).toFixed(2) : '-') + '</span> / <span class="away-val">' + (m.away_goals_prevented != null ? parseFloat(m.away_goals_prevented).toFixed(2) : '-') + '</span></div></div>';
-            }
+            html += '<div class="stat-item"><div class="stat-label-small">GK Sv</div><div class="stat-values"><span class="home-val">' + nv(m.home_goalkeeper_saves) + '</span> / <span class="away-val">' + nv(m.away_goalkeeper_saves) + '</span></div></div>';
+            html += '<div class="stat-item"><div class="stat-label-small">Pass%</div><div class="stat-values"><span class="home-val">' + nv(m.home_pass_accuracy) + '</span> / <span class="away-val">' + nv(m.away_pass_accuracy) + '</span></div></div>';
             html += '<div class="stat-item"><div class="stat-label-small">Ref</div><div class="stat-values" style="font-size:0.7rem;color:var(--muted);">' + esc(m.referee || '-') + '</div></div>';
             html += '</div>';
-
             html += '<div class="detail-section ' + isExpanded + '" id="detail-' + escJS(cardId) + '">';
             html += '<div class="detail-grid">';
             const detailRows = [
+                ['Goals Prevented', m.home_goals_prevented != null ? parseFloat(m.home_goals_prevented).toFixed(2) : '-', m.away_goals_prevented != null ? parseFloat(m.away_goals_prevented).toFixed(2) : '-'],
+                ['Total Passes', nv(m.home_total_passes), nv(m.away_total_passes)],
                 ['Shots Off Target', nv(m.home_shots_off_goal), nv(m.away_shots_off_goal)],
                 ['Blocked Shots', nv(m.home_blocked_shots), nv(m.away_blocked_shots)],
                 ['Shots Inside Box', nv(m.home_shots_inside_box), nv(m.away_shots_inside_box)],
                 ['Shots Outside Box', nv(m.home_shots_outside_box), nv(m.away_shots_outside_box)],
                 ['Offsides', nv(m.home_offsides), nv(m.away_offsides)],
                 ['Free Kicks', nv(m.home_free_kicks), nv(m.away_free_kicks)],
-                ['Red Cards', ((m.home_red_cards||0)*1 + (m.away_red_cards||0)*1 > 0 ? nv(m.home_red_cards) + ' / ' + nv(m.away_red_cards) : null)],
-                ['Total Passes', nv(m.home_total_passes), nv(m.away_total_passes)],
                 ['Passes Accurate', nv(m.home_passes_accurate), nv(m.away_passes_accurate)],
-                ['Venue', esc(m.venue || '-'), ''],
             ];
             detailRows.forEach(dr => {
                 if (dr[1] === null || (dr.length === 3 && dr[1] === '-' && dr[2] === '-')) return;
@@ -379,13 +382,18 @@ function render() {
             html += '</div>';
         });
 
-        if (totalPages > 1) {
+        if (matches.length > PER_PAGE) {
             html += '<div class="pagination-bar">';
-            html += '<button onclick="goPage(\'' + escJS(lname) + '\',0)"' + (page===0?' disabled':'') + '><i class="fas fa-angle-double-left"></i></button>';
-            html += '<button onclick="goPage(\'' + escJS(lname) + '\',' + (page-1) + ')"' + (page===0?' disabled':'') + '><i class="fas fa-angle-left"></i></button>';
-            html += '<span class="page-info">Page ' + (page+1) + ' of ' + totalPages + '</span>';
-            html += '<button onclick="goPage(\'' + escJS(lname) + '\',' + (page+1) + ')"' + (page>=totalPages-1?' disabled':'') + '><i class="fas fa-angle-right"></i></button>';
-            html += '<button onclick="goPage(\'' + escJS(lname) + '\',' + (totalPages-1) + ')"' + (page>=totalPages-1?' disabled':'') + '><i class="fas fa-angle-double-right"></i></button>';
+            if (showAll) {
+                html += '<button onclick="toggleShowAll(\'' + escJS(lname) + '\',false)"><i class="fas fa-list me-1"></i>Paginate (' + matches.length + ' total)</button>';
+            } else {
+                html += '<button onclick="goPage(\'' + escJS(lname) + '\',0)"' + (page===0?' disabled':'') + '><i class="fas fa-angle-double-left"></i></button>';
+                html += '<button onclick="goPage(\'' + escJS(lname) + '\',' + (page-1) + ')"' + (page===0?' disabled':'') + '><i class="fas fa-angle-left"></i></button>';
+                html += '<span class="page-info">' + (start+1) + '-' + Math.min(start + perPage, matches.length) + ' of ' + matches.length + '</span>';
+                html += '<button onclick="goPage(\'' + escJS(lname) + '\',' + (page+1) + ')"' + (page>=totalPages-1?' disabled':'') + '><i class="fas fa-angle-right"></i></button>';
+                html += '<button onclick="goPage(\'' + escJS(lname) + '\',' + (totalPages-1) + ')"' + (page>=totalPages-1?' disabled':'') + '><i class="fas fa-angle-double-right"></i></button>';
+                html += '<button onclick="toggleShowAll(\'' + escJS(lname) + '\',true)"><i class="fas fa-expand-alt me-1"></i>Show All</button>';
+            }
             html += '</div>';
         }
 
@@ -426,6 +434,11 @@ function collapseAll() {
 }
 function goPage(name, page) {
     leaguePages[name] = Math.max(0, page);
+    render();
+}
+function toggleShowAll(name, show) {
+    sortState['showAll_' + name] = show;
+    leaguePages[name] = 0;
     render();
 }
 function sortLeague(name, key) {

@@ -20,7 +20,7 @@ if (isset($opts['help'])) {
 
 $date = $opts['date'] ?? date('Y-m-d', strtotime('-1 day'));
 $isTest = isset($opts['test']);
-$sleepSec = $isTest ? 3 : $RATE_LIMIT_SEC;
+$sleepSec = 0;
 $maxFixtures = isset($opts['limit']) ? (int)$opts['limit'] : 9999;
 
 $logFile = __DIR__ . '/../logs/stats_collector_' . $date . '.log';
@@ -190,6 +190,7 @@ $insertStmt = $db->prepare("INSERT INTO match_statistics
      raw_statistics=VALUES(raw_statistics), raw_fixture=VALUES(raw_fixture)
 ");
 
+$maxDailyRequests = 99;
 $collected = 0;
 $skipped = 0;
 $errors = 0;
@@ -198,6 +199,7 @@ $requestCount = 0;
 $checked = 0;
 
 foreach ($allFixtures as $f) {
+    if ($requestCount >= $maxDailyRequests) { apiLog("Daily API quota limit reached ($maxDailyRequests)"); break; }
     $fid = $f['fixture']['id'];
     $homeName = $f['teams']['home']['name'] ?? '';
     $awayName = $f['teams']['away']['name'] ?? '';
@@ -222,11 +224,6 @@ foreach ($allFixtures as $f) {
     if ($isTest && $collected >= 5) break;
 
     apiLog("[$fid] $homeName $homeScore-$awayScore $awayName ($leagueName)");
-
-    if ($requestCount > 0) {
-        apiLog("  Sleeping {$sleepSec}s (rate limit)...");
-        sleep($sleepSec);
-    }
 
     $statsResp = apiGet('/fixtures/statistics', ['fixture' => $fid]);
     $requestCount++;
