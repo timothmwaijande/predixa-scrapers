@@ -157,12 +157,13 @@ try {
             if (isset($resultedBanker[$normKey])) continue;
             if (isset($yestPairBanker[$normKey])) continue;
             $matchTime = $todaySourcesBanker[$bp['match_name']];
-            if (!$matchTime) continue;
-            try {
-                $ko = new DateTime($matchTime);
-                $minsPast = ($nowBanker->getTimestamp() - $ko->getTimestamp()) / 60;
-                if ($minsPast > 0) continue;
-            } catch (Exception $e) { continue; }
+            if ($matchTime) {
+                try {
+                    $ko = new DateTime($matchTime);
+                    $minsPast = ($nowBanker->getTimestamp() - $ko->getTimestamp()) / 60;
+                    if ($minsPast > 0) continue;
+                } catch (Exception $e) {}
+            }
             $recs = explode(',', $bp['recommended_pick']);
             foreach ($recs as $rec) {
                 $rec = trim($rec);
@@ -995,12 +996,13 @@ try {
         if (!isset($todaySrc[$bp['match_name']])) continue;
         if (isset($yestPair[$norm($bp['home_team']) . '|' . $norm($bp['away_team'])])) continue;
         $bpMatchTime = $todaySrcTime[$bp['match_name']] ?? '';
-        if (!$bpMatchTime) continue;
-        try {
-            $bpKo = new DateTime($bpMatchTime);
-            $bpMinsPast = (new DateTime())->getTimestamp() - $bpKo->getTimestamp();
-            if ($bpMinsPast > 0) continue;
-        } catch (Exception $e) { continue; }
+        if ($bpMatchTime) {
+            try {
+                $bpKo = new DateTime($bpMatchTime);
+                $bpMinsPast = (new DateTime())->getTimestamp() - $bpKo->getTimestamp();
+                if ($bpMinsPast > 0) continue;
+            } catch (Exception $e) {}
+        }
 
         $recs = explode(',', $bp['recommended_pick']);
         foreach ($recs as $rec) {
