@@ -8,6 +8,12 @@ logPageVisit('track-record');
 $db = getDB();
 if (!$db) { echo "DB unavailable"; exit; }
 
+function fmtCompact($n) {
+    if ($n >= 1000000) return round($n / 1000000, 1) . 'M';
+    if ($n >= 1000) return round($n / 1000, 1) . 'K';
+    return (string)$n;
+}
+
 $db->exec("CREATE TABLE IF NOT EXISTS `pick_settlements` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `web_pick_id` INT NOT NULL,
@@ -316,11 +322,11 @@ footer a:hover { color: var(--primary); }
 
     <!-- Stats Badges -->
     <div class="d-flex flex-wrap gap-2 mb-4 justify-content-center">
-        <div class="stats-badge"><div class="num" style="color:var(--accent);"><?= $settled ?></div><div class="lbl">Settled</div></div>
-        <div class="stats-badge"><div class="num" style="color:var(--accent);"><?= $total ?></div><div class="lbl">All Picks</div></div>
+        <div class="stats-badge"><div class="num" style="color:var(--accent);"><?= fmtCompact($settled) ?></div><div class="lbl">Settled</div></div>
+        <div class="stats-badge"><div class="num" style="color:var(--accent);"><?= fmtCompact($total) ?></div><div class="lbl">All Picks</div></div>
         <div class="stats-badge"><div class="num" style="color:#22C55E;"><?= $winRate ?>%</div><div class="lbl">Win Rate</div></div>
         <div class="stats-badge"><div class="num" style="color:<?= $profit >= 0 ? '#22C55E' : '#EF4444' ?>;"><?= ($profit >= 0 ? '+' : '') . number_format($profit, 1) ?>u</div><div class="lbl">Profit (ROI <?= ($roi >= 0 ? '+' : '') . $roi ?>%)</div></div>
-        <div class="stats-badge"><div class="num" style="color:#FBBF24;"><?= $pending ?></div><div class="lbl">Pending</div></div>
+        <div class="stats-badge"><div class="num" style="color:#FBBF24;"><?= fmtCompact($pending) ?></div><div class="lbl">Pending</div></div>
         <?php if ($winStreak > 0): ?>
         <div class="stats-badge" style="border-color:rgba(34,197,94,0.4);background:linear-gradient(135deg,rgba(34,197,94,0.15) 0%,rgba(6,182,212,0.08) 100%);">
             <div class="num" style="color:#22C55E;font-size:1.4rem;"><i class="fas fa-fire me-1"></i><?= $winStreak ?></div>
@@ -331,9 +337,9 @@ footer a:hover { color: var(--primary); }
 
     <!-- Win/Loss/Void breakdown -->
     <div class="d-flex flex-wrap gap-2 mb-4 justify-content-center">
-        <div class="stats-badge" style="min-width:80px;padding:10px;"><div class="num" style="color:#22C55E;font-size:1.3rem;"><?= $won ?></div><div class="lbl">Won</div></div>
-        <div class="stats-badge" style="min-width:80px;padding:10px;"><div class="num" style="color:#EF4444;font-size:1.3rem;"><?= $lost ?></div><div class="lbl">Lost</div></div>
-        <div class="stats-badge" style="min-width:80px;padding:10px;"><div class="num" style="color:#94a3b8;font-size:1.3rem;"><?= $voided ?></div><div class="lbl">Void</div></div>
+        <div class="stats-badge" style="min-width:80px;padding:10px;"><div class="num" style="color:#22C55E;font-size:1.3rem;"><?= fmtCompact($won) ?></div><div class="lbl">Won</div></div>
+        <div class="stats-badge" style="min-width:80px;padding:10px;"><div class="num" style="color:#EF4444;font-size:1.3rem;"><?= fmtCompact($lost) ?></div><div class="lbl">Lost</div></div>
+        <div class="stats-badge" style="min-width:80px;padding:10px;"><div class="num" style="color:#94a3b8;font-size:1.3rem;"><?= fmtCompact($voided) ?></div><div class="lbl">Void</div></div>
         <?php if ($sparkline): ?>
         <div class="stats-badge" style="min-width:80px;padding:10px;display:flex;align-items:center;justify-content:center;">
             <div style="letter-spacing:3px;font-size:0.9rem;"><?= $sparkline ?></div>

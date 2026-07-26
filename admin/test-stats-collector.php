@@ -2,6 +2,12 @@
 require_once __DIR__ . '/../config.php';
 $db = getDB();
 
+function fmtCompact($n) {
+    if ($n >= 1000000) return round($n / 1000000, 1) . 'M';
+    if ($n >= 1000) return round($n / 1000, 1) . 'K';
+    return (string)$n;
+}
+
 $dateFrom = $_GET['date_from'] ?? ($_GET['date'] ?? date('Y-m-d', strtotime('-1 day')));
 $dateTo = $_GET['date_to'] ?? $dateFrom;
 
@@ -155,13 +161,13 @@ if ($stats) {
 
     <div class="row g-3 mb-4">
         <div class="col-md-3 col-6">
-            <div class="stat-card"><div class="stat-big" style="color:var(--primary);"><?= number_format($totalRows) ?></div><div class="stat-label">Total Matches</div></div>
+            <div class="stat-card"><div class="stat-big" style="color:var(--primary);"><?= fmtCompact($totalRows) ?></div><div class="stat-label">Total Matches</div></div>
         </div>
         <div class="col-md-3 col-6">
             <div class="stat-card"><div class="stat-big" style="color:var(--accent);"><?= count($recentMonths) > 0 ? $recentMonths[0]['month_label'] : 'N/A' ?></div><div class="stat-label">Latest Month</div></div>
         </div>
         <div class="col-md-3 col-6">
-            <div class="stat-card"><div class="stat-big" style="color:#22C55E;"><?= count($recentMonths) > 0 ? number_format($recentMonths[0]['cnt']) : 0 ?></div><div class="stat-label">Matches (Latest)</div></div>
+            <div class="stat-card"><div class="stat-big" style="color:#22C55E;"><?= count($recentMonths) > 0 ? fmtCompact($recentMonths[0]['cnt']) : 0 ?></div><div class="stat-label">Matches (Latest)</div></div>
         </div>
         <div class="col-md-3 col-6">
             <div class="stat-card"><div class="stat-big" style="color:#FBBF24;"><?= count($leagues) ?></div><div class="stat-label">Leagues Covered</div></div>
