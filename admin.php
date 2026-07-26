@@ -44,13 +44,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($_POST['action'] === 'revoke_admin' && isset($_POST['target_user_id'])) {
             $res = revokeAdminAccess((int)$_POST['target_user_id']);
             $msg = $res['success'] ? "<i class='fas fa-check-circle me-1' style='color:#22C55E;'></i>{$res['message']}" : "<i class='fas fa-times-circle me-1' style='color:#EF4444;'></i>{$res['message']}";
-        } elseif ($_POST['action'] === 'save_top_picks') {
-            $selected = isset($_POST['selected_picks']) ? array_filter($_POST['selected_picks'], 'is_numeric') : [];
-            $selectedVals = array_values($selected);
-            $res = saveAdminTopPicks($selectedVals, $user['id']);
-            $msg = $res
-                ? "<i class='fas fa-check-circle me-1' style='color:#22C55E;'></i>" . count($selectedVals) . " picks saved! IDs: [" . implode(',', $selectedVals) . "]"
-                : "<i class='fas fa-times-circle me-1' style='color:#EF4444;'></i>Failed to save picks. Selected IDs: [" . implode(',', $selectedVals) . "]";
         } elseif ($_POST['action'] === 'run_analysis') {
             $analysisLog = [];
             try {
@@ -2266,102 +2259,6 @@ $articles = $db->query("SELECT * FROM betting_articles ORDER BY created_at DESC"
     </div>
 </div>
 <?php endif; // end super admin for Betting School ?>
-
-<?php if (empty($allPicks)) $allPicks = getAllPicksForAdmin(); ?>
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title"><i class="fas fa-star me-1"></i>Configure TOP PICKS</h2>
-        <span class="badge" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white;">Rollover/Both Exclusive</span>
-    </div>
-    <div class="alert" style="background: #ECFDF5; border-left: 4px solid #10B981; margin-bottom: 1rem;">
-        <strong><i class="fas fa-lightbulb me-1"></i>How it works:</strong> Search matches below → Click to add to selection → Click "Save as TOP PICKS". 
-        Only Rollover & Both subscribers will see these.
-    </div>
-
-    <form method="POST" id="topPicksForm">
-    <input type="hidden" name="action" value="save_top_picks">
-    <div class="row">
-        <div class="col-md-6">
-            <input type="text" id="pickSearch" class="search-input" placeholder="&#xF002; Search match or league...">
-            <div id="availablePicks" style="max-height: 400px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem;">
-                <?php foreach ($allPicks as $pick): ?>
-                <div class="pick-item" data-id="<?= $pick['id'] ?>" data-name="<?= strtolower($pick['match_name']) ?>" data-league="<?= strtolower($pick['league']) ?>"
-                     style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; margin-bottom: 0.25rem; background: var(--bg-soft); border-radius: 4px; cursor: pointer; transition: 0.2s; border: 2px solid transparent;">
-                    <input type="checkbox" name="selected_picks[]" value="<?= $pick['id'] ?>" class="pick-checkbox" style="width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;">
-                    <div style="flex: 1; pointer-events: none;">
-                        <div style="font-weight: 600; font-size: 0.85rem;"><?= htmlspecialchars($pick['match_name']) ?></div>
-                        <div style="font-size: 0.75rem; color: var(--text-muted);"><?= htmlspecialchars($pick['league']) ?> • <?= number_format($pick['odds'], 2) ?>x</div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <h5 style="font-size: 0.9rem; margin-bottom: 0.5rem;"><i class="fas fa-check-circle me-1" style="color:#22C55E;"></i>Selected for TOP PICKS (<span id="selectedCount">0</span>)</h5>
-            <div id="selectedPicksList" style="max-height: 400px; overflow-y: auto; border: 2px dashed var(--primary); border-radius: 6px; padding: 0.5rem; min-height: 150px; background: #F0FDF4;">
-                <div class="text-center text-muted py-3" id="emptyMsg">No picks selected yet</div>
-            </div>
-            <button type="submit" class="btn btn-approve w-100 mt-3"><i class="fas fa-floppy-disk me-1"></i>Save as TOP PICKS</button>
-        </div>
-    </div>
-    </form>
-</div>
-
-<script>
-(function() {
-    const searchInput = document.getElementById('pickSearch');
-    const availableDiv = document.getElementById('availablePicks');
-    const selectedList = document.getElementById('selectedPicksList');
-    const selectedCount = document.getElementById('selectedCount');
-
-    function refreshSelected() {
-        const checked = availableDiv.querySelectorAll('.pick-checkbox:checked');
-        selectedList.innerHTML = '';
-        selectedCount.textContent = checked.length;
-
-        if (checked.length === 0) {
-            selectedList.innerHTML = '<div class="text-center text-muted py-3">No picks selected yet</div>';
-            return;
-        }
-        checked.forEach(cb => {
-            const el = cb.closest('.pick-item');
-            if (!el) return;
-            const clone = el.cloneNode(true);
-            const cloneCb = clone.querySelector('.pick-checkbox');
-            cloneCb.removeAttribute('name');
-            cloneCb.checked = true;
-            cloneCb.addEventListener('change', () => { cb.checked = cloneCb.checked; refreshSelected(); });
-            clone.style.borderColor = 'var(--primary)';
-            clone.style.background = '#E0F2FE';
-            clone.style.marginBottom = '0.5rem';
-            selectedList.appendChild(clone);
-        });
-    }
-
-    availableDiv.addEventListener('change', function(e) {
-        if (e.target.classList.contains('pick-checkbox')) {
-            refreshSelected();
-        }
-    });
-
-    availableDiv.addEventListener('click', function(e) {
-        const cb = e.target.closest('.pick-item')?.querySelector('.pick-checkbox');
-        if (cb && e.target !== cb) {
-            cb.checked = !cb.checked;
-            refreshSelected();
-        }
-    });
-
-    searchInput?.addEventListener('input', function(e) {
-        const term = e.target.value.toLowerCase().trim();
-        availableDiv.querySelectorAll('.pick-item').forEach(el => {
-            el.style.display = (el.dataset.name.includes(term) || el.dataset.league.includes(term)) ? '' : 'none';
-        });
-    });
-})();
-</script>
-<?php endif; ?>
 
 <div class="card mt-3">
     <div class="card-header"><h2 class="card-title"><i class="fas fa-ticket me-1"></i>All Betting Codes <?php if (!empty($activeCodes)): ?><span class="badge bg-success ms-1" style="font-size: 0.7rem;"><?= count($activeCodes) ?> Active Today</span><?php endif; ?></h2></div>
