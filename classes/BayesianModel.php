@@ -1611,7 +1611,7 @@ class BayesianModel {
                     WHERE (home_team_id = ? OR away_team_id = ?)
                       AND match_date >= ? AND match_date <= CURDATE()
                 ");
-                $params = array_merge([$teamId], array_fill(0, 13, $teamId), [$lookback]);
+                $params = array_merge([$teamId], array_fill(0, 16, $teamId), [$lookback]);
                 $stmt->execute($params);
             } else {
                 $stmt = $this->db->prepare("
@@ -1635,7 +1635,7 @@ class BayesianModel {
                     WHERE (home_team_api = ? OR away_team_api = ?)
                       AND match_date >= ? AND match_date <= CURDATE()
                 ");
-                $params = array_merge([$teamName], array_fill(0, 13, $teamName), [$lookback]);
+                $params = array_merge([$teamName], array_fill(0, 16, $teamName), [$lookback]);
                 $stmt->execute($params);
             }
             $r = $stmt->fetch();

@@ -597,7 +597,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $m1 = (1/$o1) / ((1/$o1)+(1/$oX)+(1/$o2)) * 100;
                             $mX = (1/$oX) / ((1/$o1)+(1/$oX)+(1/$o2)) * 100;
                             $m2 = (1/$o2) / ((1/$o1)+(1/$oX)+(1/$o2)) * 100;
-                            $db->prepare("UPDATE bayesian_predictions SET market_odds_1=?, market_odds_x=?, market_odds_2=?, value_edge_1=ROUND(?-?,2), value_edge_x=ROUND(?-?,2), value_edge_2=ROUND(?-?,2) WHERE home_team=? AND away_team=? AND match_date=CURDATE()")->execute([$o1,$oX,$o2,$pred['prob_1'],$m1,$pred['prob_x'],$mX,$pred['prob_2'],$m2,$pred['home_team'],$pred['away_team']]);
+                            $vdb = getDB();
+                            $vdb->prepare("UPDATE bayesian_predictions SET market_odds_1=?, market_odds_x=?, market_odds_2=?, value_edge_1=ROUND(?-?,2), value_edge_x=ROUND(?-?,2), value_edge_2=ROUND(?-?,2) WHERE home_team=? AND away_team=? AND match_date=CURDATE()")->execute([$o1,$oX,$o2,$pred['prob_1'],$m1,$pred['prob_x'],$mX,$pred['prob_2'],$m2,$pred['home_team'],$pred['away_team']]);
                             $valueEdges++;
                         }
                     }
