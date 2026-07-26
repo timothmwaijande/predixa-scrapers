@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-26T08:23:45.873Z",
-  "started_at": "2026-07-26T08:23:21.649Z",
+  "generated_at": "2026-07-26T11:18:04.267Z",
+  "started_at": "2026-07-26T11:17:41.871Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
@@ -17,7 +17,7 @@
     },
     "bet_sites": {
       "status": "ok",
-      "count": 101
+      "count": 112
     },
     "wp_tables": {
       "status": "ok",
@@ -863,6 +863,78 @@
           "time": ""
         },
         {
+          "match": "Slavia Prague vs Slovacko",
+          "home": "Slavia Prague",
+          "away": "Slovacko",
+          "pick": "1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Sonderjyske vs Midtjylland",
+          "home": "Sonderjyske",
+          "away": "Midtjylland",
+          "pick": "X2 &amp; Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "FC Copenhagen vs Lyngby",
+          "home": "FC Copenhagen",
+          "away": "Lyngby",
+          "pick": "1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "HJK vs TPS",
+          "home": "HJK",
+          "away": "TPS",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "KFUM Oslo vs Molde",
+          "home": "KFUM Oslo",
+          "away": "Molde",
+          "pick": "X2",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Jerv vs Lysekloster",
+          "home": "Jerv",
+          "away": "Lysekloster",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Crvena Zvezda vs Vojvodina",
+          "home": "Crvena Zvezda",
+          "away": "Vojvodina",
+          "pick": "1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "GAIS vs Halmstad",
+          "home": "GAIS",
+          "away": "Halmstad",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
           "match": "Lok. Sofia vs Levski",
           "home": "Lok. Sofia",
           "away": "Levski",
@@ -1002,6 +1074,33 @@
           "home": "Stjarnan",
           "away": "Ilves",
           "pick": "Over 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Slavia Prague vs Slovacko",
+          "home": "Slavia Prague",
+          "away": "Slovacko",
+          "pick": "1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "FC Copenahgen vs Lyngby",
+          "home": "FC Copenahgen",
+          "away": "Lyngby",
+          "pick": "1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Crvena Zvezda vs Vojvodina",
+          "home": "Crvena Zvezda",
+          "away": "Vojvodina",
+          "pick": "1 Ov 1.5",
           "odds": "",
           "league": "",
           "time": ""
@@ -1903,6 +2002,20 @@
       "time": "13:00"
     },
     {
+      "match": "GAIS vs Halmstads BK",
+      "home": "GAIS",
+      "away": "Halmstads BK",
+      "pick": "Home(1)",
+      "sources": [
+        "adibet",
+        "bet_sites"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "Sweden",
+      "time": ""
+    },
+    {
       "match": "Malmö vs IF Elfsborg",
       "home": "Malmö",
       "away": "IF Elfsborg",
@@ -1929,6 +2042,48 @@
       "odds": "",
       "league": "Norway Eliteserien",
       "time": "18:15"
+    },
+    {
+      "match": "HJK vs TPS",
+      "home": "HJK",
+      "away": "TPS",
+      "pick": "Home(1)",
+      "sources": [
+        "adibet",
+        "bet_sites"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "Finland",
+      "time": ""
+    },
+    {
+      "match": "KFUM Oslo vs Molde",
+      "home": "KFUM Oslo",
+      "away": "Molde",
+      "pick": "X2",
+      "sources": [
+        "adibet",
+        "bet_sites"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "Norway",
+      "time": ""
+    },
+    {
+      "match": "Jerv vs Lysekloster",
+      "home": "Jerv",
+      "away": "Lysekloster",
+      "pick": "Home(1)",
+      "sources": [
+        "adibet",
+        "bet_sites"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "Norway",
+      "time": ""
     },
     {
       "match": "Plzen vs Liberec",
