@@ -171,6 +171,7 @@ try {
                 if (count($parts) !== 2) continue;
                 $market = trim($parts[0]);
                 $prob = (float)trim($parts[1]);
+                if ($prob < 70) continue;
                 $bestOdds = 0;
                 $mv = strtoupper($market);
                 if ($mv === '1') $bestOdds = (float)($bp['market_odds_1'] ?? 0);
@@ -181,7 +182,7 @@ try {
                     'home_team' => $bp['home_team'],
                     'away_team' => $bp['away_team'],
                     'league' => $bp['league'] ?? '',
-                    'confidence' => (float)$bp['confidence'],
+                    'confidence' => $prob,
                     'pick_value' => $market,
                     'probability' => $prob,
                     'best_odds' => $bestOdds,
@@ -878,7 +879,7 @@ if (!empty($mt) && strtolower($mt) !== 'tbd') {
     </div>
     <div style="text-align:right;min-width:36px;">
         <div style="font-size:0.55rem;color:var(--text-muted);font-weight:500;line-height:1;">Confidence</div>
-        <span style="font-weight:700;font-size:0.85rem;color:<?= ($pick['banker_data_conf'] ?? 0) >= 60 ? '#059669' : (($pick['banker_data_conf'] ?? 0) >= 30 ? '#D97706' : '#9CA3AF') ?>;"><?= $pick['banker_data_conf'] ?? 0 ?>%</span>
+        <span style="font-weight:700;font-size:0.85rem;color:<?= ($pick['banker_data_conf'] ?? 0) >= 80 ? '#059669' : (($pick['banker_data_conf'] ?? 0) >= 70 ? '#22C55E' : '#D97706') ?>;"><?= $pick['banker_data_conf'] ?? 0 ?>%</span>
     </div>
 </div>
 <?php endforeach; ?>
