@@ -841,7 +841,7 @@ body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0B
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="dropping-odds"><i class="fas fa-arrow-down me-1" style="color:#EF4444;"></i> Dropping Odds</a></li>
                         <li><a class="dropdown-item" href="signals"><i class="fas fa-microchip me-1" style="color:#22C55E;"></i> Smart Picks</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-chart-line me-1" style="color:#FBBF24;"></i> Performance</a></li>
+                        <li><a class="dropdown-item" href="track-record"><i class="fas fa-chart-line me-1" style="color:#FBBF24;"></i> Performance</a></li>
                         <li><a class="dropdown-item" href="betting-school"><i class="fas fa-book-open me-1" style="color:#fff;"></i> Betting School</a></li>
                         <li><a class="dropdown-item active" href="pikka"><i class="fas fa-futbol me-1" style="color:var(--pikka);"></i> Pikka</a></li>
                     </ul>
@@ -1418,7 +1418,7 @@ body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0B
                 <ul class="list-unstyled" style="font-size:0.85rem;">
                     <li class="mb-2"><a href="dropping-odds" style="color:var(--muted);text-decoration:none;"><i class="fas fa-arrow-trend-down me-1" style="color:#EF4444;"></i> Dropping Odds</a></li>
                     <li class="mb-2"><a href="signals" style="color:var(--muted);text-decoration:none;"><i class="fas fa-microchip me-1" style="color:#22C55E;"></i> Smart Picks</a></li>
-                    <li class="mb-2"><a href="#" style="color:var(--muted);text-decoration:none;"><i class="fas fa-chart-line me-1" style="color:#FBBF24;"></i> Performance</a></li>
+                    <li class="mb-2"><a href="track-record" style="color:var(--muted);text-decoration:none;"><i class="fas fa-chart-line me-1" style="color:#FBBF24;"></i> Performance</a></li>
                     <li class="mb-2"><a href="betting-school" style="color:var(--muted);text-decoration:none;"><i class="fas fa-book me-1" style="color:#8B5CF6;"></i> Betting School</a></li>
                     <li class="mb-2"><a href="pikka" style="color:var(--muted);text-decoration:none;"><i class="fas fa-futbol me-1" style="color:var(--pikka);"></i> Pikka</a></li>
                 </ul>
@@ -1888,7 +1888,7 @@ function cancelEditComment(cid, ta, bodyDiv, container) {
         <div>
             <label style="font-size:0.7rem;color:var(--muted);font-weight:600;margin-bottom:2px;">League</label>
             <div class="league-badges d-flex flex-wrap gap-1 mb-1">
-                <?php $leagues = ['EPL', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1', 'UCL', 'UEL', 'TPLPremier', 'KPL', 'CAF CL', 'FA Cup', 'World Cup 2026']; ?>
+                <?php $leagues = ['EPL', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1', 'UCL', 'UEL', 'TPLPremier', 'KPL', 'CAF CL', 'FA Cup']; ?>
                 <?php foreach ($leagues as $lg): ?>
                 <span class="league-badge" onclick="selectLeague(this,'<?= $lg ?>')" style="cursor:pointer;padding:2px 8px;border-radius:4px;font-size:0.65rem;font-weight:600;border:1px solid var(--border);color:var(--muted);background:transparent;transition:all .15s;"><?= $lg ?></span>
                 <?php endforeach; ?>

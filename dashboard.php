@@ -114,7 +114,114 @@ $hasMostCorners = $hasRollover;
 $hasTopPicks = $hasRollover && $hasParlay;
 
 $mostCornersPicks = deduplicatePicks(fetchPicks('most_corners'));
-$topPicks = getAdminTopPicks();
+
+// Banker of the Day: Bayesian picks (same logic as best-picks-view.php)
+$topPicks = [];
+try {
+    require_once __DIR__ . '/classes/BayesianModel.php';
+    $bmBanker = new BayesianModel();
+    $dbBanker = getDB();
+    if ($dbBanker) {
+        // Today's source matches (identical to best-picks-view)
+        $todaySourcesBanker = [];
+        $wpB = $dbBanker->query("SELECT DISTINCT match_name, match_time FROM web_picks WHERE DATE(detected_at) = CURDATE()")->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($wpB as $r) { $todaySourcesBanker[$r['match_name']] = $r['match_time'] ?: ''; }
+        $srB = $dbBanker->query("SELECT DISTINCT match_name, match_time FROM scraper_results WHERE DATE(detected_at) = CURDATE()")->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($srB as $r) { if (!isset($todaySourcesBanker[$r['match_name']])) $todaySourcesBanker[$r['match_name']] = $r['match_time'] ?: ''; }
+        $afpB = $dbBanker->query("SELECT DISTINCT match_name, match_time FROM admin_featured_picks WHERE DATE(created_at) = CURDATE()")->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($afpB as $r) { if (!isset($todaySourcesBanker[$r['match_name']])) $todaySourcesBanker[$r['match_name']] = $r['match_time'] ?: ''; }
+
+        $normBanker = function($n) { return trim(preg_replace('/\s+(if|fk|sk|fc|sc|cf|ac|as)$/i', '', preg_replace('/^(if|fk|sk|fc|sc|cf|ac|as)\s+/i', '', strtolower(trim($n))))); };
+        $resultedBanker = [];
+        $mrB = $dbBanker->query("SELECT home_team, away_team FROM match_results WHERE match_date <= CURDATE()")->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($mrB as $r) { $resultedBanker[$normBanker($r['home_team']) . '|' . $normBanker($r['away_team'])] = true; }
+        $yestPairBanker = [];
+        $ypB = $dbBanker->query("SELECT home_team, away_team FROM bayesian_predictions WHERE match_date = DATE_SUB(CURDATE(), INTERVAL 1 DAY)")->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($ypB as $r) { $yestPairBanker[$normBanker($r['home_team']) . '|' . $normBanker($r['away_team'])] = true; }
+
+        $bankerPicks = $dbBanker->query("
+            SELECT bp.match_name, bp.league, bp.confidence, bp.recommended_pick,
+                   bp.value_pick, bp.home_team, bp.away_team, bp.match_date,
+                   bp.market_odds_1, bp.market_odds_x, bp.market_odds_2
+            FROM bayesian_predictions bp
+            WHERE bp.match_date IN (CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 DAY))
+              AND bp.recommended_pick IS NOT NULL AND bp.recommended_pick != ''
+            ORDER BY bp.confidence DESC
+        ")->fetchAll(PDO::FETCH_ASSOC);
+
+        $nowBanker = new DateTime();
+        $bankerCandidates = [];
+        foreach ($bankerPicks as $bp) {
+            if (!isset($todaySourcesBanker[$bp['match_name']])) continue;
+            $normKey = $normBanker($bp['home_team']) . '|' . $normBanker($bp['away_team']);
+            if (isset($resultedBanker[$normKey])) continue;
+            if (isset($yestPairBanker[$normKey])) continue;
+            $matchTime = $todaySourcesBanker[$bp['match_name']];
+            if ($matchTime) {
+                try {
+                    $ko = new DateTime($matchTime);
+                    $minsPast = ($nowBanker->getTimestamp() - $ko->getTimestamp()) / 60;
+                    if ($minsPast > 105) continue;
+                } catch (Exception $e) {}
+            }
+            $recs = explode(',', $bp['recommended_pick']);
+            foreach ($recs as $rec) {
+                $rec = trim($rec);
+                $parts = explode(':', $rec);
+                if (count($parts) !== 2) continue;
+                $market = trim($parts[0]);
+                $prob = (float)trim($parts[1]);
+                $bestOdds = 0;
+                $mv = strtoupper($market);
+                if ($mv === '1') $bestOdds = (float)($bp['market_odds_1'] ?? 0);
+                elseif ($mv === 'X') $bestOdds = (float)($bp['market_odds_x'] ?? 0);
+                elseif ($mv === '2') $bestOdds = (float)($bp['market_odds_2'] ?? 0);
+                $bankerCandidates[] = [
+                    'match_name' => $bp['match_name'],
+                    'home_team' => $bp['home_team'],
+                    'away_team' => $bp['away_team'],
+                    'league' => $bp['league'] ?? '',
+                    'confidence' => (float)$bp['confidence'],
+                    'pick_value' => $market,
+                    'probability' => $prob,
+                    'best_odds' => $bestOdds,
+                ];
+            }
+        }
+        usort($bankerCandidates, fn($a, $b) => $b['probability'] <=> $a['probability']);
+        $seenBanker = [];
+        foreach ($bankerCandidates as $bc) {
+            $key = $bc['match_name'] . '|' . $bc['pick_value'];
+            if (isset($seenBanker[$key])) continue;
+            $seenBanker[$key] = true;
+            $hasOdds = $bc['best_odds'] > 0;
+            $ev = $hasOdds ? round($bc['probability'] / (1/$bc['best_odds']), 2) : 0;
+            $topPicks[] = [
+                'match_name' => $bc['match_name'],
+                'pick_value' => $bc['pick_value'],
+                'actual_odds' => $bc['best_odds'],
+                'odds' => $bc['best_odds'],
+                'pattern_badge' => ($hasOdds && $ev > 1) ? 'VALUE' : '',
+                'match_time' => '',
+                'league' => $bc['league'],
+                'win_rate_low' => 0,
+                'details' => '',
+                'home_odds' => 0,
+                'draw_odds' => 0,
+                'away_odds' => 0,
+                'safety_notes' => '',
+                'risk_tier' => '',
+                'web_pick_id' => 0,
+                'banker_probability' => $bc['probability'],
+                'banker_ev' => $ev,
+                'banker_is_value' => $hasOdds && $ev > 1,
+                'banker_data_conf' => $bc['confidence'],
+            ];
+        }
+    }
+} catch (Exception $e) {
+    $topPicks = getAdminTopPicks();
+}
 
 // Betting code marketplace
 $availableCodes = [];
@@ -480,7 +587,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg-soft); color: var(
     <button class="nav-link <?= $hasParlay ? ($defaultTab === 'parlay' ? 'active' : '') : 'disabled' ?>" data-bs-toggle="pill" data-bs-target="#parlay" type="button" <?= !$hasParlay ? 'disabled' : '' ?>><i class="fas fa-bullseye me-2"></i>Parlay</button>
     <button class="nav-link <?= $hasRollover ? ($defaultTab === 'goals' ? 'active' : '') : 'disabled' ?>" data-bs-toggle="pill" data-bs-target="#goals" type="button" <?= !$hasRollover ? 'disabled' : '' ?>><i class="fas fa-futbol me-2"></i>Goals</button>
     <button class="nav-link <?= $hasMostCorners ? ($defaultTab === 'mostcorners' ? 'active' : '') : 'disabled' ?>" data-bs-toggle="pill" data-bs-target="#mostcorners" type="button" <?= !$hasMostCorners ? 'disabled' : '' ?>><i class="fas fa-vector-square me-2"></i>Corners</button>
-    <button class="nav-link <?= $hasTopPicks ? ($defaultTab === 'featured' ? 'active' : '') : 'disabled' ?>" data-bs-toggle="pill" data-bs-target="#featured" type="button" <?= !$hasTopPicks ? 'disabled' : '' ?>><i class="fas fa-bolt me-2"></i>Popular</button>
+    <button class="nav-link <?= $hasTopPicks ? ($defaultTab === 'featured' ? 'active' : '') : 'disabled' ?>" data-bs-toggle="pill" data-bs-target="#featured" type="button" <?= !$hasTopPicks ? 'disabled' : '' ?>><i class="fas fa-gem me-2"></i>Banker</button>
     <button class="nav-link <?= ($hasParlay && $hasRollover) ? ($defaultTab === 'toppredictions' ? 'active' : '') : 'disabled' ?>" data-bs-toggle="pill" data-bs-target="#toppredictions" type="button" <?= !($hasParlay && $hasRollover) ? 'disabled' : '' ?>><i class="fas fa-crown me-2"></i>PRO</button>
     <?php if (!isSectionHidden('betting_codes')): ?>
     <button class="nav-link <?= $defaultTab === 'codes' ? 'active' : '' ?>" data-bs-toggle="pill" data-bs-target="#codes" type="button"><i class="fas fa-ticket me-2"></i>Codes</button>
@@ -731,14 +838,53 @@ if (!empty($mt) && strtolower($mt) !== 'tbd') {
 
 <div class="tab-pane fade <?= $defaultTab === 'featured' ? 'show active' : '' ?>" id="featured" role="tabpanel">
 <div class="card">
-<div class="card-header"><h5 class="card-title"><i class="fas fa-vault me-2"></i>Banker of the Day</h5></div>
+<div class="card-header" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+    <h5 class="card-title" style="margin:0;"><i class="fas fa-gem me-2" style="color:#22C55E;"></i>Banker of the Day</h5>
+    <span style="font-size:0.65rem;background:rgba(139,92,246,0.15);color:var(--primary);padding:2px 8px;border-radius:4px;font-weight:700;"><?= count($topPicks) ?> picks</span>
+    <span style="font-size:0.65rem;color:var(--text-muted);margin-left:auto;">Powered by Bayesian model</span>
+</div>
 <?php if (empty($topPicks)): ?>
-<div class="alert alert-info text-center"><div style="font-size: 3rem; margin-bottom: 1rem;"><i class="fas fa-crown" style="color: var(--accent);"></i></div><h6>Top Picks will be available once processing is complete</h6><p class="mb-0 text-muted">Please check back later!</p></div>
+<div class="alert alert-info text-center"><div style="font-size: 3rem; margin-bottom: 1rem;"><i class="fas fa-gem" style="color: #22C55E;"></i></div><h6>No picks detected today</h6><p class="mb-0 text-muted">Picks appear once the prediction engine runs and detects today's matches.</p></div>
 <?php else: ?>
-<?php foreach($topPicks as $pick): ?>
-<?php renderPickCard($pick, $hasTopPicks, 'PRO Access Required', 'Subscribe to BOTH Premium Plans (Rollover + Parlay) to unlock PRO predictions', 'both', null, false, false); ?>
+<div style="padding:0.5rem 0;">
+<?php foreach($topPicks as $i => $pick): ?>
+<?php
+    $bvProb = $pick['banker_probability'] ?? 0;
+    $bvOdds = $pick['best_odds'] ?? $pick['actual_odds'] ?? 0;
+    $bvEv = $pick['banker_ev'] ?? 0;
+    $isValue = $pick['banker_is_value'] ?? false;
+    $timeStr = '';
+    $mtRaw = trim($pick['match_time'] ?? '');
+    if (!empty($mtRaw) && !str_starts_with($mtRaw, '0000') && strtolower($mtRaw) !== 'tbd') {
+        $t = strtotime($mtRaw);
+        $timeStr = $t !== false ? date('j M, H:i', $t) . ' (GMT+3)' : '';
+    }
+?>
+<div style="display:flex;align-items:center;gap:10px;padding:0.6rem 0.75rem;border-bottom:<?= $i < count($topPicks)-1 ? '1px solid #F3F4F6' : 'none' ?>;">
+    <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:0.82rem;color:#1F2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            <?= htmlspecialchars($pick['match_name'] ?? '') ?>
+            <?php if ($timeStr): ?> <span style="font-weight:400;color:#9CA3AF;font-size:0.7rem;"><?= $timeStr ?></span><?php endif; ?>
+        </div>
+        <div style="font-size:0.65rem;color:var(--text-muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:2px;">
+            <span style="font-weight:700;color:#8B5CF6;font-size:0.72rem;"><?= htmlspecialchars($pick['pick_value'] ?? '') ?></span>
+            <?php if ($bvOdds > 0): ?><span style="color:#F59E0B;">@ <?= number_format($bvOdds, 2) ?></span><?php endif; ?>
+            <span style="color:#6366F1;"><?= $bvProb ?>%</span>
+            <?php if ($isValue): ?>
+            <span style="display:inline-flex;align-items:center;gap:3px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);color:#22C55E;padding:1px 6px;border-radius:4px;font-weight:700;font-size:0.6rem;"><i class="fas fa-check-circle"></i> VALUE</span>
+            <?php endif; ?>
+            <?php if (!empty($pick['league'])): ?> <span style="color:#9CA3AF;">· <?= htmlspecialchars($pick['league']) ?></span><?php endif; ?>
+        </div>
+    </div>
+    <div style="text-align:right;min-width:36px;">
+        <div style="font-size:0.55rem;color:var(--text-muted);font-weight:500;line-height:1;">Confidence</div>
+        <span style="font-weight:700;font-size:0.85rem;color:<?= ($pick['banker_data_conf'] ?? 0) >= 60 ? '#059669' : (($pick['banker_data_conf'] ?? 0) >= 30 ? '#D97706' : '#9CA3AF') ?>;"><?= $pick['banker_data_conf'] ?? 0 ?>%</span>
+    </div>
+</div>
 <?php endforeach; ?>
+</div>
 <?php endif; ?>
+</div>
 </div>
 </div>
 

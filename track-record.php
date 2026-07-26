@@ -133,13 +133,15 @@ $byLeague = array_slice($allLeagueRows, 0, 14);
 
 // Recent settlements (last 7 days, only settled picks)
 $recentCutoff = date('Y-m-d', strtotime('-7 days'));
-$allRecent = $db->query("
+$allRecent = $db->prepare("
     SELECT ps.*, wp.league, wp.detected_at
     FROM pick_settlements ps
     INNER JOIN web_picks wp ON ps.web_pick_id = wp.id
-    WHERE ps.settlement_date >= '$recentCutoff' AND ps.result IN ('won','lost') AND wp.pick_type IN ('rollover','parlay','over_15')
+    WHERE ps.settlement_date >= ? AND ps.result IN ('won','lost') AND wp.pick_type IN ('rollover','parlay','over_15')
     ORDER BY ps.id DESC
-")->fetchAll();
+");
+$allRecent->execute([$recentCutoff]);
+$allRecent = $allRecent->fetchAll();
 
 // Dedup: per match_name, keep the latest settlement (highest id)
 $bestPerMatch = [];

@@ -1,11 +1,11 @@
 <?php
-$secretKey = 'pred_f3cc603ea4f0e1a6038171dba59f41b601c0f815d1c1d580';
+require_once __DIR__ . '/../config.php';
+$secretKey = SETTLE_KEY;
 $providedKey = (PHP_SAPI === 'cli' ? ($argv[1] ?? '') : ($_GET['key'] ?? ''));
 if ($providedKey !== $secretKey) {
     http_response_code(403);
     die(json_encode(['status' => 'error', 'message' => 'Invalid key']));
 }
-require_once __DIR__ . '/../config.php';
 $db = getDB();
 if (!$db) { die(json_encode(['status' => 'error', 'message' => 'DB failed'])); }
 
@@ -107,45 +107,96 @@ function settleOnePick($db, $pick, $today) {
     return true;
 }
 
+function resolveSettleTeamId($db, $name) {
+    if (!$name) return null;
+    $stmt = $db->prepare("SELECT id FROM teams WHERE name = ? LIMIT 1");
+    $stmt->execute([$name]);
+    $id = $stmt->fetchColumn();
+    if ($id) return (int)$id;
+    $stmt = $db->prepare("SELECT COALESCE(home_team_id, away_team_id) FROM match_results WHERE home_team = ? OR away_team = ? LIMIT 1");
+    $stmt->execute([$name, $name]);
+    $id = $stmt->fetchColumn();
+    if ($id) return (int)$id;
+    $stmt = $db->query("SELECT id, aliases FROM teams WHERE aliases IS NOT NULL AND aliases != '[]' AND aliases != 'null'");
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+        $aliases = json_decode($r['aliases'], true);
+        if (is_array($aliases)) {
+            foreach ($aliases as $a) {
+                if (mb_strtolower(trim($a)) === mb_strtolower(trim($name))) return (int)$r['id'];
+            }
+        }
+    }
+    $stmt = $db->prepare("SELECT id FROM teams WHERE name LIKE ? ORDER BY LENGTH(name) ASC LIMIT 1");
+    $stmt->execute(['%' . $name . '%']);
+    $id = $stmt->fetchColumn();
+    return $id ? (int)$id : null;
+}
+
 function findMatchResult($db, $homeTeam, $awayTeam, $today) {
     $yesterday = date('Y-m-d', strtotime($today . ' -1 day'));
     $twoDaysAgo = date('Y-m-d', strtotime($today . ' -2 days'));
     $tomorrow = date('Y-m-d', strtotime($today . ' +1 day'));
-    $dates = [$twoDaysAgo, $yesterday, $today, $tomorrow];
+    $dates = [$today, $yesterday, $tomorrow, $twoDaysAgo];
 
-    foreach ($dates as $d) {
-        // Exact match
-        $stmt = $db->prepare("SELECT home_score, away_score FROM match_results WHERE home_team = ? AND away_team = ? AND match_date = ? LIMIT 1");
-        $stmt->execute([$homeTeam, $awayTeam, $d]);
-        $result = $stmt->fetch();
-        if ($result) return $result;
+    $fallback = null;
 
-        // Swapped teams
-        $stmt->execute([$awayTeam, $homeTeam, $d]);
-        $result = $stmt->fetch();
-        if ($result) return ['home_score' => $result['away_score'], 'away_score' => $result['home_score']];
+    // Phase 1: Try by team_id (most reliable)
+    $homeId = resolveSettleTeamId($db, $homeTeam);
+    $awayId = resolveSettleTeamId($db, $awayTeam);
+    if ($homeId && $awayId) {
+        foreach ($dates as $d) {
+            $stmt = $db->prepare("SELECT home_score, away_score, home_team, away_team FROM match_results WHERE ((home_team_id = ? AND away_team_id = ?) OR (home_team_id = ? AND away_team_id = ?)) AND match_date = ? LIMIT 1");
+            $stmt->execute([$homeId, $awayId, $awayId, $homeId, $d]);
+            $result = $stmt->fetch();
+            if ($result) {
+                if ((int)$result['home_score'] > 0 || (int)$result['away_score'] > 0) return $result;
+                if (!$fallback) $fallback = $result;
+            }
+        }
     }
 
-    // Fuzzy match across today +-1
+    // Phase 2: Try by exact name match
+    foreach ($dates as $d) {
+        $stmt = $db->prepare("SELECT home_score, away_score, home_team, away_team FROM match_results WHERE home_team = ? AND away_team = ? AND match_date = ? LIMIT 1");
+        $stmt->execute([$homeTeam, $awayTeam, $d]);
+        $result = $stmt->fetch();
+        if ($result) {
+            if ((int)$result['home_score'] > 0 || (int)$result['away_score'] > 0) return $result;
+            if (!$fallback) $fallback = $result;
+        }
+
+        $stmt->execute([$awayTeam, $homeTeam, $d]);
+        $result = $stmt->fetch();
+        if ($result) {
+            $swapped = ['home_score' => $result['away_score'], 'away_score' => $result['home_score'], 'home_team' => $result['home_team'], 'away_team' => $result['away_team']];
+            if ((int)$swapped['home_score'] > 0 || (int)$swapped['away_score'] > 0) return $swapped;
+            if (!$fallback) $fallback = $swapped;
+        }
+    }
+
+    // Phase 3: Fuzzy match — prefer non-zero scores
     foreach ($dates as $d) {
         $stmt = $db->prepare("SELECT home_score, away_score, home_team, away_team FROM match_results WHERE match_date = ? ORDER BY id DESC LIMIT 200");
         $stmt->execute([$d]);
         foreach ($stmt->fetchAll() as $m) {
             if (teamFuzzyMatch($homeTeam, $m['home_team']) && teamFuzzyMatch($awayTeam, $m['away_team'])) {
-                return $m;
+                if ((int)$m['home_score'] > 0 || (int)$m['away_score'] > 0) return $m;
+                if (!$fallback) $fallback = $m;
             }
             if (teamFuzzyMatch($homeTeam, $m['away_team']) && teamFuzzyMatch($awayTeam, $m['home_team'])) {
-                return ['home_score' => $m['away_score'], 'away_score' => $m['home_score']];
+                $swapped = ['home_score' => $m['away_score'], 'away_score' => $m['home_score'], 'home_team' => $m['home_team'], 'away_team' => $m['away_team']];
+                if ((int)$swapped['home_score'] > 0 || (int)$swapped['away_score'] > 0) return $swapped;
+                if (!$fallback) $fallback = $swapped;
             }
         }
     }
-    return null;
+    return $fallback;
 }
 
 function normalizePickTeam($name) {
     $name = trim(preg_replace('/\s+/', ' ', $name));
-    $name = preg_replace('/^(FC|CF|AC|SC|RC|SS|CD|AS|SK|FK|NK|UD|CD|CA|CR|EC|AA|AE|SSC|Real|Atletico)\s+/i', '', $name);
-    $name = preg_replace('/\s+(FC|CF|AC|SC|RC|SS|CD|AS|SK|FK|NK|UD|CD|CA|CR|EC|AA|AE|SSC)$/i', '', $name);
+    $name = preg_replace('/^(FC|CF|AC|SC|RC|SS|CD|AS|SK|FK|NK|UD|CA|CR|EC|AA|AE|SSC)\s+/i', '', $name);
+    $name = preg_replace('/\s+(FC|CF|AC|SC|RC|SS|CD|AS|SK|FK|NK|UD|CA|CR|EC|AA|AE|SSC)$/i', '', $name);
     return trim(mb_strtolower($name));
 }
 

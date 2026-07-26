@@ -635,13 +635,19 @@ class BayesianModel {
         $settled = 0; $matched = 0; $unmatched = 0;
 
         try {
+            // Mark stale unmatched predictions older than 3 days as 'stale' so they don't clog the queue
+            $staleCutoff = date('Y-m-d', strtotime('-3 days'));
+            $this->db->exec("UPDATE bayesian_predictions SET result = 'stale', settled_at = NOW() WHERE result = 'pending' AND match_date < '$staleCutoff'");
+
+            // Process newest predictions first (ORDER BY match_date DESC) — prevents old unmatched rows from blocking recent settles
             $stmt = $this->db->query("
                 SELECT id, home_team, away_team, match_name, match_date,
                        prob_1, prob_x, prob_2, over_25, under_25,
                        btts_yes, btts_no, recommended_pick
                 FROM bayesian_predictions
                 WHERE result = 'pending'
-                LIMIT 200
+                ORDER BY match_date DESC
+                LIMIT 500
             ");
 
             $updateStmt = $this->db->prepare("UPDATE bayesian_predictions SET result = ?, home_score = ?, away_score = ?, settled_at = NOW() WHERE id = ?");

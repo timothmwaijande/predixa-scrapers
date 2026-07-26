@@ -566,7 +566,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tuneResult = $bmTune->tunePriorStrength();
     if (is_array($tuneResult)) {
         $_SESSION['bayesian_k'] = $tuneResult['best_k'];
-        $_SESSION['bayesian_err'] = $tuneResult['best_err'];
+        $_SESSION['bayesian_k_err'] = $tuneResult['best_err'];
+        try { $db->exec("CREATE TABLE IF NOT EXISTS bayesian_config (`key` VARCHAR(50) PRIMARY KEY, `value` TEXT, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)"); $db->prepare("REPLACE INTO bayesian_config (`key`, `value`) VALUES ('prior_k', ?)")->execute([$tuneResult['best_k']]); $db->prepare("REPLACE INTO bayesian_config (`key`, `value`) VALUES ('prior_k_err', ?)")->execute([$tuneResult['best_err']]); } catch (Exception $e) {}
         $msg = "<i class='fas fa-check-circle me-1' style='color:#22C55E;'></i>Bayesian re-tuned: k = {$tuneResult['best_k']}, error rate = " . round($tuneResult['best_err']*100, 1) . "%";
     } else {
         $error = "<i class='fas fa-times-circle me-1' style='color:#EF4444;'></i>Bayesian tuning failed (need ≥20 settled picks in last 90 days)";
@@ -582,7 +583,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = $bm->settlePredictions();
         $msg = "<i class='fas fa-check-circle me-1' style='color:#22C55E;'></i>Bayesian settle: {$result['settled']} settled, {$result['matched']} matched, {$result['unmatched']} unmatched";
     } elseif ($_POST['action'] === 'bayesian_clear_session') {
-        unset($_SESSION['bayesian_k'], $_SESSION['bayesian_err']);
+        unset($_SESSION['bayesian_k'], $_SESSION['bayesian_k_err'], $_SESSION['bayesian_err']);
+        try { $db->exec("DELETE FROM bayesian_config WHERE `key` IN ('prior_k', 'prior_k_err')"); } catch (Exception $e) {}
         $msg = "<i class='fas fa-check-circle me-1' style='color:#22C55E;'></i>Bayesian cache cleared";
     }
 }
@@ -760,13 +762,8 @@ if ($db) {
     $allUsers = $stmt->fetchAll();
 }
 
-$tabStats = $db->query("SELECT tab_name, COUNT(*) as visits FROM tab_views WHERE visited_at >= CURDATE() GROUP BY tab_name ORDER BY visits DESC")->fetchAll();
-$countryStats = $db->query("SELECT country, COUNT(*) as visits FROM page_views WHERE country != 'Unknown' AND visited_at >= CURDATE() GROUP BY country ORDER BY visits DESC LIMIT 8")->fetchAll();
-$todayVisits = $db->query("SELECT COUNT(*) FROM page_views WHERE visited_at >= CURDATE()")->fetchColumn() ?: 0;
-$pageStats = $db->query("SELECT page, COUNT(*) as visits FROM page_views WHERE visited_at >= CURDATE() GROUP BY page ORDER BY visits DESC")->fetchAll();
-$topIps = $db->query("SELECT ip_address, COUNT(*) as hits, MAX(visited_at) as last_hit FROM page_views WHERE visited_at >= CURDATE() AND ip_address != '' GROUP BY ip_address ORDER BY hits DESC LIMIT 5")->fetchAll();
-$recentVisits = $db->query("SELECT pv.*, wu.phone, wu.email FROM page_views pv LEFT JOIN web_users wu ON pv.user_id = wu.id ORDER BY pv.visited_at DESC LIMIT 20")->fetchAll();
-$allPicks = getAllPicksForAdmin();
+// Defer heavy analytics queries — only run when visitors tab is active
+$tabStats = []; $countryStats = []; $todayVisits = 0; $pageStats = []; $topIps = []; $recentVisits = []; $allPicks = [];
 $tabOrder = ['scrape_analyze', 'approve', 'users', 'admins', 'code_purchases', 'visitors'];
 $requestedTab = $_GET['tab'] ?? '';
 if ($requestedTab) {
@@ -1278,6 +1275,15 @@ body { font-family: 'Inter', sans-serif; background: var(--bg-soft); color: var(
 <?php if (!hasAdminPermission('visitors')): ?>
 <div class="alert alert-danger text-center py-4"><i class="fas fa-lock me-2"></i>You do not have permission to view visitor logs.</div>
 <?php else: ?>
+<?php
+// Lazy-load analytics only when visitors tab is active
+$tabStats = $db->query("SELECT tab_name, COUNT(*) as visits FROM tab_views WHERE visited_at >= CURDATE() GROUP BY tab_name ORDER BY visits DESC")->fetchAll();
+$countryStats = $db->query("SELECT country, COUNT(*) as visits FROM page_views WHERE country != 'Unknown' AND visited_at >= CURDATE() GROUP BY country ORDER BY visits DESC LIMIT 8")->fetchAll();
+$todayVisits = $db->query("SELECT COUNT(*) FROM page_views WHERE visited_at >= CURDATE()")->fetchColumn() ?: 0;
+$pageStats = $db->query("SELECT page, COUNT(*) as visits FROM page_views WHERE visited_at >= CURDATE() GROUP BY page ORDER BY visits DESC")->fetchAll();
+$topIps = $db->query("SELECT ip_address, COUNT(*) as hits, MAX(visited_at) as last_hit FROM page_views WHERE visited_at >= CURDATE() AND ip_address != '' GROUP BY ip_address ORDER BY hits DESC LIMIT 5")->fetchAll();
+$recentVisits = $db->query("SELECT pv.*, wu.phone, wu.email FROM page_views pv LEFT JOIN web_users wu ON pv.user_id = wu.id ORDER BY pv.visited_at DESC LIMIT 20")->fetchAll();
+?>
 <div class="card">
     <div class="card-header"><h2 class="card-title">Today's Visitor Activity</h2><span class="badge" style="background: var(--primary); color: white;"><?= $todayVisits ?> Total Visits</span></div>
     <div class="stats-grid" style="margin-bottom: 1rem;">
@@ -1806,16 +1812,37 @@ $overallCorrect = 0; $overallTotal = 0;
 foreach ($accTrend as $d) { $overallCorrect += (int)$d['correct']; $overallTotal += (int)$d['total']; }
 $overallAcc = $overallTotal > 0 ? round($overallCorrect / $overallTotal * 100, 1) : 0;
 
-// Auto-tune on first load if not already tuned (stored in session)
-if (!isset($_SESSION['bayesian_k']) && $overallTotal >= 20) {
-    $tuneResult = $bayesianModel->tunePriorStrength();
-    if (is_array($tuneResult)) {
-        $_SESSION['bayesian_k'] = $tuneResult['best_k'];
-        $_SESSION['bayesian_err'] = $tuneResult['best_err'];
+// Auto-tune: check DB cache first (avoids 80k+ queries on every new session)
+if ($overallTotal >= 20) {
+    $tunedK = $_SESSION['bayesian_k'] ?? null;
+    $tunedErr = $_SESSION['bayesian_err'] ?? null;
+    if ($tunedK === null) {
+        try {
+            $db->exec("CREATE TABLE IF NOT EXISTS bayesian_config (`key` VARCHAR(50) PRIMARY KEY, `value` TEXT, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)");
+            $cfgRow = $db->query("SELECT `value` FROM bayesian_config WHERE `key` = 'prior_k'")->fetch();
+            if ($cfgRow) {
+                $tunedK = (float)$cfgRow['value'];
+                $cfgErr = $db->query("SELECT `value` FROM bayesian_config WHERE `key` = 'prior_k_err'")->fetch();
+                $tunedErr = $cfgErr ? (float)$cfgErr['value'] : null;
+            } else {
+                $tuneResult = $bayesianModel->tunePriorStrength();
+                if (is_array($tuneResult)) {
+                    $tunedK = $tuneResult['best_k'];
+                    $tunedErr = $tuneResult['best_err'];
+                    $db->prepare("REPLACE INTO bayesian_config (`key`, `value`) VALUES ('prior_k', ?)")->execute([$tunedK]);
+                    $db->prepare("REPLACE INTO bayesian_config (`key`, `value`) VALUES ('prior_k_err', ?)")->execute([$tunedErr]);
+                }
+            }
+        } catch (Exception $e) {
+            $tunedK = $_SESSION['bayesian_k'] ?? $bayesianModel->getPriorStrength();
+        }
+        $_SESSION['bayesian_k'] = $tunedK;
+        $_SESSION['bayesian_k_err'] = $tunedErr;
     }
+} else {
+    $tunedK = $_SESSION['bayesian_k'] ?? $bayesianModel->getPriorStrength();
+    $tunedErr = $_SESSION['bayesian_k_err'] ?? null;
 }
-$tunedK = $_SESSION['bayesian_k'] ?? $bayesianModel->getPriorStrength();
-$tunedErr = $_SESSION['bayesian_err'] ?? null;
 ?>
 <div class="card mt-3" style="border-left: 4px solid #10B981;">
     <div class="card-header d-flex flex-wrap align-items-center gap-2">
@@ -2240,6 +2267,7 @@ $articles = $db->query("SELECT * FROM betting_articles ORDER BY created_at DESC"
 </div>
 <?php endif; // end super admin for Betting School ?>
 
+<?php if (empty($allPicks)) $allPicks = getAllPicksForAdmin(); ?>
 <div class="card">
     <div class="card-header">
         <h2 class="card-title"><i class="fas fa-star me-1"></i>Configure TOP PICKS</h2>

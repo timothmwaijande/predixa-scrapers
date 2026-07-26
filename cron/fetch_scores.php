@@ -38,7 +38,8 @@ $skipped = 0;
 
 function normalizeTeam($name) {
     $name = trim(preg_replace('/\s+/', ' ', $name));
-    $name = preg_replace('/^(FC|CF|AC|SC|RC|SS|CD|AS|SK|FK|NK|UD|CD|CA|CR|EC|AA|AE|SSC|Real|Atletico)\s+/i', '', $name);
+    // Strip generic club prefixes/suffixes only, NOT identity names like Real/Atletico
+    $name = preg_replace('/^(FC|CF|AC|SC|RC|SS|CD|AS|SK|FK|NK|UD|CD|CA|CR|EC|AA|AE|SSC)\s+/i', '', $name);
     $name = preg_replace('/\s+(FC|CF|AC|SC|RC|SS|CD|AS|SK|FK|NK|UD|CD|CA|CR|EC|AA|AE|SSC)$/i', '', $name);
     return trim(mb_strtolower($name));
 }
@@ -100,13 +101,13 @@ foreach ($input['matches'] as $m) {
             $skipped++;
         }
         if (!$existing['home_team_id'] || !$existing['away_team_id']) {
-            $hid = resolveTeamId($db, $home, $home);
-            $aid = resolveTeamId($db, $away, $away);
+            $hid = resolveTeamId($db, trim($m['home_team']), $home);
+            $aid = resolveTeamId($db, trim($m['away_team']), $away);
             $updateTeamIds->execute([$hid, $aid, $existing['id']]);
         }
     } else {
-        $hid = resolveTeamId($db, $home, $home);
-        $aid = resolveTeamId($db, $away, $away);
+        $hid = resolveTeamId($db, trim($m['home_team']), $home);
+        $aid = resolveTeamId($db, trim($m['away_team']), $away);
         $insertStmt->execute([$home, $away, $hs, $as, $matchDate, $league ?: null, $hid, $aid]);
         $inserted++;
     }
