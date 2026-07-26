@@ -2259,6 +2259,7 @@ $articles = $db->query("SELECT * FROM betting_articles ORDER BY created_at DESC"
     </div>
 </div>
 <?php endif; // end super admin for Betting School ?>
+<?php endif; ?>
 
 <div class="card mt-3">
     <div class="card-header"><h2 class="card-title"><i class="fas fa-ticket me-1"></i>All Betting Codes <?php if (!empty($activeCodes)): ?><span class="badge bg-success ms-1" style="font-size: 0.7rem;"><?= count($activeCodes) ?> Active Today</span><?php endif; ?></h2></div>
