@@ -885,8 +885,7 @@ if (!empty($mt) && strtolower($mt) !== 'tbd') {
 <?php endforeach; ?>
 </div>
 <?php endif; ?>
-</div>
-</div>
+    </div>
 </div>
 
 <div class="tab-pane fade <?= $defaultTab === 'toppredictions' ? 'show active' : '' ?>" id="toppredictions" role="tabpanel">
