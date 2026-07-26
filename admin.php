@@ -567,9 +567,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 } elseif ($_POST['action'] === 'bayesian_batch_predict') {
         require_once __DIR__ . '/classes/BayesianModel.php';
+        require_once __DIR__ . '/classes/GoogleSheetsAPI.php';
         $bm = new BayesianModel();
         $result = $bm->runBatchPredictions();
         $msg = "<i class='fas fa-check-circle me-1' style='color:#22C55E;'></i>Bayesian batch: {$result['stored']} stored, {$result['skipped']} skipped, {$result['errors']} errors";
+        $settleResult = $bm->settlePredictions();
+        $msg .= "<br>Settled: {$settleResult['settled']}, Matched: {$settleResult['matched']}";
+        try {
+            $gapi = new GoogleSheetsAPI();
+            $oddsDrops = $gapi->getOddsDrops();
+            if (!empty($oddsDrops)) {
+                $predictions = $bm->getTodayPredictions();
+                $valueEdges = 0;
+                foreach ($predictions as $pred) {
+                    $bestMatch = null; $bestScore = 0;
+                    $hNorm = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $pred['home_team'])));
+                    $aNorm = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $pred['away_team'])));
+                    foreach ($oddsDrops as $odds) {
+                        $ohNorm = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $odds['Home_Team'])));
+                        $oaNorm = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $odds['Away_Team'])));
+                        $score = 0;
+                        if ($hNorm === $ohNorm && $aNorm === $oaNorm) $score += 2;
+                        elseif ($hNorm === $oaNorm && $aNorm === $ohNorm) $score += 1;
+                        if ($score > $bestScore) { $bestScore = $score; $bestMatch = $odds; }
+                    }
+                    if ($bestMatch && $bestScore >= 2) {
+                        $o1 = (float)$bestMatch['Odds_1_Now']; $oX = (float)$bestMatch['Odds_X_Now']; $o2 = (float)$bestMatch['Odds_2_Now'];
+                        if ($o1 > 0 && $oX > 0 && $o2 > 0) {
+                            $m1 = (1/$o1) / ((1/$o1)+(1/$oX)+(1/$o2)) * 100;
+                            $mX = (1/$oX) / ((1/$o1)+(1/$oX)+(1/$o2)) * 100;
+                            $m2 = (1/$o2) / ((1/$o1)+(1/$oX)+(1/$o2)) * 100;
+                            $db->prepare("UPDATE bayesian_predictions SET market_odds_1=?, market_odds_x=?, market_odds_2=?, value_edge_1=ROUND(?-?,2), value_edge_x=ROUND(?-?,2), value_edge_2=ROUND(?-?,2) WHERE home_team=? AND away_team=? AND match_date=CURDATE()")->execute([$o1,$oX,$o2,$pred['prob_1'],$m1,$pred['prob_x'],$mX,$pred['prob_2'],$m2,$pred['home_team'],$pred['away_team']]);
+                            $valueEdges++;
+                        }
+                    }
+                }
+                $msg .= "<br>Value edges matched: {$valueEdges}";
+            }
+        } catch (Exception $e) { $msg .= "<br><span style='color:#F59E0B;'>VALUE edge skip: " . $e->getMessage() . "</span>"; }
     } elseif ($_POST['action'] === 'bayesian_settle') {
         require_once __DIR__ . '/classes/BayesianModel.php';
         $bm = new BayesianModel();
@@ -1757,10 +1792,28 @@ $sub = in_array($requestedSub, ['analysis', 'verified']) ? $requestedSub : 'anal
 
 <div class="row g-3 mb-3">
     <div class="col-md-6">
+        <div class="card h-100 d-flex flex-column" style="border-left: 4px solid #059669;">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-robot me-1" style="color:#059669;"></i>Step 1: Run Bayesian</h2>
+                <span class="badge" style="background: #059669; color: white;">Run first</span>
+            </div>
+            <div class="alert" style="background: #ECFDF5; border-left: 4px solid #059669; margin-bottom: 1rem; font-size: 0.8rem;">
+                <strong><i class="fas fa-lightbulb me-1"></i>How it works:</strong> Generates predictions from historical data, settles old results,
+                then compares against Google Sheets odds to identify VALUE edges. Run this before "Run Analysis" for VALUE badges to appear.
+            </div>
+            <form method="POST" class="mt-auto">
+                <input type="hidden" name="action" value="bayesian_batch_predict">
+                <button type="submit" class="btn btn-approve w-100" style="padding: 0.6rem; font-size: 0.9rem; background: #059669; border-color: #059669;" onclick="return confirm('Run Bayesian predictions + settle + VALUE edge comparison?')">
+                    <i class="fas fa-robot me-1"></i>Run Bayesian Now
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-6">
         <div class="card h-100 d-flex flex-column" style="border-left: 4px solid #8B5CF6;">
             <div class="card-header">
-                <h2 class="card-title"><i class="fas fa-brain me-1"></i>Run Analysis</h2>
-                <span class="badge" style="background: var(--primary); color: white;">Generates picks from scraped odds</span>
+                <h2 class="card-title"><i class="fas fa-brain me-1"></i>Step 2: Run Analysis</h2>
+                <span class="badge" style="background: var(--primary); color: white;">Run second</span>
             </div>
             <div class="alert" style="background: #F0F4FF; border-left: 4px solid var(--primary); margin-bottom: 1rem; font-size: 0.8rem;">
                 <strong><i class="fas fa-lightbulb me-1"></i>How it works:</strong> Reads the latest scraped odds from Google Sheets (OAuth2),
@@ -1782,6 +1835,8 @@ $sub = in_array($requestedSub, ['analysis', 'verified']) ? $requestedSub : 'anal
             <?php endif; ?>
         </div>
     </div>
+</div>
+<div class="row g-3 mb-3">
     <div class="col-md-6">
         <div class="card h-100 d-flex flex-column" style="border-left: 4px solid #EF4444;">
             <div class="card-header">
