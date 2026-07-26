@@ -157,13 +157,12 @@ try {
             if (isset($resultedBanker[$normKey])) continue;
             if (isset($yestPairBanker[$normKey])) continue;
             $matchTime = $todaySourcesBanker[$bp['match_name']];
-            if ($matchTime) {
-                try {
-                    $ko = new DateTime($matchTime);
-                    $minsPast = ($nowBanker->getTimestamp() - $ko->getTimestamp()) / 60;
-                    if ($minsPast > 105) continue;
-                } catch (Exception $e) {}
-            }
+            if (!$matchTime) continue;
+            try {
+                $ko = new DateTime($matchTime);
+                $minsPast = ($nowBanker->getTimestamp() - $ko->getTimestamp()) / 60;
+                if ($minsPast > 0) continue;
+            } catch (Exception $e) { continue; }
             $recs = explode(',', $bp['recommended_pick']);
             foreach ($recs as $rec) {
                 $rec = trim($rec);
@@ -965,9 +964,13 @@ try {
 
     // Load today's source matches for intersection filter
     $todaySrc = [];
+    $todaySrcTime = [];
     foreach (['web_picks' => 'detected_at', 'scraper_results' => 'detected_at', 'admin_featured_picks' => 'created_at'] as $tbl => $col) {
-        $q = $db2->query("SELECT DISTINCT match_name FROM $tbl WHERE DATE($col) = CURDATE()");
-        if ($q) foreach ($q->fetchAll(PDO::FETCH_ASSOC) as $r) $todaySrc[$r['match_name']] = true;
+        $q = $db2->query("SELECT DISTINCT match_name, match_time FROM $tbl WHERE DATE($col) = CURDATE()");
+        if ($q) foreach ($q->fetchAll(PDO::FETCH_ASSOC) as $r) {
+            $todaySrc[$r['match_name']] = true;
+            if (!isset($todaySrcTime[$r['match_name']])) $todaySrcTime[$r['match_name']] = $r['match_time'] ?: '';
+        }
     }
 
     // Normalize helper
@@ -991,6 +994,13 @@ try {
     foreach ($bayesianPicks as $bp) {
         if (!isset($todaySrc[$bp['match_name']])) continue;
         if (isset($yestPair[$norm($bp['home_team']) . '|' . $norm($bp['away_team'])])) continue;
+        $bpMatchTime = $todaySrcTime[$bp['match_name']] ?? '';
+        if (!$bpMatchTime) continue;
+        try {
+            $bpKo = new DateTime($bpMatchTime);
+            $bpMinsPast = (new DateTime())->getTimestamp() - $bpKo->getTimestamp();
+            if ($bpMinsPast > 0) continue;
+        } catch (Exception $e) { continue; }
 
         $recs = explode(',', $bp['recommended_pick']);
         foreach ($recs as $rec) {
