@@ -1,0 +1,41 @@
+name: Import Football Data
+
+on:
+  schedule:
+    # Daily at 05:00 UTC (08:00 EAT)
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+    inputs:
+      season:
+        description: 'Season code (e.g. 2526). Blank = current season'
+        default: ''
+        required: false
+      recent:
+        description: 'Only last 7 days (true/false)'
+        default: 'true'
+        required: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: package.json
+
+      - name: Install deps
+        run: npm install
+
+      - name: Fetch football-data.co.uk CSVs and POST results
+        env:
+          KEY: ${{ secrets.FETCH_SCORES_KEY }}
+          SEASON: ${{ inputs.season || '' }}
+          RECENT: ${{ inputs.recent || 'true' }}
+        run: |
+          ARGS="--key=$KEY"
+          if [ -n "$SEASON" ]; then ARGS="$ARGS --season=$SEASON"; fi
+          if [ "$RECENT" = "true" ]; then ARGS="$ARGS --recent"; fi
+          node cron/fetch_football_data.js $ARGS
