@@ -5,7 +5,7 @@ function deduplicate(matches) {
   const seen = new Set();
   const unique = [];
   for (const m of matches) {
-    const key = m.home_team + '||' + m.away_team;
+    const key = (m.home_team + '||' + m.away_team).toLowerCase();
     if (!seen.has(key)) { seen.add(key); unique.push(m); }
   }
   return unique;
@@ -16,7 +16,80 @@ function parseScore(text) {
   return isNaN(n) ? null : n;
 }
 
-// --- SportyBet ---
+// === API-Football (primary source - covers ALL leagues) ===
+async function scrapeAPIFootballForDate(apiKey, dateStr) {
+  const r = await fetch(`https://v3.football.api-sports.io/fixtures?date=${dateStr}`, {
+    headers: { 'x-apisports-key': apiKey, 'User-Agent': 'Mozilla/5.0' },
+    timeout: 30000,
+  });
+
+  if (r.status === 429 || r.status === 403) {
+    console.error('[api-football] Rate limited or forbidden (' + r.status + ')');
+    return [];
+  }
+  if (r.status !== 200) {
+    console.error('[api-football] HTTP ' + r.status);
+    return [];
+  }
+
+  const data = await r.json();
+  if (data.errors && Object.keys(data.errors).length > 0) {
+    console.error('[api-football] Errors:', JSON.stringify(data.errors));
+    return [];
+  }
+
+  const matches = [];
+  for (const fixture of (data.response || [])) {
+    const status = fixture.fixture?.status?.short;
+    if (status !== 'FT') continue;
+
+    const home = fixture.teams?.home?.name;
+    const away = fixture.teams?.away?.name;
+    const homeScore = fixture.goals?.home;
+    const awayScore = fixture.goals?.away;
+
+    if (!home || !away || homeScore === null || awayScore === null) continue;
+    if (typeof homeScore !== 'number' || typeof awayScore !== 'number') continue;
+
+    matches.push({
+      home_team: home,
+      away_team: away,
+      home_score: homeScore,
+      away_score: awayScore,
+      match_date: dateStr,
+    });
+  }
+  return matches;
+}
+
+async function scrapeAPIFootball() {
+  const apiKey = process.env.API_FOOTBALL_KEY || '';
+  if (!apiKey) {
+    console.error('[api-football] No API key set');
+    return [];
+  }
+
+  const allMatches = [];
+  const today = new Date();
+
+  // Fetch today and yesterday (2 requests, covers the settlement window)
+  for (let i = 0; i <= 1; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().slice(0, 10);
+    try {
+      const matches = await scrapeAPIFootballForDate(apiKey, dateStr);
+      allMatches.push(...matches);
+      console.error(`[api-football] ${dateStr}: ${matches.length} finished matches`);
+    } catch (e) {
+      console.error(`[api-football] ${dateStr}: Error - ${e.message}`);
+    }
+  }
+
+  return allMatches;
+}
+
+// === SportyBet (fallback - improved scraper) ===
 async function scrapeSportyBet() {
   const res = await fetch('https://livescore.sportybet.com/', {
     headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
@@ -26,42 +99,58 @@ async function scrapeSportyBet() {
   const $ = cheerio.load(html);
   const matches = [];
 
-  const scoreSelectors = [
-    '[class*=sh-match__scores]',
-    '[class*=match__scores]',
-    '[class*=scoreboard]',
-    '[class*=live-score]',
-  ];
+  $('[data-testid="matchList-common-match"]').each((i, card) => {
+    const $card = $(card);
 
-  for (const sel of scoreSelectors) {
-    const els = $(sel);
-    if (els.length === 0) continue;
-    els.each((_, scoresEl) => {
-      const matchCard = $(scoresEl).closest('[class]').parent();
-      if (!matchCard.length) return;
+    const statusText = $card.find('.sh-match__status').text().trim();
+    if (!statusText.includes('FT') && !statusText.includes('END') && !statusText.includes('Ended')) return;
 
-      const statusText = matchCard.text();
-      if (!statusText.includes('Ended') && !statusText.includes('END') && !statusText.includes('FT')) return;
+    const teamsEl = $card.find('.sh-match__teams');
+    if (!teamsEl.length) return;
 
-      const teamsEl = matchCard.find('[class*=sh-match__teams] .truncate, [class*=teams] .truncate, [class*=participant]');
-      const homeTeam = $(teamsEl[0]).text().trim();
-      const awayTeam = $(teamsEl[1]).text().trim();
-      if (!homeTeam || !awayTeam) return;
+    const teamDivs = teamsEl.find('.truncate');
+    if (teamDivs.length < 2) return;
 
-      const scoreEls = $(scoresEl).find('[class*=rounded-match__score], [class*=score], [class*=digit]');
-      const hs = parseScore($(scoreEls[0]).text());
-      const as = parseScore($(scoreEls[1]).text());
-      if (hs === null || as === null) return;
-      if (hs > 15 || as > 15) return;
+    const homeTeam = $(teamDivs[0]).text().trim();
+    const awayTeam = $(teamDivs[1]).text().trim();
+    if (!homeTeam || !awayTeam) return;
 
-      matches.push({ home_team: homeTeam, away_team: awayTeam, home_score: hs, away_score: as, match_date: new Date().toISOString().slice(0, 10) });
+    const scoresEl = $card.find('.sh-match__scores');
+    if (!scoresEl.length) return;
+
+    const scoreDigits = [];
+    scoresEl.find('[class*="rounded-match__score"], [class*="h-[1.125rem]"]').each((_, el) => {
+      const text = $(el).text().replace(/[^\d]/g, '').trim();
+      if (text.length > 0 && text.length <= 2) {
+        const num = parseInt(text);
+        if (!isNaN(num) && num <= 20) scoreDigits.push(num);
+      }
     });
-    if (matches.length > 0) break;
-  }
-  return deduplicate(matches);
+
+    if (scoreDigits.length < 2) {
+      const scoreText = scoresEl.text().replace(/[^\d]/g, '');
+      if (scoreText.length >= 2) {
+        scoreDigits.push(parseInt(scoreText[0]));
+        scoreDigits.push(parseInt(scoreText[1]));
+      }
+    }
+
+    if (scoreDigits.length >= 2) {
+      matches.push({
+        home_team: homeTeam,
+        away_team: awayTeam,
+        home_score: scoreDigits[0],
+        away_score: scoreDigits[1],
+        match_date: new Date().toISOString().slice(0, 10),
+      });
+    }
+  });
+
+  console.error(`[sportybet] Found ${matches.length} finished matches`);
+  return matches;
 }
 
-// --- Soccer24 ---
+// === Soccer24 (client-side rendered, limited) ===
 async function scrapeSoccer24() {
   const res = await fetch('https://www.soccer24.com/', {
     headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
@@ -82,7 +171,7 @@ async function scrapeSoccer24() {
     if (!homeTeam || !awayTeam) return;
 
     const scoreEl = $(row).find('[class*=event__scores]');
-    const scoreParts = scoreEl.text().trim().split(/\s*[–\-:]\s*/);
+    const scoreParts = scoreEl.text().trim().split(/\s*[\u2013\u2014\-:]\s*/);
     if (scoreParts.length === 2) {
       const hs = parseScore(scoreParts[0]);
       const as = parseScore(scoreParts[1]);
@@ -91,66 +180,41 @@ async function scrapeSoccer24() {
       }
     }
   });
-  return deduplicate(matches);
-}
 
-// --- LiveScore.in ---
-async function scrapeLiveScoreIn() {
-  const res = await fetch('https://www.livescores.in/', {
-    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
-    timeout: 20000,
-  });
-  const html = await res.text();
-  const $ = cheerio.load(html);
-  const matches = [];
-
-  $('[class*=score-card], [class*=match-row], .msResult').each((_, card) => {
-    const status = $(card).find('[class*=status], [class*=state]').text().trim().toLowerCase();
-    if (!status.includes('ft') && !status.includes('full') && !status.includes('ended') && !status.includes('finished')) return;
-
-    const teams = $(card).find('[class*=team]');
-    const homeTeam = $(teams[0]).text().trim();
-    const awayTeam = $(teams[teams.length - 1]).text().trim();
-    if (!homeTeam || !awayTeam) return;
-
-    const scores = $(card).find('[class*=score]');
-    const scoresText = scores.first().text().trim();
-    const parts = scoresText.split(/\s*[–\-:]\s*/);
-    if (parts.length === 2) {
-      const hs = parseScore(parts[0]);
-      const as = parseScore(parts[1]);
-      if (hs !== null && as !== null && hs <= 15 && as <= 15) {
-        matches.push({ home_team: homeTeam, away_team: awayTeam, home_score: hs, away_score: as, match_date: new Date().toISOString().slice(0, 10) });
-      }
-    }
-  });
-  return deduplicate(matches);
+  console.error(`[soccer24] Found ${matches.length} finished matches`);
+  return matches;
 }
 
 async function scrape() {
-  const errors = [];
-  const sources = [
-    { name: 'sportybet', fn: scrapeSportyBet },
-    { name: 'soccer24', fn: scrapeSoccer24 },
-    { name: 'livescore.in', fn: scrapeLiveScoreIn },
-  ];
+  const allMatches = [];
 
-  for (const src of sources) {
-    try {
-      const matches = await src.fn();
-      if (matches.length > 0) {
-        console.error(`[${src.name}] Found ${matches.length} finished matches`);
-        return matches;
-      }
-      console.error(`[${src.name}] 0 matches`);
-    } catch (e) {
-      console.error(`[${src.name}] Error: ${e.message}`);
-      errors.push(`${src.name}: ${e.message}`);
-    }
+  // 1. Try API-Football first (most comprehensive)
+  try {
+    const apiMatches = await scrapeAPIFootball();
+    allMatches.push(...apiMatches);
+  } catch (e) {
+    console.error('[api-football] Error:', e.message);
   }
 
-  console.error('All sources failed:', errors.join('; '));
-  return [];
+  // 2. Try SportyBet (good fallback, different team names)
+  try {
+    const sportyMatches = await scrapeSportyBet();
+    allMatches.push(...sportyMatches);
+  } catch (e) {
+    console.error('[sportybet] Error:', e.message);
+  }
+
+  // 3. Try Soccer24 (limited but different names)
+  try {
+    const soccer24Matches = await scrapeSoccer24();
+    allMatches.push(...soccer24Matches);
+  } catch (e) {
+    console.error('[soccer24] Error:', e.message);
+  }
+
+  const unique = deduplicate(allMatches);
+  console.error(`[total] ${unique.length} unique finished matches from ${allMatches.length} raw`);
+  return unique;
 }
 
 if (require.main === module) {

@@ -85,7 +85,13 @@ function settleOnePick($db, $pick, $today) {
     $homeTeam = normalizePickTeam($parts[0]);
     $awayTeam = normalizePickTeam($parts[1]);
 
-    $result = findMatchResult($db, $homeTeam, $awayTeam, $today);
+    // Use pick's detected_at date as anchor (not today) so older picks can find their match
+    $pickDate = date('Y-m-d', strtotime($pick['detected_at'] ?? $today));
+    $result = findMatchResult($db, $homeTeam, $awayTeam, $pickDate);
+    if (!$result) {
+        // Fallback: also try today in case the match date differs from detection date
+        $result = findMatchResult($db, $homeTeam, $awayTeam, $today);
+    }
     if (!$result) {
         echo "  No result found for: $matchName\n";
         return false;
@@ -132,11 +138,11 @@ function resolveSettleTeamId($db, $name) {
     return $id ? (int)$id : null;
 }
 
-function findMatchResult($db, $homeTeam, $awayTeam, $today) {
-    $yesterday = date('Y-m-d', strtotime($today . ' -1 day'));
-    $twoDaysAgo = date('Y-m-d', strtotime($today . ' -2 days'));
-    $tomorrow = date('Y-m-d', strtotime($today . ' +1 day'));
-    $dates = [$today, $yesterday, $tomorrow, $twoDaysAgo];
+function findMatchResult($db, $homeTeam, $awayTeam, $anchorDate) {
+    $yesterday = date('Y-m-d', strtotime($anchorDate . ' -1 day'));
+    $twoDaysAgo = date('Y-m-d', strtotime($anchorDate . ' -2 days'));
+    $tomorrow = date('Y-m-d', strtotime($anchorDate . ' +1 day'));
+    $dates = array_unique([$anchorDate, $yesterday, $tomorrow, $twoDaysAgo]);
 
     $fallback = null;
 
@@ -176,7 +182,7 @@ function findMatchResult($db, $homeTeam, $awayTeam, $today) {
 
     // Phase 3: Fuzzy match — prefer non-zero scores
     foreach ($dates as $d) {
-        $stmt = $db->prepare("SELECT home_score, away_score, home_team, away_team FROM match_results WHERE match_date = ? ORDER BY id DESC LIMIT 200");
+        $stmt = $db->prepare("SELECT home_score, away_score, home_team, away_team FROM match_results WHERE match_date = ? ORDER BY id DESC");
         $stmt->execute([$d]);
         foreach ($stmt->fetchAll() as $m) {
             if (teamFuzzyMatch($homeTeam, $m['home_team']) && teamFuzzyMatch($awayTeam, $m['away_team'])) {
@@ -195,8 +201,9 @@ function findMatchResult($db, $homeTeam, $awayTeam, $today) {
 
 function normalizePickTeam($name) {
     $name = trim(preg_replace('/\s+/', ' ', $name));
-    $name = preg_replace('/^(FC|CF|AC|SC|RC|SS|CD|AS|SK|FK|NK|UD|CA|CR|EC|AA|AE|SSC)\s+/i', '', $name);
-    $name = preg_replace('/\s+(FC|CF|AC|SC|RC|SS|CD|AS|SK|FK|NK|UD|CA|CR|EC|AA|AE|SSC)$/i', '', $name);
+    // Strip common club prefixes (but NOT identity names like Real, Atletico, Club)
+    $name = preg_replace('/^(FC|CF|AC|SC|RC|SS|CD|AS|SK|FK|NK|UD|CA|CR|EC|AA|AE|SSC|IF|IFK|BK|FF|AIK|BSC|VfL|1\. FC|US|SV|TS|TV|CS|PK|KK|NK|HNK|FK|PFC|NS|SC|GD)\s+/i', '', $name);
+    $name = preg_replace('/\s+(FC|CF|AC|SC|RC|SS|CD|AS|SK|FK|NK|UD|CA|CR|EC|AA|AE|SSC|IF|IFK|BK|FF|II|W|B|Res\.|U\d+)$/i', '', $name);
     return trim(mb_strtolower($name));
 }
 
@@ -204,24 +211,30 @@ function teamFuzzyMatch($a, $b) {
     if ($a === $b) return true;
     if (strpos($a, $b) !== false || strpos($b, $a) !== false) return true;
 
-    // Normalize: strip common suffixes like "fk", "fc", "cf" etc after a space
-    $strip = ['fc', 'cf', 'ac', 'sc', 'rc', 'ss', 'cd', 'as', 'sk', 'fk', 'nk', 'ud', 'ca', 'cr', 'ec', 'aa', 'ae', 'ssc'];
+    // Strip common suffixes like "fk", "fc", "cf" etc
+    $strip = ['fc', 'cf', 'ac', 'sc', 'rc', 'ss', 'cd', 'as', 'sk', 'fk', 'nk', 'ud', 'ca', 'cr', 'ec', 'aa', 'ae', 'ssc', 'if', 'ifk', 'bk', 'ff', 'ii', 'u21', 'u23', 'res', 'b'];
     $aClean = trim(preg_replace('/\s+(' . implode('|', $strip) . ')$/i', '', $a));
     $bClean = trim(preg_replace('/\s+(' . implode('|', $strip) . ')$/i', '', $b));
     if ($aClean === $bClean) return true;
     if (strpos($aClean, $bClean) !== false || strpos($bClean, $aClean) !== false) return true;
 
+    // Also strip prefixes
+    $aClean2 = trim(preg_replace('/^(' . implode('|', $strip) . ')\s+/i', '', $aClean));
+    $bClean2 = trim(preg_replace('/^(' . implode('|', $strip) . ')\s+/i', '', $bClean));
+    if ($aClean2 === $bClean2) return true;
+    if ($aClean2 !== '' && $bClean2 !== '' && (strpos($aClean2, $bClean2) !== false || strpos($bClean2, $aClean2) !== false)) return true;
+
     // Word overlap
-    $aWords = preg_split('/\s+/', $a);
-    $bWords = preg_split('/\s+/', $b);
+    $aWords = preg_split('/\s+/', $aClean2);
+    $bWords = preg_split('/\s+/', $bClean2);
     $common = array_intersect($aWords, $bWords);
     $min = min(count($aWords), count($bWords));
     if ($min > 0 && count($common) >= $min * 0.5) return true;
 
-    // Single-word teams: check if one is a substring of the other after normalization
+    // Single-word teams: check if one is a substring of the other
     if (count($aWords) === 1 || count($bWords) === 1) {
-        $longer = count($aWords) >= count($bWords) ? $a : $b;
-        $shorter = count($aWords) < count($bWords) ? $a : $b;
+        $longer = count($aWords) >= count($bWords) ? $aClean2 : $bClean2;
+        $shorter = count($aWords) < count($bWords) ? $aClean2 : $bClean2;
         if (strlen($shorter) >= 3 && strpos($longer, $shorter) !== false) return true;
     }
 

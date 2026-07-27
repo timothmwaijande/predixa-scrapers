@@ -38,9 +38,9 @@ $skipped = 0;
 
 function normalizeTeam($name) {
     $name = trim(preg_replace('/\s+/', ' ', $name));
-    // Strip generic club prefixes/suffixes only, NOT identity names like Real/Atletico
-    $name = preg_replace('/^(FC|CF|AC|SC|RC|SS|CD|AS|SK|FK|NK|UD|CD|CA|CR|EC|AA|AE|SSC)\s+/i', '', $name);
-    $name = preg_replace('/\s+(FC|CF|AC|SC|RC|SS|CD|AS|SK|FK|NK|UD|CD|CA|CR|EC|AA|AE|SSC)$/i', '', $name);
+    // Strip generic club prefixes/suffixes
+    $name = preg_replace('/^(FC|CF|AC|SC|RC|SS|CD|AS|SK|FK|NK|UD|CD|CA|CR|EC|AA|AE|SSC|IF|IFK|BK|FF|PFC|HNK|FK|US|SV|VfL|1\. FC|CS|GD|SC|NK|HNK)\s+/i', '', $name);
+    $name = preg_replace('/\s+(FC|CF|AC|SC|RC|SS|CD|AS|SK|FK|NK|UD|CD|CA|CR|EC|AA|AE|SSC|IF|IFK|BK|FF|II|W|Res\.|U\d+)$/i', '', $name);
     return trim(mb_strtolower($name));
 }
 

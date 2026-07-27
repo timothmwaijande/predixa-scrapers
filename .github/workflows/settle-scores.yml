@@ -19,8 +19,10 @@ jobs:
       - name: Install deps
         run: npm install
 
-      - name: Scrape scores from SportyBet
+      - name: Scrape scores (API-Football + SportyBet)
         id: scores
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
           node scrape_scores.js > matches.json
           echo "count=$(node -e "console.log(JSON.parse(require('fs').readFileSync('matches.json','utf8')).matches.length)")" >> $GITHUB_OUTPUT
