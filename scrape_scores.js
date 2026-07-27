@@ -54,7 +54,7 @@ async function scrapeSportyBet() {
       if (hs === null || as === null) return;
       if (hs > 15 || as > 15) return;
 
-      matches.push({ home_team: homeTeam, away_team: awayTeam, home_score: hs, away_score: as });
+      matches.push({ home_team: homeTeam, away_team: awayTeam, home_score: hs, away_score: as, match_date: new Date().toISOString().slice(0, 10) });
     });
     if (matches.length > 0) break;
   }
@@ -87,7 +87,7 @@ async function scrapeSoccer24() {
       const hs = parseScore(scoreParts[0]);
       const as = parseScore(scoreParts[1]);
       if (hs !== null && as !== null && hs <= 15 && as <= 15) {
-        matches.push({ home_team: homeTeam, away_team: awayTeam, home_score: hs, away_score: as });
+        matches.push({ home_team: homeTeam, away_team: awayTeam, home_score: hs, away_score: as, match_date: new Date().toISOString().slice(0, 10) });
       }
     }
   });
@@ -120,7 +120,7 @@ async function scrapeLiveScoreIn() {
       const hs = parseScore(parts[0]);
       const as = parseScore(parts[1]);
       if (hs !== null && as !== null && hs <= 15 && as <= 15) {
-        matches.push({ home_team: homeTeam, away_team: awayTeam, home_score: hs, away_score: as });
+        matches.push({ home_team: homeTeam, away_team: awayTeam, home_score: hs, away_score: as, match_date: new Date().toISOString().slice(0, 10) });
       }
     }
   });
