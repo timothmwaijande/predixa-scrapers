@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-27T09:48:09.269Z",
-  "started_at": "2026-07-27T09:47:49.770Z",
+  "generated_at": "2026-07-27T12:54:23.993Z",
+  "started_at": "2026-07-27T12:54:02.686Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
@@ -17,11 +17,11 @@
     },
     "bet_sites": {
       "status": "ok",
-      "count": 112
+      "count": 104
     },
     "wp_tables": {
       "status": "ok",
-      "count": 22
+      "count": 26
     }
   },
   "sources_detail": [
@@ -683,6 +683,78 @@
           "time": ""
         },
         {
+          "match": "CSKA Sofia vs Botev",
+          "home": "CSKA Sofia",
+          "away": "Botev",
+          "pick": "2 Ov 0.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Randers FC vs Silkeborg",
+          "home": "Randers FC",
+          "away": "Silkeborg",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Breidablik vs Vestmannaeyjar",
+          "home": "Breidablik",
+          "away": "Vestmannaeyjar",
+          "pick": "1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Tukums 2000 vs RFS",
+          "home": "Tukums 2000",
+          "away": "RFS",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Valmiera vs Riga FC 2",
+          "home": "Valmiera",
+          "away": "Riga FC 2",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Rosenborg vs Fredrikstad",
+          "home": "Rosenborg",
+          "away": "Fredrikstad",
+          "pick": "1 DNB",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Hacken vs AIK",
+          "home": "Hacken",
+          "away": "AIK",
+          "pick": "Over 2.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Oster vs Varberg",
+          "home": "Oster",
+          "away": "Varberg",
+          "pick": "2 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
           "match": "Slavia Prague vs Slovacko",
           "home": "Slavia Prague",
           "away": "Slovacko",
@@ -750,150 +822,6 @@
           "home": "GAIS",
           "away": "Halmstad",
           "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Lok. Sofia vs Levski",
-          "home": "Lok. Sofia",
-          "away": "Levski",
-          "pick": "Under 3.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Plzen vs Liberec",
-          "home": "Plzen",
-          "away": "Liberec",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Brno vs Sparta Prague",
-          "home": "Brno",
-          "away": "Sparta Prague",
-          "pick": "X2",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Haka vs KaPA",
-          "home": "Haka",
-          "away": "KaPA",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Babrungas vs Ekranas",
-          "home": "Babrungas",
-          "away": "Ekranas",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Stromsgodset vs Lyn",
-          "home": "Stromsgodset",
-          "away": "Lyn",
-          "pick": "1 Ov 1.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Tromsdalen vs Follo",
-          "home": "Tromsdalen",
-          "away": "Follo",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Dundee Utd vs Clyde",
-          "home": "Dundee Utd",
-          "away": "Clyde",
-          "pick": "1 Ov 1.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Dun. Streda vs Velez",
-          "home": "Dun. Streda",
-          "away": "Velez",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Rakow vs Valletta",
-          "home": "Rakow",
-          "away": "Valletta",
-          "pick": "1 Ov 1.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "FC Santa Coloma vs SK Rapid",
-          "home": "FC Santa Coloma",
-          "away": "SK Rapid",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Vaduz vs Atletic",
-          "home": "Vaduz",
-          "away": "Atletic",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "FCSB vs Auda",
-          "home": "FCSB",
-          "away": "Auda",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Rijeka vs Derry City",
-          "home": "Rijeka",
-          "away": "Derry City",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Partizan vs UNA Strassen",
-          "home": "Partizan",
-          "away": "UNA Strassen",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Stjarnan vs Ilves",
-          "home": "Stjarnan",
-          "away": "Ilves",
-          "pick": "Over 1.5",
           "odds": "",
           "league": "",
           "time": ""
@@ -1748,6 +1676,42 @@
           "odds": "",
           "league": "",
           "time": ""
+        },
+        {
+          "match": "OKMK vs Mashal Muborak",
+          "home": "OKMK",
+          "away": "Mashal Muborak",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Mushuc Runa vs Libertad",
+          "home": "Mushuc Runa",
+          "away": "Libertad",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Fenix vs Yupanqui",
+          "home": "Fenix",
+          "away": "Yupanqui",
+          "pick": "1X",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Romero Gormaz L. vs Sorribes Tormo S.",
+          "home": "Romero Gormaz L.",
+          "away": "Sorribes Tormo S.",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "",
+          "time": ""
         }
       ]
     }
@@ -1769,6 +1733,49 @@
       "time": "18:00"
     },
     {
+      "match": "FK Tukums 2000/TSS vs FC RFS",
+      "home": "FK Tukums 2000/TSS",
+      "away": "FC RFS",
+      "pick": "Away(2)",
+      "sources": [
+        "allnigeriafootball",
+        "adibet",
+        "bet_sites"
+      ],
+      "source_count": 3,
+      "odds": "",
+      "league": "Latvia Virsliga",
+      "time": "16:00"
+    },
+    {
+      "match": "BK Hacken vs AIK",
+      "home": "BK Hacken",
+      "away": "AIK",
+      "pick": "Over 2.5",
+      "sources": [
+        "adibet",
+        "bet_sites"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "Sweden",
+      "time": ""
+    },
+    {
+      "match": "Randers FC vs Silkeborg IF",
+      "home": "Randers FC",
+      "away": "Silkeborg IF",
+      "pick": "Over 1.5",
+      "sources": [
+        "allnigeriafootball",
+        "bet_sites"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "Denmark Superliga",
+      "time": "18:00"
+    },
+    {
       "match": "FC Dunav Ruse vs Ludogorets",
       "home": "FC Dunav Ruse",
       "away": "Ludogorets",
@@ -1781,20 +1788,6 @@
       "odds": "",
       "league": "Bulgaria Parva Liga",
       "time": "17:00"
-    },
-    {
-      "match": "FK Tukums 2000/TSS vs FC RFS",
-      "home": "FK Tukums 2000/TSS",
-      "away": "FC RFS",
-      "pick": "Away(2)",
-      "sources": [
-        "allnigeriafootball",
-        "adibet"
-      ],
-      "source_count": 2,
-      "odds": "",
-      "league": "Latvia Virsliga",
-      "time": "16:00"
     },
     {
       "match": "HJK vs TPS",
