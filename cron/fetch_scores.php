@@ -84,8 +84,8 @@ foreach ($input['matches'] as $m) {
     if (empty($home) || empty($away)) { $skipped++; continue; }
 
     $matchDate = trim($m['match_date'] ?? '');
-    if (empty($matchDate)) { $skipped++; continue; }
-    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $matchDate)) { $skipped++; continue; }
+    if (empty($matchDate)) { $matchDate = date('Y-m-d'); }
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $matchDate)) { $matchDate = date('Y-m-d'); }
 
     $checkStmt->execute([$home, $away, $matchDate]);
     $existing = $checkStmt->fetch();
