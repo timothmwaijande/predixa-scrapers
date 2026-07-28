@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-28T11:56:58.722Z",
-  "started_at": "2026-07-28T11:56:37.663Z",
+  "generated_at": "2026-07-28T16:04:30.021Z",
+  "started_at": "2026-07-28T16:04:12.919Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
@@ -17,7 +17,7 @@
     },
     "bet_sites": {
       "status": "ok",
-      "count": 107
+      "count": 91
     },
     "wp_tables": {
       "status": "ok",
@@ -421,150 +421,6 @@
     {
       "source": "bet_sites",
       "picks": [
-        {
-          "match": "Slavia Sofia vs CSKA Sofia",
-          "home": "Slavia Sofia",
-          "away": "CSKA Sofia",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "TPS vs Ilves",
-          "home": "TPS",
-          "away": "Ilves",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "KPV Kokkola vs Rovaniemi",
-          "home": "KPV Kokkola",
-          "away": "Rovaniemi",
-          "pick": "Over 2.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Hafnarfjordur vs Breikdablik",
-          "home": "Hafnarfjordur",
-          "away": "Breikdablik",
-          "pick": "Over 2.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Kopavogur vs Vestri",
-          "home": "Kopavogur",
-          "away": "Vestri",
-          "pick": "Over 2.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Jelgava vs RFS",
-          "home": "Jelgava",
-          "away": "RFS",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Super Nova vs Grobina",
-          "home": "Super Nova",
-          "away": "Grobina",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Orgryte vs Djurgarden",
-          "home": "Orgryte",
-          "away": "Djurgarden",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Ludogorets vs Lod. Plovdiv",
-          "home": "Ludogorets",
-          "away": "Lod. Plovdiv",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Valur vs Fram",
-          "home": "Valur",
-          "away": "Fram",
-          "pick": "Over 2.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Throttur vs Volsungur",
-          "home": "Throttur",
-          "away": "Volsungur",
-          "pick": "Over 2.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Riga FC vs Tukums 2000",
-          "home": "Riga FC",
-          "away": "Tukums 2000",
-          "pick": "Over 2.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Molde vs Brann",
-          "home": "Molde",
-          "away": "Brann",
-          "pick": "Over 2.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Viking vs Sandefjord",
-          "home": "Viking",
-          "away": "Sandefjord",
-          "pick": "Over 2.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Univ. Craiova vs UTA Arad",
-          "home": "Univ. Craiova",
-          "away": "UTA Arad",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Aberdeen vs Queens Park",
-          "home": "Aberdeen",
-          "away": "Queens Park",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
         {
           "match": "KuPS vs Sabah Baku",
           "home": "KuPS",
