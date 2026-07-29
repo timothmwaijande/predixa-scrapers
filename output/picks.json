@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-29T15:48:51.096Z",
-  "started_at": "2026-07-29T15:48:29.045Z",
+  "generated_at": "2026-07-29T19:13:00.459Z",
+  "started_at": "2026-07-29T19:12:39.372Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
@@ -259,9 +259,9 @@
           "time": ""
         },
         {
-          "match": "FC Copenhagen vs PolissyaZhytomyr",
+          "match": "FC Copenhagen vs Polissya Zhytomyr",
           "home": "FC Copenhagen",
-          "away": "PolissyaZhytomyr",
+          "away": "Polissya Zhytomyr",
           "pick": "GG(BTTS)",
           "odds": "",
           "league": "Euro Competitions",
