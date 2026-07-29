@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-29T19:13:00.459Z",
-  "started_at": "2026-07-29T19:12:39.372Z",
+  "generated_at": "2026-07-29T22:58:19.811Z",
+  "started_at": "2026-07-29T22:57:58.397Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
@@ -17,7 +17,7 @@
     },
     "bet_sites": {
       "status": "ok",
-      "count": 97
+      "count": 103
     },
     "wp_tables": {
       "status": "ok",
@@ -494,6 +494,33 @@
       "source": "bet_sites",
       "picks": [
         {
+          "match": "Gyor vs Bissen",
+          "home": "Gyor",
+          "away": "Bissen",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Vestri vs RFS",
+          "home": "Vestri",
+          "away": "RFS",
+          "pick": "Over 2.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Ajax vs Vojvodina",
+          "home": "Ajax",
+          "away": "Vojvodina",
+          "pick": "Over 2.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
           "match": "Crv. Zvezda vs Larne",
           "home": "Crv. Zvezda",
           "away": "Larne",
@@ -660,6 +687,33 @@
           "home": "Dainava Alytus",
           "away": "Transinvest 2",
           "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Gyor vs Bissen",
+          "home": "Gyor",
+          "away": "Bissen",
+          "pick": "1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Ajax vs Vojvodina",
+          "home": "Ajax",
+          "away": "Vojvodina",
+          "pick": "1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Austria Vienna vs Liepaja",
+          "home": "Austria Vienna",
+          "away": "Liepaja",
+          "pick": "1 Ov 1.5",
           "odds": "",
           "league": "",
           "time": ""
