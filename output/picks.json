@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-31T08:46:52.056Z",
-  "started_at": "2026-07-31T08:46:29.574Z",
+  "generated_at": "2026-07-31T11:58:16.946Z",
+  "started_at": "2026-07-31T11:57:52.140Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
@@ -17,7 +17,7 @@
     },
     "bet_sites": {
       "status": "ok",
-      "count": 102
+      "count": 115
     },
     "wp_tables": {
       "status": "ok",
@@ -449,6 +449,24 @@
       "source": "bet_sites",
       "picks": [
         {
+          "match": "D. Zagreb vs Slaven Belupo",
+          "home": "D. Zagreb",
+          "away": "Slaven Belupo",
+          "pick": "Over 2.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Sparta Prague vs Zlin",
+          "home": "Sparta Prague",
+          "away": "Zlin",
+          "pick": "Over 2.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
           "match": "Gyor vs Bissen",
           "home": "Gyor",
           "away": "Bissen",
@@ -498,6 +516,78 @@
           "home": "Fylkir",
           "away": "Volsungur",
           "pick": "Over 2.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "LASK vs Grazer",
+          "home": "LASK",
+          "away": "Grazer",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "D. Zagreb vs Slaven Belupo",
+          "home": "D. Zagreb",
+          "away": "Slaven Belupo",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Sparta Prague vs Zlin",
+          "home": "Sparta Prague",
+          "away": "Zlin",
+          "pick": "1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Koge vs Vejle",
+          "home": "Koge",
+          "away": "Vejle",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "KTP vs SJK Akatemia",
+          "home": "KTP",
+          "away": "SJK Akatemia",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Drogheda vs Shamrock Rovers",
+          "home": "Drogheda",
+          "away": "Shamrock Rovers",
+          "pick": "X2",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Valerenga vs HamKam",
+          "home": "Valerenga",
+          "away": "HamKam",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Bodo/Glimt vs Lillestrom",
+          "home": "Bodo/Glimt",
+          "away": "Lillestrom",
+          "pick": "1 Ov 1.5",
           "odds": "",
           "league": "",
           "time": ""
@@ -632,6 +722,33 @@
           "match": "SK Rapid vs Santa Coloma",
           "home": "SK Rapid",
           "away": "Santa Coloma",
+          "pick": "1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "D. Zagreb vs Slaven",
+          "home": "D. Zagreb",
+          "away": "Slaven",
+          "pick": "1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Sparta Prague vs Zlin",
+          "home": "Sparta Prague",
+          "away": "Zlin",
+          "pick": "1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Bodo/Glimt vs Lillestrom",
+          "home": "Bodo/Glimt",
+          "away": "Lillestrom",
           "pick": "1 Ov 1.5",
           "odds": "",
           "league": "",
@@ -1600,6 +1717,20 @@
     }
   ],
   "intersections": [
+    {
+      "match": "Drogheda United vs Shamrock Rovers",
+      "home": "Drogheda United",
+      "away": "Shamrock Rovers",
+      "pick": "X2",
+      "sources": [
+        "allnigeriafootball",
+        "bet_sites"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "Ireland Premier Division",
+      "time": "20:00"
+    },
     {
       "match": "Gyor vs Bissen",
       "home": "Gyor",
