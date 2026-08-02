@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-02T08:21:30.647Z",
-  "started_at": "2026-08-02T08:21:07.741Z",
+  "generated_at": "2026-08-02T11:15:15.165Z",
+  "started_at": "2026-08-02T11:14:55.828Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
@@ -17,7 +17,7 @@
     },
     "bet_sites": {
       "status": "ok",
-      "count": 118
+      "count": 126
     },
     "wp_tables": {
       "status": "ok",
@@ -425,6 +425,78 @@
           "home": "Fylkir",
           "away": "Volsungur",
           "pick": "Over 2.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Rijeka vs Rudes",
+          "home": "Rijeka",
+          "away": "Rudes",
+          "pick": "1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Midtjylland vs Horsens",
+          "home": "Midtjylland",
+          "away": "Horsens",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Parnu JK vs Levadia",
+          "home": "Parnu JK",
+          "away": "Levadia",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Ordabasy vs Tobol",
+          "home": "Ordabasy",
+          "away": "Tobol",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Riga FC vs Grobina",
+          "home": "Riga FC",
+          "away": "Grobina",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "PSV vs AZ Alkmaar",
+          "home": "PSV",
+          "away": "AZ Alkmaar",
+          "pick": "Over 2.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Alesund vs Tromso",
+          "home": "Alesund",
+          "away": "Tromso",
+          "pick": "X2",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Kongsvinger vs Strommen",
+          "home": "Kongsvinger",
+          "away": "Strommen",
+          "pick": "1 Ov 1.5",
           "odds": "",
           "league": "",
           "time": ""
@@ -1679,5 +1751,20 @@
       ]
     }
   ],
-  "intersections": []
+  "intersections": [
+    {
+      "match": "FC Midtjylland vs AC Horsens",
+      "home": "FC Midtjylland",
+      "away": "AC Horsens",
+      "pick": "Home(1)",
+      "sources": [
+        "allnigeriafootball",
+        "bet_sites"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "Denmark Superliga",
+      "time": "13:00"
+    }
+  ]
 }
