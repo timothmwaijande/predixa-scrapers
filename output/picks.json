@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-08-03T16:22:55.703Z",
-  "started_at": "2026-08-03T16:22:35.441Z",
+  "generated_at": "2026-08-03T19:27:43.322Z",
+  "started_at": "2026-08-03T19:27:22.967Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
       "status": "ok",
-      "count": 11
+      "count": 13
     },
     "adibet": {
       "status": "ok",
@@ -126,6 +126,24 @@
           "odds": "",
           "league": "Argentina Primera Nacional",
           "time": "20:00"
+        },
+        {
+          "match": "Senegal vs Morocco",
+          "home": "Senegal",
+          "away": "Morocco",
+          "pick": "Home(DNB)Morocco",
+          "odds": "",
+          "league": "AFCON, Women",
+          "time": "21:00"
+        },
+        {
+          "match": "Kenya vs Algeria",
+          "home": "Kenya",
+          "away": "Algeria",
+          "pick": "X2",
+          "odds": "",
+          "league": "AFCON, Women",
+          "time": "21:00"
         }
       ]
     },
