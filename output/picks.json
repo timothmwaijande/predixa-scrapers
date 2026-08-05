@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-05T08:32:23.593Z",
-  "started_at": "2026-08-05T08:32:06.286Z",
+  "generated_at": "2026-08-05T11:58:28.122Z",
+  "started_at": "2026-08-05T11:58:11.057Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
@@ -21,7 +21,7 @@
     },
     "wp_tables": {
       "status": "ok",
-      "count": 22
+      "count": 26
     }
   },
   "sources_detail": [
@@ -1483,6 +1483,42 @@
           "home": "Hafnarfjordur",
           "away": "KR Reykjavik",
           "pick": "Draw(X)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Leczna vs KKS Kalisz",
+          "home": "Leczna",
+          "away": "KKS Kalisz",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Ranheim 2 vs Ntnui",
+          "home": "Ranheim 2",
+          "away": "Ntnui",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Lanzhou Longyuan vs Beijing Technology",
+          "home": "Lanzhou Longyuan",
+          "away": "Beijing Technology",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Andreev A. vs Demanet E.",
+          "home": "Andreev A.",
+          "away": "Demanet E.",
+          "pick": "Home(1)",
           "odds": "",
           "league": "",
           "time": ""
