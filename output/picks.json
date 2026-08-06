@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-06T08:32:47.972Z",
-  "started_at": "2026-08-06T08:32:27.076Z",
+  "generated_at": "2026-08-06T12:01:23.341Z",
+  "started_at": "2026-08-06T12:01:01.226Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
@@ -17,7 +17,7 @@
     },
     "bet_sites": {
       "status": "ok",
-      "count": 124
+      "count": 135
     },
     "wp_tables": {
       "status": "ok",
@@ -212,7 +212,7 @@
           "match": "Richmond Kickers vs New York Cosmos",
           "home": "Richmond Kickers",
           "away": "New York Cosmos",
-          "pick": "Over 1.5",
+          "pick": "Over 1.5 Won",
           "odds": "",
           "league": "USA USL League One",
           "time": "00:00"
@@ -221,7 +221,7 @@
           "match": "FC Naples vs Av Alta FC",
           "home": "FC Naples",
           "away": "Av Alta FC",
-          "pick": "Over 1.5",
+          "pick": "Over 1.5 Won",
           "odds": "",
           "league": "USA USL League One",
           "time": "00:30"
@@ -230,7 +230,7 @@
           "match": "Penarol vs Montevideo Wanderers",
           "home": "Penarol",
           "away": "Montevideo Wanderers",
-          "pick": "Home(DNB)Penarol",
+          "pick": "Home(DNB)Penarol Won",
           "odds": "",
           "league": "Uruguay Primera División",
           "time": "00:00"
@@ -239,7 +239,7 @@
           "match": "Quilmes AC vs Gimnasia y Esgrima de Jujuy",
           "home": "Quilmes AC",
           "away": "Gimnasia y Esgrima de Jujuy",
-          "pick": "Under 3.5",
+          "pick": "Under 3.5 Won",
           "odds": "",
           "league": "Argentina Primera Nacional",
           "time": "00:00"
@@ -308,6 +308,78 @@
           "home": "Bryne",
           "away": "Stromsgodset",
           "pick": "Over 2.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "KuPS vs Univ. Craiova",
+          "home": "KuPS",
+          "away": "Univ. Craiova",
+          "pick": "X2",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Benfica vs Hearts",
+          "home": "Benfica",
+          "away": "Hearts",
+          "pick": "1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Paide vs SK Rapid",
+          "home": "Paide",
+          "away": "SK Rapid",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Sheriff vs St. Gallen",
+          "home": "Sheriff",
+          "away": "St. Gallen",
+          "pick": "X2",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Ajax vs Shelbourne",
+          "home": "Ajax",
+          "away": "Shelbourne",
+          "pick": "1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Braga vs D. Minsk",
+          "home": "Braga",
+          "away": "D. Minsk",
+          "pick": "1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Valur vs Nordsjaelland",
+          "home": "Valur",
+          "away": "Nordsjaelland",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Bohemians vs Midtjylland",
+          "home": "Bohemians",
+          "away": "Midtjylland",
+          "pick": "Away(2)",
           "odds": "",
           "league": "",
           "time": ""
@@ -515,6 +587,33 @@
           "home": "Orlando",
           "away": "Milford",
           "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Ajax vs Shelbourne",
+          "home": "Ajax",
+          "away": "Shelbourne",
+          "pick": "1 &amp; Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Braga vs D. Minsk",
+          "home": "Braga",
+          "away": "D. Minsk",
+          "pick": "1 &amp; 1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Bohemians vs Midtjylland",
+          "home": "Bohemians",
+          "away": "Midtjylland",
+          "pick": "Away(2)",
           "odds": "",
           "league": "",
           "time": ""
@@ -1639,6 +1738,48 @@
       "odds": "",
       "league": "UEFA Europa League",
       "time": "18:00"
+    },
+    {
+      "match": "Paide Linnameeskond vs SK Rapid",
+      "home": "Paide Linnameeskond",
+      "away": "SK Rapid",
+      "pick": "Away(2)",
+      "sources": [
+        "allnigeriafootball",
+        "bet_sites"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "UEFA Conference League",
+      "time": "17:00"
+    },
+    {
+      "match": "Valur Reykjavik vs Nordsjaelland",
+      "home": "Valur Reykjavik",
+      "away": "Nordsjaelland",
+      "pick": "Away(2)",
+      "sources": [
+        "allnigeriafootball",
+        "bet_sites"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "UEFA Conference League",
+      "time": "19:30"
+    },
+    {
+      "match": "Bohemians Dublin vs FC Midtjylland",
+      "home": "Bohemians Dublin",
+      "away": "FC Midtjylland",
+      "pick": "Away(2)",
+      "sources": [
+        "allnigeriafootball",
+        "bet_sites"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "UEFA Conference League",
+      "time": "19:45"
     }
   ]
 }
