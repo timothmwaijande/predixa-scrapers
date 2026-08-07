@@ -1,6 +1,7 @@
 <?php
 require_once 'config.php';
 require_once 'auth.php';
+require_once 'admin_render_user_row.php';
 require_once 'classes/OddsAnalyzer.php';
 require_once 'includes/signals_engine.php';
 requireLogin();
@@ -22,7 +23,7 @@ $analysisLog = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         if ($_POST['action'] === 'approve' && isset($_POST['payment_id'])) {
-            if (approvePayment($_POST['payment_id'], $_POST['tier'])) {
+            if (approvePayment($_POST['payment_id'], $_POST['tier'], $_POST['ref_number'] ?? null)) {
                 $msg = "<i class='fas fa-check-circle me-1' style='color:#22C55E;'></i> Approved " . htmlspecialchars($_POST['tier']) . " successfully!";
             } else {
                 $error = "Failed to approve.";
@@ -30,8 +31,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($_POST['action'] === 'reject' && isset($_POST['payment_id'])) {
             $db = getDB();
             $reason = trim($_POST['rejection_reason'] ?? 'Wrong reference number');
-            $stmt = $db->prepare("UPDATE payment_verifications SET status='rejected', rejection_reason=?, verified_at=NOW() WHERE id=?");
-            $stmt->execute([$reason, $_POST['payment_id']]);
+            $ref = trim($_POST['ref_number'] ?? '');
+            if ($ref !== '') {
+                $stmt = $db->prepare("UPDATE payment_verifications SET status='rejected', rejection_reason=?, verified_at=NOW() WHERE reference_number=?");
+                $stmt->execute([$reason, $ref]);
+            } else {
+                $stmt = $db->prepare("UPDATE payment_verifications SET status='rejected', rejection_reason=?, verified_at=NOW() WHERE id=?");
+                $stmt->execute([$reason, $_POST['payment_id']]);
+            }
             $msg = "<i class='fas fa-times-circle me-1' style='color:#EF4444;'></i>Payment rejected.";
         } elseif ($_POST['action'] === 'grant_admin' && isset($_POST['target_user_id'])) {
             $perms = isset($_POST['permissions']) ? $_POST['permissions'] : null;
@@ -51,6 +58,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $analyzer = new OddsAnalyzer();
                 $analysisLog[] = '[' . date('H:i:s') . '] Fetching odds data from Google Sheets via OAuth2...';
                 $tips = $analyzer->getTips();
+                foreach ($analyzer->guardLog as $guardMsg) {
+                    $analysisLog[] = '[' . date('H:i:s') . '] ⚠️ ' . $guardMsg;
+                }
                 if (empty($tips)) {
                     throw new Exception('No picks generated. Either no odds data in the lookback window or all matches were filtered out.');
                 }
@@ -519,6 +529,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $reason = trim($_POST['rejection_reason'] ?? 'Wrong reference number');
     $res = rejectCreditPurchase((int)$_POST['credit_id'], $reason);
     $msg = $res['success'] ? "<i class='fas fa-times-circle me-1' style='color:#EF4444;'></i>{$res['message']}" : 'Failed to reject';
+} elseif ($_POST['action'] === 'referral_mark_paid' && isset($_POST['purchase_id'])) {
+    $res = adminConfirmReferralPaid((int)$_POST['purchase_id']);
+    $msg = $res['success'] ? "<i class='fas fa-check-circle me-1' style='color:#22C55E;'></i>{$res['message']}" : "<i class='fas fa-times-circle me-1' style='color:#EF4444;'></i>{$res['message']}";
 } elseif ($_POST['action'] === 'award_bonus_credits' && isset($_POST['target_user_id'])) {
     $res = awardBonusCredits((int)$_POST['target_user_id'], 6, $user['id'], 'Performance bonus (2 days)');
     $msg = $res['success'] ? "<i class='fas fa-check-circle me-1' style='color:#22C55E;'></i>{$res['message']}" : "<i class='fas fa-times-circle me-1' style='color:#EF4444;'></i>{$res['message']}";
@@ -553,8 +566,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $db->prepare("UPDATE web_users SET is_demo = 0 WHERE id = ?");
     $stmt->execute([(int)$_POST['user_id']]);
     $msg = "<i class='fas fa-check-circle me-1' style='color:#22C55E;'></i>Demo status removed.";
+} elseif ($_POST['action'] === 'set_referrer' && isset($_POST['user_id']) && isset($_POST['referrer_id'])) {
+    $db = getDB();
+    $targetId = (int)$_POST['user_id'];
+    $referrerInput = trim($_POST['referrer_id']);
+    if ($referrerInput === '' || $referrerInput === '0') {
+        $stmt = $db->prepare("UPDATE web_users SET referred_by = NULL WHERE id = ?");
+        $stmt->execute([$targetId]);
+        $msg = "<i class='fas fa-check-circle me-1' style='color:#22C55E;'></i>Referrer cleared for user #{$targetId}.";
+    } else {
+        // Accept either a numeric user ID or a PR referral code
+        if (is_numeric($referrerInput)) {
+            $referrerId = (int)$referrerInput;
+        } else {
+            // Accept a PR referral code (PRD-prefixed or bare; case-insensitive)
+            $refUser = getUserByReferralCode($referrerInput);
+            $referrerId = $refUser ? (int)$refUser['id'] : -1;
+        }
+        if ($referrerId === $targetId) {
+            $error = "<i class='fas fa-times-circle me-1' style='color:#EF4444;'></i>A user cannot refer themselves.";
+        } elseif ($referrerId > 0) {
+            $stmt = $db->prepare("SELECT id FROM web_users WHERE id = ?"); $stmt->execute([$referrerId]);
+            if (!$stmt->fetch()) {
+                $error = "<i class='fas fa-times-circle me-1' style='color:#EF4444;'></i>Referrer not found — check the code or user ID.";
+            } else {
+                ensureReferralCode($referrerId);
+                $stmt = $db->prepare("UPDATE web_users SET referred_by = ? WHERE id = ?");
+                $stmt->execute([$referrerId, $targetId]);
+                $msg = "<i class='fas fa-check-circle me-1' style='color:#22C55E;'></i>Referrer linked for user #{$targetId}.";
+            }
+        } else {
+            $error = "<i class='fas fa-times-circle me-1' style='color:#EF4444;'></i>Referral code or user not found.";
+        }
+    }
 } elseif ($_POST['action'] === 'retune_bayesian') {
     require_once __DIR__ . '/classes/BayesianModel.php';
+    $db = getDB();
     $bmTune = new BayesianModel();
     $tuneResult = $bmTune->tunePriorStrength();
     if (is_array($tuneResult)) {
@@ -573,6 +620,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $msg = "<i class='fas fa-check-circle me-1' style='color:#22C55E;'></i>Bayesian batch: {$result['stored']} stored, {$result['skipped']} skipped, {$result['errors']} errors";
         $settleResult = $bm->settlePredictions();
         $msg .= "<br>Settled: {$settleResult['settled']}, Matched: {$settleResult['matched']}";
+        $accStats = $bm->getAccuracyStats();
+        $total = (int)($accStats['total'] ?? 0);
+        if ($total > 0) {
+            $correct = (int)$accStats['correct'];
+            $rate = round($correct / $total * 100, 1);
+            $msg .= "<br>Accuracy: {$rate}% ({$correct}/{$total})";
+        }
         try {
             $gapi = new GoogleSheetsAPI();
             $oddsDrops = $gapi->getOddsDrops();
@@ -583,22 +637,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $bestMatch = null; $bestScore = 0;
                     $hNorm = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $pred['home_team'])));
                     $aNorm = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $pred['away_team'])));
+                    $lNorm = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $pred['league'] ?? '')));
                     foreach ($oddsDrops as $odds) {
                         $ohNorm = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $odds['Home_Team'])));
                         $oaNorm = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $odds['Away_Team'])));
+                        $olNorm = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $odds['League'] ?? '')));
                         $score = 0;
                         if ($hNorm === $ohNorm && $aNorm === $oaNorm) $score += 2;
                         elseif ($hNorm === $oaNorm && $aNorm === $ohNorm) $score += 1;
+                        if ($lNorm && $olNorm && (strpos($lNorm, $olNorm) !== false || strpos($olNorm, $lNorm) !== false)) $score += 1;
+                        elseif (!$lNorm) $score += 1;
                         if ($score > $bestScore) { $bestScore = $score; $bestMatch = $odds; }
                     }
                     if ($bestMatch && $bestScore >= 2) {
                         $o1 = (float)$bestMatch['Odds_1_Now']; $oX = (float)$bestMatch['Odds_X_Now']; $o2 = (float)$bestMatch['Odds_2_Now'];
                         if ($o1 > 0 && $oX > 0 && $o2 > 0) {
-                            $m1 = (1/$o1) / ((1/$o1)+(1/$oX)+(1/$o2)) * 100;
-                            $mX = (1/$oX) / ((1/$o1)+(1/$oX)+(1/$o2)) * 100;
-                            $m2 = (1/$o2) / ((1/$o1)+(1/$oX)+(1/$o2)) * 100;
-                            $vdb = getDB();
-                            $vdb->prepare("UPDATE bayesian_predictions SET market_odds_1=?, market_odds_x=?, market_odds_2=?, value_edge_1=ROUND(?-?,2), value_edge_x=ROUND(?-?,2), value_edge_2=ROUND(?-?,2) WHERE home_team=? AND away_team=? AND match_date=CURDATE()")->execute([$o1,$oX,$o2,$pred['prob_1'],$m1,$pred['prob_x'],$mX,$pred['prob_2'],$m2,$pred['home_team'],$pred['away_team']]);
+                            $implied1 = 1 / $o1; $impliedX = 1 / $oX; $implied2 = 1 / $o2;
+                            $sumImplied = $implied1 + $impliedX + $implied2;
+                            $market1 = $implied1 / $sumImplied * 100;
+                            $marketX = $impliedX / $sumImplied * 100;
+                            $market2 = $implied2 / $sumImplied * 100;
+                            $bayes1 = (float)$pred['prob_1'];
+                            $bayesX = (float)$pred['prob_x'];
+                            $bayes2 = (float)$pred['prob_2'];
+                            $edge1 = round($bayes1 - $market1, 1);
+                            $edgeX = round($bayesX - $marketX, 1);
+                            $edge2 = round($bayes2 - $market2, 1);
+                            $edges = [['1', $edge1], ['X', $edgeX], ['2', $edge2]];
+                            usort($edges, function($a, $b) { return $b[1] <=> $a[1]; });
+                            $bestEdge = $edges[0];
+                            $valuePick = $bestEdge[1] > 0 ? $bestEdge[0] : null;
+                            $bm->updateValueEdge($pred['id'], $edge1, $edgeX, $edge2, $valuePick, $o1, $oX, $o2);
                             $valueEdges++;
                         }
                     }
@@ -613,6 +682,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $msg = "<i class='fas fa-check-circle me-1' style='color:#22C55E;'></i>Bayesian settle: {$result['settled']} settled, {$result['matched']} matched, {$result['unmatched']} unmatched";
     } elseif ($_POST['action'] === 'bayesian_clear_session') {
         unset($_SESSION['bayesian_k'], $_SESSION['bayesian_k_err'], $_SESSION['bayesian_err']);
+        $db = getDB();
         try { $db->exec("DELETE FROM bayesian_config WHERE `key` IN ('prior_k', 'prior_k_err')"); } catch (Exception $e) {}
         $msg = "<i class='fas fa-check-circle me-1' style='color:#22C55E;'></i>Bayesian cache cleared";
     }
@@ -631,6 +701,10 @@ if (isset($_POST['save_presentation_mode'])) {
 
 $payments = getPendingPayments();
 $pendingCreditPurchases = getPendingCreditPurchases();
+$unpaidReferralCommissions = getUnpaidReferralCommissions();
+$allReferralCommissions = getAllReferralCommissions();
+$sellerUnpaidReferral = [];
+foreach ($pendingCreditPurchases as $pc) { $sellerUnpaidReferral[(int)$pc['user_id']] = getSellerUnpaidReferral((int)$pc['user_id']); }
 $allCreditPurchases = getAllCreditPurchases();
 $allUsersWithCredits = getAllUsersWithCredits();
 $pendingAviatorPurchases = getPendingAviatorPurchases();
@@ -773,6 +847,7 @@ $currentMonth = date('Y-m');
 $totalUsers = $totalPremium = 0;
 $rolloverCount = $parlayCount = $bothCount = 0;
 $totalRevenue = 0;
+$aviatorRevenue = 0;
 $allUsers = [];
 
 if ($db) {
@@ -786,9 +861,23 @@ if ($db) {
     $stmt = $db->prepare("SELECT SUM(pv.amount) as total_revenue FROM payment_verifications pv WHERE pv.status = 'approved' AND DATE_FORMAT(pv.verified_at, '%Y-%m') = ?");
     $stmt->execute([$currentMonth]);
     $totalRevenue = (float)(($stmt->fetch())['total_revenue'] ?? 0);
-    $stmt = $db->prepare("SELECT id, phone, email, display_name, status, trial_expiry, parlay_expiry, rollover_expiry, join_date, last_login, is_demo FROM web_users ORDER BY id DESC LIMIT 20");
+    $stmt = $db->prepare("SELECT SUM(amount) as aviator_revenue FROM aviator_purchases WHERE status = 'approved' AND DATE_FORMAT(verified_at, '%Y-%m') = ?");
+    $stmt->execute([$currentMonth]);
+    $aviatorRevenue = (float)(($stmt->fetch())['aviator_revenue'] ?? 0);
+    $stmt = $db->prepare("SELECT id, phone, email, display_name, status, trial_expiry, parlay_expiry, rollover_expiry, join_date, last_login, is_demo, referred_by, referral_code FROM web_users ORDER BY id DESC LIMIT 20");
     $stmt->execute();
     $allUsers = $stmt->fetchAll();
+    // Build a lookup of referrer names/phones for display
+    $referrerNames = [];
+    $referrerCodes = [];
+    $referrerIds = array_filter(array_unique(array_map(function($r){ return (int)($r['referred_by'] ?? 0); }, $allUsers)));
+    if ($referrerIds) {
+        $in = implode(',', array_map('intval', $referrerIds));
+        foreach ($db->query("SELECT id, display_name, phone, referral_code FROM web_users WHERE id IN ($in)")->fetchAll() as $rr) {
+            $referrerNames[(int)$rr['id']] = $rr['display_name'] ?: $rr['phone'];
+            $referrerCodes[(int)$rr['id']] = $rr['referral_code'] ?? '';
+        }
+    }
 }
 
 // Defer heavy analytics queries — only run when visitors tab is active
@@ -914,6 +1003,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg-soft); color: var(
             <div class="stat-card"><div class="stat-icon"></div><div class="stat-number"><?= $rolloverCount ?></div><div class="stat-label">Rollover</div></div>
             <div class="stat-card"><div class="stat-icon"></div><div class="stat-number"><?= $parlayCount ?></div><div class="stat-label">Parlay</div></div>
             <div class="stat-card"><div class="stat-icon"></div><div class="stat-number"><?= $bothCount ?></div><div class="stat-label">Both</div></div>
+            <div class="stat-card" style="border-color:rgba(251,191,36,0.3);"><div class="stat-icon"><i class="fas fa-plane" style="color:#FBBF24;"></i></div><div class="stat-number"><?= number_format($aviatorRevenue) ?> TZS</div><div class="stat-label">Aviator (MTD)</div></div>
             <div class="revenue-card"><div class="revenue-label">Monthly Revenue</div><div class="revenue-amount"><?= number_format($totalRevenue) ?> TZS</div></div>
         </div>
     </div>
@@ -965,6 +1055,9 @@ body { font-family: 'Inter', sans-serif; background: var(--bg-soft); color: var(
     </a>
     <?php endif; ?>
     <span style="font-weight: 600; color: var(--text-dark); font-size: 0.85rem; display: flex; align-items: center; gap: 4px; margin-left: 8px; border-left: 1px solid var(--border-color); padding-left: 12px;"><i class="fas fa-wrench" style="color: #6366f1;"></i>Tools:</span>
+    <a href="odds-signals" target="_blank" style="display: inline-flex; align-items: center; gap: 4px; background: #FEF2F2; color: #DC2626; padding: 4px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
+        <i class="fas fa-chart-line"></i> Odds Signals
+    </a>
     <a href="admin/h2h-test" target="_blank" style="display: inline-flex; align-items: center; gap: 4px; background: #EEF2FF; color: #4338CA; padding: 4px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
         <i class="fas fa-swords"></i> H2H Test
     </a>
@@ -1001,8 +1094,8 @@ body { font-family: 'Inter', sans-serif; background: var(--bg-soft); color: var(
                         <td><span class="badge badge-pending"><?= $durText ?></span></td>
                         <td class="text-muted"><?= date('M d, H:i', strtotime($p['created_at'])) ?></td>
                         <td>
-                            <form method="POST" class="d-inline"><input type="hidden" name="action" value="approve"><input type="hidden" name="payment_id" value="<?= $p['id'] ?>"><input type="hidden" name="tier" value="<?= htmlspecialchars($p['tier']) ?>"><button type="submit" class="btn btn-approve me-1" onclick="return confirm('Approve <?= strtoupper($p['tier']) ?>?')">Approve</button></form>
-                            <form method="POST" class="d-inline reject-form"><input type="hidden" name="action" value="reject"><input type="hidden" name="payment_id" value="<?= $p['id'] ?>"><input type="hidden" name="rejection_reason" value=""><button type="button" class="btn btn-reject" onclick="var r=prompt('Rejection reason:','Wrong reference number');if(r){this.form.rejection_reason.value=r;this.form.submit();}">Reject</button></form>
+                            <form method="POST" class="d-inline"><input type="hidden" name="action" value="approve"><input type="hidden" name="payment_id" value="<?= $p['id'] ?>"><input type="hidden" name="ref_number" value="<?= htmlspecialchars($p['reference_number']) ?>"><input type="hidden" name="tier" value="<?= htmlspecialchars($p['tier']) ?>"><button type="submit" class="btn btn-approve me-1" onclick="return confirm('Approve <?= strtoupper($p['tier']) ?>?')">Approve</button></form>
+                            <form method="POST" class="d-inline reject-form"><input type="hidden" name="action" value="reject"><input type="hidden" name="payment_id" value="<?= $p['id'] ?>"><input type="hidden" name="ref_number" value="<?= htmlspecialchars($p['reference_number']) ?>"><input type="hidden" name="rejection_reason" value=""><button type="button" class="btn btn-reject" onclick="var r=prompt('Rejection reason:','Wrong reference number');if(r){this.form.rejection_reason.value=r;this.form.submit();}">Reject</button></form>
                         </td>
                     </tr>
                     <?php endforeach; endif; ?>
@@ -1062,45 +1155,13 @@ body { font-family: 'Inter', sans-serif; background: var(--bg-soft); color: var(
     <?php else: ?>
     <div class="card">
         <div class="card-header"><h2 class="card-title"><i class="fas fa-users me-1"></i>All Users</h2><span class="badge" style="background: var(--primary); color: white;"><?= $totalUsers ?> Total</span></div>
-        <div class="mb-2 px-3"><input type="text" class="table-search form-control form-control-sm" data-table="usersTable" placeholder="Search by phone, name, or email..." style="max-width:360px;"></div>
+        <div class="mb-2 px-3"><input type="text" class="table-search form-control form-control-sm" data-table="usersTable" placeholder="Search by phone, name, email, or PR code..." style="max-width:360px;"></div>
         <div class="table-responsive">
             <table class="table" id="usersTable" data-page-size="10">
-                <thead><tr><th>ID</th><th>Phone</th><th>Name</th><th>Status</th><th>Parlay Exp</th><th>Rollover Exp</th><th>Joined</th><th>Demo</th></tr></thead>
+                <thead><tr><th>ID</th><th>Phone</th><th>Name</th><th>Status</th><th>Parlay Exp</th><th>Rollover Exp</th><th>Joined</th><th>Referrer</th><th>Demo</th></tr></thead>
                 <tbody>
-                    <?php if (empty($allUsers)): ?><tr><td colspan="8" class="text-center text-muted py-4"><i class="fas fa-users me-2"></i>No users registered yet</td></tr>
-                    <?php else: foreach ($allUsers as $u): ?>
-                    <?php
-                        $paExp = '-'; $roExp = '-';
-                        if ($u['parlay_expiry']) { $rem = max(0,strtotime($u['parlay_expiry'])-time()); $h = floor($rem/3600); $pl = $h>=24 ? floor($h/24).'d' : $h.'h'; $paExp = (new DateTime($u['parlay_expiry']))->format('M d, H:i').' ('.$pl.')'; }
-                        if ($u['rollover_expiry']) { $rem = max(0,strtotime($u['rollover_expiry'])-time()); $h = floor($rem/3600); $rl = $h>=24 ? floor($h/24).'d' : $h.'h'; $roExp = (new DateTime($u['rollover_expiry']))->format('M d, H:i').' ('.$rl.')'; }
-                        $uName = htmlspecialchars($u['display_name'] ?? '');
-                    ?>
-                    <tr>
-                        <td>#<?= $u['id'] ?></td>
-                        <td><code style="color: var(--primary);"><?= htmlspecialchars($u['phone']) ?></code></td>
-                        <td style="font-size:0.85rem;"><?= $uName ?: '<span class="text-muted">—</span>' ?></td>
-                        <td><span class="badge <?= str_replace(['trial_parlay','premium_parlay','premium_rollover','premium_both'], ['badge-pending','badge-parlay','badge-rollover','badge-both'], $u['status']) ?>"><?= ucfirst(str_replace('_', ' ', $u['status'])) ?></span></td>
-                        <td class="text-muted" style="white-space: nowrap;"><?= $paExp ?></td>
-                        <td class="text-muted" style="white-space: nowrap;"><?= $roExp ?></td>
-                        <td class="text-muted"><?= date('M d',strtotime($u['join_date'])) ?></td>
-                        <td>
-                            <?php if ($u['is_demo'] ?? false): ?>
-                            <span style="display:inline-flex;align-items:center;gap:4px;background:#FEF3C7;color:#92400E;padding:2px 10px;border-radius:4px;font-size:0.75rem;font-weight:600;"><i class="fas fa-user-tag"></i>Demo</span>
-                            <form method="POST" style="display:inline;" onsubmit="return confirm('Remove demo status from <?= htmlspecialchars($u['phone']) ?>?')">
-                                <input type="hidden" name="action" value="remove_demo">
-                                <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
-                                <button type="submit" style="background:none;border:none;color:#EF4444;cursor:pointer;font-size:0.7rem;text-decoration:underline;padding:0;">Remove</button>
-                            </form>
-                            <?php else: ?>
-                            <form method="POST" style="display:inline;" onsubmit="return confirm('Mark <?= htmlspecialchars($u['phone']) ?> as demo user?')">
-                                <input type="hidden" name="action" value="set_demo">
-                                <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
-                                <button type="submit" style="background:none;border:1px dashed #D1D5DB;color:#6B7280;padding:2px 10px;border-radius:4px;cursor:pointer;font-size:0.75rem;">Set Demo</button>
-                            </form>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                    <?php endforeach; endif; ?>
+                    <?php if (empty($allUsers)): ?><tr><td colspan="9" class="text-center text-muted py-4"><i class="fas fa-users me-2"></i>No users registered yet</td></tr>
+                    <?php else: foreach ($allUsers as $u): echo renderAdminUserRow($u, $referrerCodes, $referrerNames); endforeach; endif; ?>
                 </tbody>
              </table>
         </div>
@@ -1311,7 +1372,7 @@ $countryStats = $db->query("SELECT country, COUNT(*) as visits FROM page_views W
 $todayVisits = $db->query("SELECT COUNT(*) FROM page_views WHERE visited_at >= CURDATE()")->fetchColumn() ?: 0;
 $pageStats = $db->query("SELECT page, COUNT(*) as visits FROM page_views WHERE visited_at >= CURDATE() GROUP BY page ORDER BY visits DESC")->fetchAll();
 $topIps = $db->query("SELECT ip_address, COUNT(*) as hits, MAX(visited_at) as last_hit FROM page_views WHERE visited_at >= CURDATE() AND ip_address != '' GROUP BY ip_address ORDER BY hits DESC LIMIT 5")->fetchAll();
-$recentVisits = $db->query("SELECT pv.*, wu.phone, wu.email FROM page_views pv LEFT JOIN web_users wu ON pv.user_id = wu.id ORDER BY pv.visited_at DESC LIMIT 20")->fetchAll();
+$recentVisits = $db->query("SELECT pv.*, wu.phone, wu.email, wu.display_name FROM page_views pv LEFT JOIN web_users wu ON pv.user_id = wu.id ORDER BY pv.visited_at DESC LIMIT 20")->fetchAll();
 ?>
 <div class="card">
     <div class="card-header"><h2 class="card-title">Today's Visitor Activity</h2><span class="badge" style="background: var(--primary); color: white;"><?= $todayVisits ?> Total Visits</span></div>
@@ -1348,7 +1409,7 @@ $recentVisits = $db->query("SELECT pv.*, wu.phone, wu.email FROM page_views pv L
         <?php endif; ?>
     </div>
     <div class="mb-2" style="display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem;">
-        <input type="text" class="table-search form-control form-control-sm" data-table="visitorTable" placeholder="Filter by IP, Page, or Email..." style="max-width:320px;">
+        <input type="text" class="table-search form-control form-control-sm" data-table="visitorTable" placeholder="Filter by Name, IP, Page, or Email..." style="max-width:320px;">
         <?php if (!empty($topIps)): ?>
         <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.4rem;">
             <span style="font-size:0.75rem;font-weight:600;color:var(--text-muted);"><i class="fas fa-shield-alt me-1" style="color:#EF4444;"></i>Top IPs:</span>
@@ -1373,7 +1434,7 @@ $recentVisits = $db->query("SELECT pv.*, wu.phone, wu.email FROM page_views pv L
             <?php else: foreach ($recentVisits as $v): ?>
                 <tr>
                     <td class="text-muted"><?php $dt = new DateTime($v['visited_at'], new DateTimeZone('Africa/Dar_es_Salaam')); echo $dt->format('H:i:s'); ?></td>
-                    <td><?= $v['user_id'] ? '<a href="?tab=users" class="text-decoration-none">#'.$v['user_id'].'</a>' : '<span class="badge badge-pending">Guest</span>' ?></td>
+                    <td><?php if ($v['user_id']): ?><a href="?tab=users" class="text-decoration-none" style="color:var(--primary);font-weight:600;"><?= htmlspecialchars($v['display_name'] ?: ($v['phone'] ?: '#'.$v['user_id'])) ?></a><br><small class="text-muted">#<?= $v['user_id'] ?></small><?php else: ?><span class="badge badge-pending">Guest</span><?php endif; ?></td>
                     <td><?= $v['country'] !== 'Unknown' ? '<i class="fas fa-globe me-1"></i>'.htmlspecialchars($v['country']) : '<i class="fas fa-globe me-1"></i>Unknown' ?></td>
                     <td><code style="color: var(--primary);"><?= htmlspecialchars($v['page']) ?></code></td>
                     <td><?= htmlspecialchars($v['ip_address']) ?></td>
@@ -1450,6 +1511,48 @@ $topSellers = getTopSellerStats(10);
     </div>
 </div>
 
+<?php $refUnpaidCount = count(array_filter($allReferralCommissions, fn($r) => (int)$r['referral_paid'] === 0)); ?>
+<div class="card mb-3" style="border-left:4px solid #D97706;">
+    <div class="card-header"><h2 class="card-title"><i class="fas fa-hand-holding-usd me-1" style="color:#D97706;"></i>Referral Commission Payments</h2><span class="badge" style="background:#D97706;color:#fff;"><?= $refUnpaidCount ?> unpaid / <?= count($allReferralCommissions) ?> total</span></div>
+    <div class="mb-2"><input type="text" class="table-search form-control form-control-sm" data-table="referralPaymentsTable" placeholder="Search seller or agent..." style="max-width:320px;"></div>
+    <div class="table-responsive">
+        <table class="table" id="referralPaymentsTable" data-page-size="10">
+            <thead><tr><th>Sale</th><th>Seller</th><th>Agent</th><th>Amount</th><th>Sale Date</th><th>Status</th><th>Confirmed</th><th>Action</th></tr></thead>
+            <tbody>
+                <?php if (empty($allReferralCommissions)): ?>
+                <tr><td colspan="8" class="text-center text-muted py-4"><i class="fas fa-hand-holding-usd me-2"></i>No referral sales yet — once a referred seller makes a sale, its commission status shows up here.</td></tr>
+                <?php else: foreach ($allReferralCommissions as $ur): ?>
+                <tr>
+                    <td>#<?= (int)$ur['purchase_id'] ?></td>
+                    <td><code style="color: var(--primary);"><?= htmlspecialchars($ur['seller_name'] ?: $ur['seller_phone']) ?></code><br><small class="text-muted"><?= htmlspecialchars($ur['seller_phone']) ?></small></td>
+                    <td><code style="color: var(--primary);"><?= htmlspecialchars($ur['agent_name'] ?: $ur['agent_phone']) ?></code><br><small class="text-muted"><?= htmlspecialchars($ur['agent_phone']) ?></small></td>
+                    <td><strong><?= number_format((int)$ur['referral_commission']) ?> TZS</strong></td>
+                    <td class="text-muted"><?= date('M d, H:i', strtotime($ur['purchased_at'])) ?></td>
+                    <td><?php if ((int)$ur['referral_paid']): ?><span class="badge" style="background:#DCFCE7;color:#166534;">Paid</span><?php else: ?><span class="badge" style="background:#FEF3C7;color:#B45309;">Unpaid</span><?php endif; ?></td>
+                    <td class="text-muted"><?php if ((int)$ur['referral_paid']): ?><?= $ur['referral_paid_by'] === 'admin' ? 'Admin override' : 'Confirmed by agent' ?><br><small><?= date('M d, H:i', strtotime($ur['referral_paid_at'])) ?></small><?php else: ?><span class="text-muted">Awaiting agent</span><?php endif; ?></td>
+                    <td>
+                        <?php if (!(int)$ur['referral_paid']): ?>
+                        <form method="POST" class="d-inline">
+                            <input type="hidden" name="action" value="referral_mark_paid">
+                            <input type="hidden" name="purchase_id" value="<?= (int)$ur['purchase_id'] ?>">
+                            <button type="submit" class="btn btn-sm" style="background:#D97706;color:#fff;border:none;" onclick="return confirm('Mark sale #<?= (int)$ur['purchase_id'] ?> as paid? Only use this after contacting agent <?= htmlspecialchars($ur['agent_name'] ?: $ur['agent_phone']) ?> and confirming the seller sent the money.')">Mark paid (override)</button>
+                        </form>
+                        <?php else: ?>
+                        <span class="text-muted small">Done</span>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <?php endforeach; endif; ?>
+            </tbody>
+        </table>
+    </div>
+    <div class="text-center py-2 load-more-wrap" data-table="referralPaymentsTable" style="border-top:1px solid var(--border-color);">
+        <button type="button" class="btn btn-sm load-more-btn" style="background:var(--bg-soft);color:var(--primary);border:1px solid var(--border-color);padding:4px 20px;border-radius:6px;">
+            Show <span class="count">0</span> more
+        </button>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-header"><h2 class="card-title"><i class="fas fa-coins me-1"></i>Pending Credit Purchases</h2><span class="badge" style="background: var(--primary); color: white;"><?= count($pendingCreditPurchases) ?> Pending</span></div>
     <div class="mb-2"><input type="text" class="table-search form-control form-control-sm" data-table="pendingCreditsTable" placeholder="Search by name or phone..." style="max-width:320px;"></div>
@@ -1460,15 +1563,16 @@ $topSellers = getTopSellerStats(10);
                 <?php if (empty($pendingCreditPurchases)): ?>
                 <tr><td colspan="7" class="text-center text-muted py-4"><i class="fas fa-coins me-2"></i>No pending credit purchases</td></tr>
                 <?php else: foreach ($pendingCreditPurchases as $pc): ?>
+                <?php $__unpaid = $sellerUnpaidReferral[(int)$pc['user_id']] ?? ['count' => 0, 'amount' => 0]; ?>
                 <tr>
                     <td>#<?= $pc['id'] ?></td>
-                    <td><code style="color: var(--primary);"><?= htmlspecialchars($pc['display_name'] ?: $pc['phone']) ?></code><br><small class="text-muted"><?= htmlspecialchars($pc['phone']) ?></small></td>
+                    <td><code style="color: var(--primary);"><?= htmlspecialchars($pc['display_name'] ?: $pc['phone']) ?></code><br><small class="text-muted"><?= htmlspecialchars($pc['phone']) ?></small><?php if ($__unpaid['count'] > 0): ?><br><span class="badge" style="background:#FEF3C7;color:#B45309;">Owes <?= number_format($__unpaid['amount']) ?> TZS agent commission (<?= $__unpaid['count'] ?> sale<?= $__unpaid['count'] > 1 ? 's' : '' ?>)</span><?php endif; ?></td>
                     <td><strong><?= (int)$pc['credits_requested'] ?></strong></td>
                     <td><?= number_format($pc['amount_paid']) ?> TZS</td>
                     <td><code><?= htmlspecialchars($pc['payment_reference']) ?></code></td>
                     <td class="text-muted"><?= date('M d, H:i', strtotime($pc['created_at'])) ?></td>
                     <td>
-                        <form method="POST" class="d-inline"><input type="hidden" name="action" value="approve_credit"><input type="hidden" name="credit_id" value="<?= $pc['id'] ?>"><button type="submit" class="btn btn-approve me-1" onclick="return confirm('Award <?= (int)$pc['credits_requested'] ?> credits to <?= htmlspecialchars($pc['phone']) ?>?')">Approve</button></form>
+                        <form method="POST" class="d-inline"><input type="hidden" name="action" value="approve_credit"><input type="hidden" name="credit_id" value="<?= $pc['id'] ?>"><button type="submit" class="btn btn-approve me-1" onclick="return confirm('Award <?= (int)$pc['credits_requested'] ?> credits to <?= htmlspecialchars($pc['phone']) ?>?<?= $__unpaid['count'] ? ' WARNING: this seller still owes '.number_format($__unpaid['amount']).' TZS in agent commissions. Verify the agent confirmed payment before approving.' : '' ?>')">Approve</button></form>
                         <form method="POST" class="d-inline reject-form"><input type="hidden" name="action" value="reject_credit"><input type="hidden" name="credit_id" value="<?= $pc['id'] ?>"><input type="hidden" name="rejection_reason" value=""><button type="button" class="btn btn-sm" style="background: #EF4444; color: white; border: none; padding: 0.35rem 0.75rem; border-radius: 6px;" onclick="var r=prompt('Rejection reason:','Wrong reference number');if(r){this.form.rejection_reason.value=r;this.form.submit();}">Reject</button></form>
                     </td>
                 </tr>
@@ -1837,20 +1941,7 @@ $sub = in_array($requestedSub, ['analysis', 'verified']) ? $requestedSub : 'anal
         </div>
     </div>
 </div>
-<div class="row g-3 mb-3">
-    <div class="col-md-6">
-        <div class="card h-100 d-flex flex-column" style="border-left: 4px solid #EF4444;">
-            <div class="card-header">
-                <h2 class="card-title"><i class="fas fa-chart-line me-1" style="color:#EF4444;"></i>Odds Signals</h2>
-                <span class="badge" style="background: #EF4444; color: white;">Decision tool</span>
-            </div>
-            <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem;">Analyze today's odds movement across 5 markets (1X2, DC, Over 1.5, GG, Team to Score) with confidence scores.</p>
-            <a href="odds-signals" class="btn btn-approve w-100 mt-auto" style="padding:0.6rem;font-size:0.9rem;background:#EF4444;border-color:#EF4444;">
-                <i class="fas fa-chart-line me-1"></i>Open Odds Signals
-            </a>
-        </div>
-    </div>
-</div>
+
 
 <?php
 require_once __DIR__ . '/classes/BayesianModel.php';
@@ -2483,8 +2574,9 @@ document.querySelectorAll('.load-more-btn').forEach(function(btn) {
     });
 });
 
-// Search: within paginated rows, or all matching rows if searching
+// Search: within paginated rows, or all matching rows if searching (usersTable has its own server-backed search below)
 document.querySelectorAll('.table-search').forEach(function(input) {
+    if (input.dataset.table === 'usersTable') return;
     var handler = function() {
         var filter = this.value.toLowerCase().trim();
         var table = document.getElementById(this.dataset.table);
@@ -2495,13 +2587,42 @@ document.querySelectorAll('.table-search').forEach(function(input) {
             if (filter === '') {
                 row.style.display = i < maxVisible ? '' : 'none';
             } else {
-                row.style.display = row.textContent.toLowerCase().includes(filter) ? '' : 'none';
+                var haystack = row.textContent.toLowerCase();
+                row.querySelectorAll('input[value]').forEach(function(inp) { haystack += ' ' + String(inp.value || '').toLowerCase(); });
+                row.querySelectorAll('[data-search]').forEach(function(el) { haystack += ' ' + String(el.dataset.search || '').toLowerCase(); });
+                row.style.display = haystack.includes(filter) ? '' : 'none';
             }
         });
     };
     input.addEventListener('keyup', handler);
     input.addEventListener('search', handler);
 });
+
+// All Users: server-backed search (searches all users, not just the loaded 20)
+var usersSearchInput = document.querySelector('.table-search[data-table="usersTable"]');
+var usersTableEl = document.getElementById('usersTable');
+if (usersSearchInput && usersTableEl) {
+    var usersTimer = null;
+    var usersTbody = usersTableEl.querySelector('tbody');
+    var usersApiBase = window.location.pathname.replace(/\/[^/]*$/, '/').replace(/\/\/+/g, '/');
+    function runUsersSearch() {
+        clearTimeout(usersTimer);
+        usersTimer = setTimeout(function() {
+            var q = usersSearchInput.value.trim();
+            fetch(usersApiBase + 'ajax_admin_users_table.php?q=' + encodeURIComponent(q))
+                .then(function(resp) { return resp.json(); })
+                .then(function(data) {
+                    if (!data || typeof data.html !== 'string') return;
+                    usersTbody.innerHTML = data.html;
+                    usersTableEl.dataset.maxVisible = (q === '') ? parseInt(usersTableEl.dataset.pageSize || 10) : 999;
+                    applyPagination('usersTable');
+                })
+                .catch(function() {});
+        }, 250);
+    }
+    usersSearchInput.addEventListener('input', runUsersSearch);
+    usersSearchInput.addEventListener('search', runUsersSearch);
+}
 
 // Verified: search by match name column only
 var verifiedSearch = document.getElementById('verifiedSearch');

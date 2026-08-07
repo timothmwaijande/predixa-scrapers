@@ -23,6 +23,12 @@ try {
     $analysisLog[] = '[' . date('H:i:s') . '] Fetching odds data from Google Sheets via OAuth2...';
     $tips = $analyzer->getTips();
 
+    if (!empty($analyzer->guardLog)) {
+        foreach ($analyzer->guardLog as $guardMsg) {
+            $analysisLog[] = '[' . date('H:i:s') . '] ⚠️ ' . $guardMsg;
+        }
+    }
+
     if (empty($tips)) {
         $analysisLog[] = '[' . date('H:i:s') . '] No picks generated.';
         echo json_encode(['status' => 'ok', 'log' => $analysisLog, 'inserted' => 0]);
