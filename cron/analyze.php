@@ -97,6 +97,40 @@ try {
     unset($tip);
     $analysisLog[] = '[' . date('H:i:s') . '] Verified boost: ' . $verifiedCount . ' tips';
 
+    // --- Phase 0.5: Bayesian agreement boost ---
+    $bayesianAgreeCount = 0;
+    $bayesianDisagreeCount = 0;
+    try {
+        require_once __DIR__ . '/../classes/BayesianModel.php';
+        $bmBoost = new BayesianModel();
+        foreach ($tips as &$tip) {
+            $matchName = $tip['match'] ?? '';
+            $pickVal = $tip['pick'] ?? '';
+            if (!$matchName || !$pickVal) continue;
+            $agreement = $bmBoost->getAgreementScore($matchName, $pickVal);
+            if ($agreement === null) continue;
+            if ($agreement['strongly_agrees']) {
+                $tip['win_rate_low'] = min(99, (int)($tip['win_rate_low'] ?? 0) + 8);
+                $tip['win_rate_high'] = min(99, (int)($tip['win_rate_high'] ?? 0) + 6);
+                if (!isset($tip['safety_notes'])) $tip['safety_notes'] = [];
+                $tip['safety_notes'][] = '🤖 Bayesian agrees (' . $agreement['probability'] . '%) +' . $agreement['agreement'] . '%';
+                $bayesianAgreeCount++;
+            } elseif ($agreement['disagrees']) {
+                $tip['win_rate_low'] = max(30, (int)($tip['win_rate_low'] ?? 50) - 12);
+                $tip['win_rate_high'] = max(35, (int)($tip['win_rate_high'] ?? 60) - 10);
+                if (!isset($tip['safety_notes'])) $tip['safety_notes'] = [];
+                $tip['safety_notes'][] = '⚠️ Bayesian disagrees (' . $agreement['probability'] . '%) — model conflict';
+                $bayesianDisagreeCount++;
+            }
+        }
+        unset($tip);
+        if ($bayesianAgreeCount > 0 || $bayesianDisagreeCount > 0) {
+            $analysisLog[] = '[' . date('H:i:s') . '] <i class="fas fa-chart-bar me-1" style="color:#059669;"></i>Bayesian boost: ' . $bayesianAgreeCount . ' agreed ↑, ' . $bayesianDisagreeCount . ' disagreed ↓';
+        }
+    } catch (Exception $e) {
+        $analysisLog[] = '[' . date('H:i:s') . '] <i class="fas fa-exclamation-triangle me-1" style="color:#F59E0B;"></i>Bayesian boost skipped: ' . $e->getMessage();
+    }
+
     // --- Phase 1: Categorize tips ---
     $rolloverPool = [];
     $parlayPool = [];
@@ -285,14 +319,13 @@ try {
         return array_values(array_filter($pool, fn($p) => !in_array($p['match'], $existingToday)));
     };
 
-    $allInserts = array_merge(
-        $filterExisting($rolloverPool),
-        $filterExisting($resolvedOver15),
-        $filterExisting($resolvedCorners),
-        $filterExisting($under25Pool),
-        $filterExisting($combinedParlay),
-        $bestCombo ? $filterExisting($bestCombo) : []
-    );
+    $rolloverPool = $filterExisting($rolloverPool);
+    $resolvedOver15 = $filterExisting($resolvedOver15);
+    $resolvedCorners = $filterExisting($resolvedCorners);
+    $under25Pool = $filterExisting($under25Pool);
+    $combinedParlay = $filterExisting($combinedParlay);
+    if ($bestCombo) $bestCombo = $filterExisting($bestCombo);
+    $allInserts = array_merge($rolloverPool, $resolvedOver15, $resolvedCorners, $under25Pool, $combinedParlay, $bestCombo ?? []);
     $replaceNames = array_unique(array_filter(array_map(fn($p) => $p['match'] ?? null, $allInserts)));
     if (!empty($replaceNames)) {
         $placeholders = implode(',', array_fill(0, count($replaceNames), '?'));
