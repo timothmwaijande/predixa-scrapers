@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-08-07T22:32:32.895Z",
-  "started_at": "2026-08-07T22:32:11.366Z",
+  "generated_at": "2026-08-08T06:48:51.015Z",
+  "started_at": "2026-08-08T06:48:33.217Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
       "status": "ok",
-      "count": 17
+      "count": 0
     },
     "adibet": {
       "status": "ok",
@@ -21,167 +21,13 @@
     },
     "wp_tables": {
       "status": "ok",
-      "count": 26
+      "count": 33
     }
   },
   "sources_detail": [
     {
       "source": "allnigeriafootball",
-      "picks": [
-        {
-          "match": "Aston Villa vs Bayern Munich",
-          "home": "Aston Villa",
-          "away": "Bayern Munich",
-          "pick": "Over 2.5",
-          "odds": "",
-          "league": "Club Friendly Games",
-          "time": "13:00"
-        },
-        {
-          "match": "Sandefjord Fotball vs KFUM Oslo",
-          "home": "Sandefjord Fotball",
-          "away": "KFUM Oslo",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "Norway Eliteserien",
-          "time": "18:00"
-        },
-        {
-          "match": "SC Cambuur vs Excelsior Rotterdam",
-          "home": "SC Cambuur",
-          "away": "Excelsior Rotterdam",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "Netherlands Eredivisie",
-          "time": "19:00"
-        },
-        {
-          "match": "Estoril Praia vs FC Famalicão",
-          "home": "Estoril Praia",
-          "away": "FC Famalicão",
-          "pick": "Under 3.5",
-          "odds": "",
-          "league": "Portugal Primeira Liga",
-          "time": "20:15"
-        },
-        {
-          "match": "Rosario Central vs CA Aldosivi",
-          "home": "Rosario Central",
-          "away": "CA Aldosivi",
-          "pick": "Under 3.5",
-          "odds": "",
-          "league": "Argentina Primera LPF",
-          "time": "23:30"
-        },
-        {
-          "match": "SonderjyskE vs Viborg FF",
-          "home": "SonderjyskE",
-          "away": "Viborg FF",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "Denmark Superliga",
-          "time": "18:00"
-        },
-        {
-          "match": "CS Belgrano vs CA 9 de Julio Rafaela",
-          "home": "CS Belgrano",
-          "away": "CA 9 de Julio Rafaela",
-          "pick": "Under 3.5",
-          "odds": "",
-          "league": "Argentina Torneo Federal A",
-          "time": "00:45"
-        },
-        {
-          "match": "Levski Sofia vs Lokomotiv Plovdiv",
-          "home": "Levski Sofia",
-          "away": "Lokomotiv Plovdiv",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "Bulgaria Parva Liga",
-          "time": "19:15"
-        },
-        {
-          "match": "Middelfart BK vs Brabrand IF",
-          "home": "Middelfart BK",
-          "away": "Brabrand IF",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "Denmark 2nd Division",
-          "time": "17:30"
-        },
-        {
-          "match": "CA Ituzaingó vs Deportivo Camioneros",
-          "home": "CA Ituzaingó",
-          "away": "Deportivo Camioneros",
-          "pick": "Under 3.5",
-          "odds": "",
-          "league": "Argentina Primera B",
-          "time": "23:00"
-        },
-        {
-          "match": "Club Comunicaciones vs Villa San Carlos",
-          "home": "Club Comunicaciones",
-          "away": "Villa San Carlos",
-          "pick": "Under 3.5",
-          "odds": "",
-          "league": "Argentina Primera B",
-          "time": "23:00"
-        },
-        {
-          "match": "Cerro Largo vs Juventud de Las Piedras",
-          "home": "Cerro Largo",
-          "away": "Juventud de Las Piedras",
-          "pick": "Under 3.5",
-          "odds": "",
-          "league": "Uruguay Primera División",
-          "time": "23:00"
-        },
-        {
-          "match": "Holywell Town vs Connah&#8217;s Quay",
-          "home": "Holywell Town",
-          "away": "Connah&#8217;s Quay",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "Wales Cymru Premier",
-          "time": "19:45"
-        },
-        {
-          "match": "The New Saints vs Haverfordwest County",
-          "home": "The New Saints",
-          "away": "Haverfordwest County",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "Wales Cymru Premier",
-          "time": "19:45"
-        },
-        {
-          "match": "Shamrock Rovers vs Dundalk FC",
-          "home": "Shamrock Rovers",
-          "away": "Dundalk FC",
-          "pick": "1X",
-          "odds": "",
-          "league": "Ireland Premier Division",
-          "time": "20:00"
-        },
-        {
-          "match": "Ferrocarril Midland vs CD Maipu",
-          "home": "Ferrocarril Midland",
-          "away": "CD Maipu",
-          "pick": "Under 3.5",
-          "odds": "",
-          "league": "Argentina Primera Nacional",
-          "time": "00:00"
-        },
-        {
-          "match": "MTK Budapest vs Puskás Akadémia",
-          "home": "MTK Budapest",
-          "away": "Puskás Akadémia",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "Hungary NB I",
-          "time": "16:30"
-        }
-      ]
+      "picks": []
     },
     {
       "source": "adibet",
@@ -1524,235 +1370,298 @@
       "source": "wp_tables",
       "picks": [
         {
-          "match": "Bochum vs Hertha",
-          "home": "Bochum",
-          "away": "Hertha",
+          "match": "Darmstadt vs Holstein Kiel",
+          "home": "Darmstadt",
+          "away": "Holstein Kiel",
           "pick": "Draw(X)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Brugge vs Kortrijk",
-          "home": "Brugge",
-          "away": "Kortrijk",
+          "match": "Wolfsburg vs Kaiserslautern",
+          "home": "Wolfsburg",
+          "away": "Kaiserslautern",
           "pick": "Draw(X)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Sonderyske vs Viborg",
-          "home": "Sonderyske",
-          "away": "Viborg",
+          "match": "PSV vs Fortuna Sittard",
+          "home": "PSV",
+          "away": "Fortuna Sittard",
           "pick": "Draw(X)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Cambuur vs Excelsior",
-          "home": "Cambuur",
-          "away": "Excelsior",
+          "match": "Den Bosch vs Almere",
+          "home": "Den Bosch",
+          "away": "Almere",
           "pick": "Draw(X)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Dordrecht vs Jong Ajax",
-          "home": "Dordrecht",
-          "away": "Jong Ajax",
+          "match": "Mjallby vs Elfsborg",
+          "home": "Mjallby",
+          "away": "Elfsborg",
           "pick": "Draw(X)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Brugge vs Kortrijk",
-          "home": "Brugge",
-          "away": "Kortrijk",
+          "match": "Norrkoping vs Brage",
+          "home": "Norrkoping",
+          "away": "Brage",
+          "pick": "Draw(X)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Lausanne vs Young Boys",
+          "home": "Lausanne",
+          "away": "Young Boys",
+          "pick": "Draw(X)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Servette vs Grasshoppers",
+          "home": "Servette",
+          "away": "Grasshoppers",
+          "pick": "Draw(X)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Norrkoping vs Brage",
+          "home": "Norrkoping",
+          "away": "Brage",
           "pick": "Home(1)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Levski Sofia vs Lokomotiv Plovdiv",
-          "home": "Levski Sofia",
-          "away": "Lokomotiv Plovdiv",
+          "match": "PSV vs Fortuna Sittard",
+          "home": "PSV",
+          "away": "Fortuna Sittard",
           "pick": "Home(1)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "SJK vs Gnistan",
-          "home": "SJK",
-          "away": "Gnistan",
+          "match": "Lausanne vs Young Boys",
+          "home": "Lausanne",
+          "away": "Young Boys",
           "pick": "Away(2)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Winterthur vs Wil",
-          "home": "Winterthur",
-          "away": "Wil",
+          "match": "Falkenberg vs Nordic",
+          "home": "Falkenberg",
+          "away": "Nordic",
           "pick": "Away(2)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Brugge vs Kortrijk",
-          "home": "Brugge",
-          "away": "Kortrijk",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Sonderyske vs Viborg",
-          "home": "Sonderyske",
-          "away": "Viborg",
+          "match": "Mjallby vs Elfsborg",
+          "home": "Mjallby",
+          "away": "Elfsborg",
           "pick": "Draw(X)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Brugge vs Kortrijk",
-          "home": "Brugge",
-          "away": "Kortrijk",
+          "match": "Norrkoping vs Brage",
+          "home": "Norrkoping",
+          "away": "Brage",
           "pick": "Home(1)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Levski Sofia vs Lokomotiv Plovdiv",
-          "home": "Levski Sofia",
-          "away": "Lokomotiv Plovdiv",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "SJK vs Gnistan",
-          "home": "SJK",
-          "away": "Gnistan",
+          "match": "Darmstadt vs Holstein Kiel",
+          "home": "Darmstadt",
+          "away": "Holstein Kiel",
           "pick": "Away(2)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Winterthur vs Wil",
-          "home": "Winterthur",
-          "away": "Wil",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Brugge vs Kortrijk",
-          "home": "Brugge",
-          "away": "Kortrijk",
+          "match": "Norrkoping vs Brage",
+          "home": "Norrkoping",
+          "away": "Brage",
           "pick": "Home(1)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Sonderyske vs Viborg",
-          "home": "Sonderyske",
-          "away": "Viborg",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Bochum vs Hertha",
-          "home": "Bochum",
-          "away": "Hertha",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Brugge vs Kortrijk",
-          "home": "Brugge",
-          "away": "Kortrijk",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Sonderyske vs Viborg",
-          "home": "Sonderyske",
-          "away": "Viborg",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Cambuur vs Excelsior",
-          "home": "Cambuur",
-          "away": "Excelsior",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Dordrecht vs Jong Ajax",
-          "home": "Dordrecht",
-          "away": "Jong Ajax",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Parndorf vs SV Donau",
-          "home": "Parndorf",
-          "away": "SV Donau",
+          "match": "PSV vs Fortuna Sittard",
+          "home": "PSV",
+          "away": "Fortuna Sittard",
           "pick": "Home(1)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Beijing Guoan vs Shenzhen Xinpengcheng",
-          "home": "Beijing Guoan",
-          "away": "Shenzhen Xinpengcheng",
+          "match": "Lausanne vs Young Boys",
+          "home": "Lausanne",
+          "away": "Young Boys",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Falkenberg vs Nordic",
+          "home": "Falkenberg",
+          "away": "Nordic",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Mjallby vs Elfsborg",
+          "home": "Mjallby",
+          "away": "Elfsborg",
+          "pick": "Draw(X)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Norrkoping vs Brage",
+          "home": "Norrkoping",
+          "away": "Brage",
           "pick": "Home(1)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Jaro 2 vs JBK",
-          "home": "Jaro 2",
-          "away": "JBK",
+          "match": "Darmstadt vs Holstein Kiel",
+          "home": "Darmstadt",
+          "away": "Holstein Kiel",
           "pick": "Away(2)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Ghibaudo A. vs Basing M.",
-          "home": "Ghibaudo A.",
-          "away": "Basing M.",
+          "match": "Darmstadt vs Holstein Kiel",
+          "home": "Darmstadt",
+          "away": "Holstein Kiel",
+          "pick": "Draw(X)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Wolfsburg vs Kaiserslautern",
+          "home": "Wolfsburg",
+          "away": "Kaiserslautern",
+          "pick": "Draw(X)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "PSV vs Fortuna Sittard",
+          "home": "PSV",
+          "away": "Fortuna Sittard",
+          "pick": "Draw(X)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Den Bosch vs Almere",
+          "home": "Den Bosch",
+          "away": "Almere",
+          "pick": "Draw(X)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Mjallby vs Elfsborg",
+          "home": "Mjallby",
+          "away": "Elfsborg",
+          "pick": "Draw(X)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Norrkoping vs Brage",
+          "home": "Norrkoping",
+          "away": "Brage",
+          "pick": "Draw(X)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Lausanne vs Young Boys",
+          "home": "Lausanne",
+          "away": "Young Boys",
+          "pick": "Draw(X)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Servette vs Grasshoppers",
+          "home": "Servette",
+          "away": "Grasshoppers",
+          "pick": "Draw(X)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Dep. Riestra vs Estudiantes L.P.",
+          "home": "Dep. Riestra",
+          "away": "Estudiantes L.P.",
+          "pick": "X2",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Atl. Ottawa vs HFX Wanderers",
+          "home": "Atl. Ottawa",
+          "away": "HFX Wanderers",
           "pick": "Away(2)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Dalian Yingbo vs Liaoning Tieren",
+          "home": "Dalian Yingbo",
+          "away": "Liaoning Tieren",
+          "pick": "Home(1)",
           "odds": "",
           "league": "",
           "time": ""
@@ -1760,20 +1669,5 @@
       ]
     }
   ],
-  "intersections": [
-    {
-      "match": "Levski Sofia vs Lokomotiv Plovdiv",
-      "home": "Levski Sofia",
-      "away": "Lokomotiv Plovdiv",
-      "pick": "Home(1)",
-      "sources": [
-        "allnigeriafootball",
-        "wp_tables"
-      ],
-      "source_count": 2,
-      "odds": "",
-      "league": "Bulgaria Parva Liga",
-      "time": "19:15"
-    }
-  ]
+  "intersections": []
 }
