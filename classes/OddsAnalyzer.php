@@ -350,16 +350,16 @@ class OddsAnalyzer {
             if ($pickType === 'win' && $isDomesticCup) return null;
             if ($pickType === 'win' && ($favForm['form_rating'] ?? 0) < 4.0) return null;
 
-            // DC drift guard: drop favorite-side DC when favorite drifts up while
-            // underdog is only mildly backed (0–3.5% drop). Settled: 70% WR vs 80–90% elsewhere.
+            // DC picks are always kept — the drift guard only adds a user-facing
+            // warning note without dropping anything from the feed.
             if ($config['drift_guard_enabled'] && $pickType === 'dc'
                 && $favDelta > $config['drift_guard_fav_min']
                 && $oppDelta > $config['drift_guard_opp_min'] && $oppDelta <= 0) {
-                $msg = "DriftGuard: dropped DC for {$home} vs {$away} ({$league}) — fav drifting +"
-                    . round($favDelta, 1) . "%, underdog mildly backed " . round($oppDelta, 1) . "%";
+                $msg = "⚠️ DriftGuard: favorite drifting +" . round($favDelta, 1)
+                    . "% while underdog mildly backed — DC kept but confidence reduced";
                 $this->guardLog[] = $msg;
                 error_log($msg);
-                return null;
+                $venueNotes[] = $msg;
             }
 
             $riskData = RiskTier::calculate(
