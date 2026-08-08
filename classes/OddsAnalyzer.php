@@ -353,10 +353,11 @@ class OddsAnalyzer {
             // DC picks are always kept — the drift guard only adds a user-facing
             // warning note without dropping anything from the feed.
             if ($config['drift_guard_enabled'] && $pickType === 'dc'
-                && $favDelta > $config['drift_guard_fav_min']
-                && $oppDelta > $config['drift_guard_opp_min'] && $oppDelta <= 0) {
-                $msg = "⚠️ DriftGuard: favorite drifting +" . round($favDelta, 1)
-                    . "% while underdog mildly backed — DC kept but confidence reduced";
+                && $favDelta > $config['drift_guard_fav_min']) {
+                $oppNote = ($oppDelta <= -3.5) ? ", underdog heavily backed " . round($oppDelta, 1) . "%"
+                    : (($oppDelta <= 0) ? ", underdog mildly backed " . round($oppDelta, 1) . "%" : "");
+                $msg = "⚠️ DriftGuard: favorite drifting +" . round($favDelta, 1) . "%"
+                    . $oppNote . " — DC kept but confidence reduced";
                 $this->guardLog[] = $msg;
                 error_log($msg);
                 $venueNotes[] = $msg;
