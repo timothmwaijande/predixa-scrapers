@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-08-10T14:56:05.762Z",
-  "started_at": "2026-08-10T14:55:43.524Z",
+  "generated_at": "2026-08-10T18:54:28.257Z",
+  "started_at": "2026-08-10T18:54:07.159Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
       "status": "ok",
-      "count": 1
+      "count": 12
     },
     "adibet": {
       "status": "ok",
@@ -29,6 +29,87 @@
       "source": "allnigeriafootball",
       "picks": [
         {
+          "match": "Santa Clara vs Nacional da Madeira",
+          "home": "Santa Clara",
+          "away": "Nacional da Madeira",
+          "pick": "1X",
+          "odds": "",
+          "league": "Portugal Primeira Liga",
+          "time": "20:15"
+        },
+        {
+          "match": "IK Sirius vs IF Brommapojkarna",
+          "home": "IK Sirius",
+          "away": "IF Brommapojkarna",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "Sweden Allsvenskan",
+          "time": "18:00"
+        },
+        {
+          "match": "Vasteraas SK vs Djurgardens IF",
+          "home": "Vasteraas SK",
+          "away": "Djurgardens IF",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "Sweden Allsvenskan",
+          "time": "18:00"
+        },
+        {
+          "match": "Caracas FC vs Deportivo La Guaira",
+          "home": "Caracas FC",
+          "away": "Deportivo La Guaira",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Venezuela Primera División",
+          "time": "23:30"
+        },
+        {
+          "match": "CA Banfield vs Belgrano de Córdoba",
+          "home": "CA Banfield",
+          "away": "Belgrano de Córdoba",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Argentina Primera LPF",
+          "time": "23:00"
+        },
+        {
+          "match": "Unión de Santa Fe vs Central Córdoba",
+          "home": "Unión de Santa Fe",
+          "away": "Central Córdoba",
+          "pick": "Home(DNB)Uni n de Santa Fe",
+          "odds": "",
+          "league": "Argentina Primera LPF",
+          "time": "18:00"
+        },
+        {
+          "match": "Silkeborg IF vs Odense Boldklub",
+          "home": "Silkeborg IF",
+          "away": "Odense Boldklub",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "Denmark Superliga",
+          "time": "18:00"
+        },
+        {
+          "match": "Goiás EC GO vs Londrina PR",
+          "home": "Goiás EC GO",
+          "away": "Londrina PR",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Brazil Brasileiro Série B",
+          "time": "23:30"
+        },
+        {
+          "match": "Botev Plovdiv vs Spartak 1918 Varna",
+          "home": "Botev Plovdiv",
+          "away": "Spartak 1918 Varna",
+          "pick": "Home(DNB)Botev Plovdiv",
+          "odds": "",
+          "league": "Bulgaria Parva Liga",
+          "time": "19:15"
+        },
+        {
           "match": "CD Cuenca vs Manta FC",
           "home": "CD Cuenca",
           "away": "Manta FC",
@@ -36,6 +117,24 @@
           "odds": "",
           "league": "Ecuador LigaPro Primera A",
           "time": "01:00"
+        },
+        {
+          "match": "Gimnasia y Esgrima de Jujuy vs Tristán Suárez",
+          "home": "Gimnasia y Esgrima de Jujuy",
+          "away": "Tristán Suárez",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Argentina Primera Nacional",
+          "time": "19:00"
+        },
+        {
+          "match": "Club Atlético Fénix vs Central Ballester",
+          "home": "Club Atlético Fénix",
+          "away": "Central Ballester",
+          "pick": "Under 2.5",
+          "odds": "",
+          "league": "Argentina Primera Nacional",
+          "time": "19:00"
         }
       ]
     },
@@ -1526,5 +1625,34 @@
       ]
     }
   ],
-  "intersections": []
+  "intersections": [
+    {
+      "match": "IK Sirius vs IF Brommapojkarna",
+      "home": "IK Sirius",
+      "away": "IF Brommapojkarna",
+      "pick": "Home(1)",
+      "sources": [
+        "allnigeriafootball",
+        "bet_sites"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "Sweden Allsvenskan",
+      "time": "18:00"
+    },
+    {
+      "match": "Silkeborg IF vs Odense Boldklub",
+      "home": "Silkeborg IF",
+      "away": "Odense Boldklub",
+      "pick": "Over 1.5",
+      "sources": [
+        "allnigeriafootball",
+        "bet_sites"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "Denmark Superliga",
+      "time": "18:00"
+    }
+  ]
 }
