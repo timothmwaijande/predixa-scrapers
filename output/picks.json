@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-08-10T07:28:17.826Z",
-  "started_at": "2026-08-10T07:27:57.721Z",
+  "generated_at": "2026-08-10T11:06:19.864Z",
+  "started_at": "2026-08-10T11:06:00.411Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
       "status": "ok",
-      "count": 0
+      "count": 1
     },
     "adibet": {
       "status": "ok",
@@ -17,7 +17,7 @@
     },
     "bet_sites": {
       "status": "ok",
-      "count": 136
+      "count": 139
     },
     "wp_tables": {
       "status": "ok",
@@ -27,7 +27,17 @@
   "sources_detail": [
     {
       "source": "allnigeriafootball",
-      "picks": []
+      "picks": [
+        {
+          "match": "CD Cuenca vs Manta FC",
+          "home": "CD Cuenca",
+          "away": "Manta FC",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Ecuador LigaPro Primera A",
+          "time": "01:00"
+        }
+      ]
     },
     {
       "source": "adibet",
@@ -91,6 +101,78 @@
           "home": "Bryne",
           "away": "Stromsgodset",
           "pick": "Over 2.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Alashkert vs BKMA",
+          "home": "Alashkert",
+          "away": "BKMA",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Silkeborg vs Odense",
+          "home": "Silkeborg",
+          "away": "Odense",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "RFS vs Grobina",
+          "home": "RFS",
+          "away": "Grobina",
+          "pick": "1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Jong AZ vs Eindhoven FC",
+          "home": "Jong AZ",
+          "away": "Eindhoven FC",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Jong PSV vs FC Volendam",
+          "home": "Jong PSV",
+          "away": "FC Volendam",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Moss vs Odd",
+          "home": "Moss",
+          "away": "Odd",
+          "pick": "Over 2.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Baerum vs KRUM Oslo 2",
+          "home": "Baerum",
+          "away": "KRUM Oslo 2",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Sirius vs Bormmapojkarna",
+          "home": "Sirius",
+          "away": "Bormmapojkarna",
+          "pick": "Home(1)",
           "odds": "",
           "league": "",
           "time": ""
@@ -231,73 +313,28 @@
           "time": ""
         },
         {
-          "match": "Club Brugge vs Kortrijk",
-          "home": "Club Brugge",
-          "away": "Kortrijk",
+          "match": "Alashkert vs BKMA",
+          "home": "Alashkert",
+          "away": "BKMA",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "RFS vs Grobina",
+          "home": "RFS",
+          "away": "Grobina",
           "pick": "1 Ov 1.5",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Levski vs Lok. Plovdiv",
-          "home": "Levski",
-          "away": "Lok. Plovdiv",
-          "pick": "Under 3.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Brno vs Liberec",
-          "home": "Brno",
-          "away": "Liberec",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Wolves vs Port Vale",
-          "home": "Wolves",
-          "away": "Port Vale",
+          "match": "Sirius vs Brommapojkarna",
+          "home": "Sirius",
+          "away": "Brommapojkarna",
           "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Afturelding vs Grindavik",
-          "home": "Afturelding",
-          "away": "Grindavik",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Bray vs Finn Harps",
-          "home": "Bray",
-          "away": "Finn Harps",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Oss vs NAC Breda",
-          "home": "Oss",
-          "away": "NAC Breda",
-          "pick": "X2 &amp; Ov 1.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Aarau vs St. Nyonnais",
-          "home": "Aarau",
-          "away": "St. Nyonnais",
-          "pick": "Over 1.5",
           "odds": "",
           "league": "",
           "time": ""
