@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-08-11T22:38:36.164Z",
-  "started_at": "2026-08-11T22:38:17.597Z",
+  "generated_at": "2026-08-12T07:21:03.392Z",
+  "started_at": "2026-08-12T07:20:42.807Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
       "status": "ok",
-      "count": 16
+      "count": 2
     },
     "adibet": {
       "status": "ok",
@@ -21,112 +21,13 @@
     },
     "wp_tables": {
       "status": "ok",
-      "count": 26
+      "count": 0
     }
   },
   "sources_detail": [
     {
       "source": "allnigeriafootball",
       "picks": [
-        {
-          "match": "Lyon vs Sparta Prague",
-          "home": "Lyon",
-          "away": "Sparta Prague",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "UEFA Champions League",
-          "time": "20:00"
-        },
-        {
-          "match": "FC Kairat Almaty vs Levski Sofia",
-          "home": "FC Kairat Almaty",
-          "away": "Levski Sofia",
-          "pick": "Under 3.5",
-          "odds": "",
-          "league": "UEFA Champions League",
-          "time": "16:00"
-        },
-        {
-          "match": "Bodoe/Glimt vs Union Gilloise",
-          "home": "Bodoe/Glimt",
-          "away": "Union Gilloise",
-          "pick": "1X",
-          "odds": "",
-          "league": "UEFA Champions League",
-          "time": "17:00"
-        },
-        {
-          "match": "Sabah Masazir vs AGF Aarhus",
-          "home": "Sabah Masazir",
-          "away": "AGF Aarhus",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "UEFA Champions League",
-          "time": "17:00"
-        },
-        {
-          "match": "FK Kauno Žalgiris vs Dinamo Zagreb",
-          "home": "FK Kauno Žalgiris",
-          "away": "Dinamo Zagreb",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "UEFA Champions League",
-          "time": "18:00"
-        },
-        {
-          "match": "Crvena Zvezda vs Hapoel Be`er Sheva FC",
-          "home": "Crvena Zvezda",
-          "away": "Hapoel Be`er Sheva FC",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "UEFA Champions League",
-          "time": "19:00"
-        },
-        {
-          "match": "NK Celje vs FC Ararat",
-          "home": "NK Celje",
-          "away": "FC Ararat",
-          "pick": "Armenia (Draw No Bet) Celje",
-          "odds": "",
-          "league": "UEFA Champions League",
-          "time": "19:15"
-        },
-        {
-          "match": "Slovan Bratislava vs Mjällby AIF",
-          "home": "Slovan Bratislava",
-          "away": "Mjällby AIF",
-          "pick": "1X",
-          "odds": "",
-          "league": "UEFA Champions League",
-          "time": "19:15"
-        },
-        {
-          "match": "Sturm Graz vs Fenerbahçe",
-          "home": "Sturm Graz",
-          "away": "Fenerbahçe",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "UEFA Champions League",
-          "time": "19:30"
-        },
-        {
-          "match": "FC CSKA 1948 vs Panathinaikos",
-          "home": "FC CSKA 1948",
-          "away": "Panathinaikos",
-          "pick": "X2",
-          "odds": "",
-          "league": "UEFA Conference League",
-          "time": "18:30"
-        },
-        {
-          "match": "FC Iberia 1999 vs Larne FC",
-          "home": "FC Iberia 1999",
-          "away": "Larne FC",
-          "pick": "1X",
-          "odds": "",
-          "league": "UEFA Europa League",
-          "time": "17:00"
-        },
         {
           "match": "Talleres de Córdoba vs CA Lanús",
           "home": "Talleres de Córdoba",
@@ -137,15 +38,6 @@
           "time": "01:00"
         },
         {
-          "match": "Palermo FC vs Juventus",
-          "home": "Palermo FC",
-          "away": "Juventus",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "Club Friendly Games",
-          "time": "11:00"
-        },
-        {
           "match": "Club Bolívar vs São Paulo FC",
           "home": "Club Bolívar",
           "away": "São Paulo FC",
@@ -153,24 +45,6 @@
           "odds": "",
           "league": "CONMEBOL Sudamericana",
           "time": "01:30"
-        },
-        {
-          "match": "Helsingborgs IF vs IFK Varnamo",
-          "home": "Helsingborgs IF",
-          "away": "IFK Varnamo",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "Sweden Superettan",
-          "time": "18:00"
-        },
-        {
-          "match": "CD Cuenca vs Manta FC",
-          "home": "CD Cuenca",
-          "away": "Manta FC",
-          "pick": "Under 3.5 Won",
-          "odds": "",
-          "league": "Ecuador LigaPro Primera A",
-          "time": "01:00"
         }
       ]
     },
@@ -1513,287 +1387,8 @@
     },
     {
       "source": "wp_tables",
-      "picks": [
-        {
-          "match": "Kairat vs Levski Sofia",
-          "home": "Kairat",
-          "away": "Levski Sofia",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Bodo Glimt vs Union Gilloise",
-          "home": "Bodo Glimt",
-          "away": "Union Gilloise",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Crvena Zvezda vs Beer Sheva",
-          "home": "Crvena Zvezda",
-          "away": "Beer Sheva",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Celje vs Ararat",
-          "home": "Celje",
-          "away": "Ararat",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Celje vs Ararat",
-          "home": "Celje",
-          "away": "Ararat",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Crvena Zvezda vs Beer Sheva",
-          "home": "Crvena Zvezda",
-          "away": "Beer Sheva",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Kauno Zalgiris vs Dinamo Zagreb",
-          "home": "Kauno Zalgiris",
-          "away": "Dinamo Zagreb",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Lyon vs Sparta Praha",
-          "home": "Lyon",
-          "away": "Sparta Praha",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Crvena Zvezda vs Beer Sheva",
-          "home": "Crvena Zvezda",
-          "away": "Beer Sheva",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Slovan Bratislava vs Mjallby",
-          "home": "Slovan Bratislava",
-          "away": "Mjallby",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Sabah vs Arhus",
-          "home": "Sabah",
-          "away": "Arhus",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Celje vs Ararat",
-          "home": "Celje",
-          "away": "Ararat",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Crvena Zvezda vs Beer Sheva",
-          "home": "Crvena Zvezda",
-          "away": "Beer Sheva",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Kauno Zalgiris vs Dinamo Zagreb",
-          "home": "Kauno Zalgiris",
-          "away": "Dinamo Zagreb",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Lyon vs Sparta Praha",
-          "home": "Lyon",
-          "away": "Sparta Praha",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Crvena Zvezda vs Beer Sheva",
-          "home": "Crvena Zvezda",
-          "away": "Beer Sheva",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Slovan Bratislava vs Mjallby",
-          "home": "Slovan Bratislava",
-          "away": "Mjallby",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Sabah vs Arhus",
-          "home": "Sabah",
-          "away": "Arhus",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Kairat vs Levski Sofia",
-          "home": "Kairat",
-          "away": "Levski Sofia",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Bodo Glimt vs Union Gilloise",
-          "home": "Bodo Glimt",
-          "away": "Union Gilloise",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Crvena Zvezda vs Beer Sheva",
-          "home": "Crvena Zvezda",
-          "away": "Beer Sheva",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "Celje vs Ararat",
-          "home": "Celje",
-          "away": "Ararat",
-          "pick": "Draw(X)",
-          "odds": "",
-          "league": "Champions League Qualifications",
-          "time": ""
-        },
-        {
-          "match": "AO Trikala vs AEL Larissa",
-          "home": "AO Trikala",
-          "away": "AEL Larissa",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Iberia 1999 vs Larne",
-          "home": "Iberia 1999",
-          "away": "Larne",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "Europe",
-          "time": ""
-        },
-        {
-          "match": "Queensland Lions vs Melbourne City",
-          "home": "Queensland Lions",
-          "away": "Melbourne City",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Schoolkate T. vs Cina F.",
-          "home": "Schoolkate T.",
-          "away": "Cina F.",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        }
-      ]
+      "picks": []
     }
   ],
-  "intersections": [
-    {
-      "match": "H. Beer Sheva vs Crvena Zvezda",
-      "home": "H. Beer Sheva",
-      "away": "Crvena Zvezda",
-      "pick": "Home(1)",
-      "sources": [
-        "allnigeriafootball",
-        "bet_sites",
-        "wp_tables"
-      ],
-      "source_count": 3,
-      "odds": "",
-      "league": "UEFA Champions League",
-      "time": "19:00"
-    },
-    {
-      "match": "Lyon vs Sparta Prague",
-      "home": "Lyon",
-      "away": "Sparta Prague",
-      "pick": "Home(1)",
-      "sources": [
-        "allnigeriafootball",
-        "bet_sites"
-      ],
-      "source_count": 2,
-      "odds": "",
-      "league": "UEFA Champions League",
-      "time": "20:00"
-    },
-    {
-      "match": "FC Iberia 1999 vs Larne FC",
-      "home": "FC Iberia 1999",
-      "away": "Larne FC",
-      "pick": "Home(1)",
-      "sources": [
-        "wp_tables",
-        "bet_sites"
-      ],
-      "source_count": 2,
-      "odds": "",
-      "league": "Europe",
-      "time": ""
-    }
-  ]
+  "intersections": []
 }
