@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-12T10:59:11.275Z",
-  "started_at": "2026-08-12T10:58:50.397Z",
+  "generated_at": "2026-08-12T14:54:54.617Z",
+  "started_at": "2026-08-12T14:54:32.702Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
@@ -17,7 +17,7 @@
     },
     "bet_sites": {
       "status": "ok",
-      "count": 146
+      "count": 149
     },
     "wp_tables": {
       "status": "ok",
@@ -479,6 +479,33 @@
           "home": "Vojvodina",
           "away": "Radnik",
           "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "PSG vs Aston Villa",
+          "home": "PSG",
+          "away": "Aston Villa",
+          "pick": "1 Ov 0.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "FC Copenhagen vs Debrecen",
+          "home": "FC Copenhagen",
+          "away": "Debrecen",
+          "pick": "1 Ov 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "SK Rapid vs Paide",
+          "home": "SK Rapid",
+          "away": "Paide",
+          "pick": "1 &amp; 1 Ov 1.5",
           "odds": "",
           "league": "",
           "time": ""
