@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-08-13T07:23:24.410Z",
-  "started_at": "2026-08-13T07:22:59.770Z",
+  "generated_at": "2026-08-13T10:59:42.189Z",
+  "started_at": "2026-08-13T10:59:22.228Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
       "status": "ok",
-      "count": 0
+      "count": 18
     },
     "adibet": {
       "status": "ok",
@@ -27,7 +27,170 @@
   "sources_detail": [
     {
       "source": "allnigeriafootball",
-      "picks": []
+      "picks": [
+        {
+          "match": "Beşiktaş vs FC Hradec Králové",
+          "home": "Beşiktaş",
+          "away": "FC Hradec Králové",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "UEFA Europa League",
+          "time": "18:00"
+        },
+        {
+          "match": "AC Omonia Nicosia vs Lincoln Red Imps",
+          "home": "AC Omonia Nicosia",
+          "away": "Lincoln Red Imps",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "UEFA Europa League",
+          "time": "18:00"
+        },
+        {
+          "match": "Universitatea Craiova vs KuPs",
+          "home": "Universitatea Craiova",
+          "away": "KuPs",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "UEFA Europa League",
+          "time": "18:00"
+        },
+        {
+          "match": "Górnik Zabrze vs Ferencvárosi",
+          "home": "Górnik Zabrze",
+          "away": "Ferencvárosi",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "UEFA Europa League",
+          "time": "18:00"
+        },
+        {
+          "match": "KI Klaksvík vs Lech Poznań",
+          "home": "KI Klaksvík",
+          "away": "Lech Poznań",
+          "pick": "X2",
+          "odds": "",
+          "league": "UEFA Europa League",
+          "time": "18:30"
+        },
+        {
+          "match": "Vikingur Reykjavik vs FC Thun",
+          "home": "Vikingur Reykjavik",
+          "away": "FC Thun",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "UEFA Europa League",
+          "time": "18:30"
+        },
+        {
+          "match": "Rangers vs Jagiellonia Bialystok",
+          "home": "Rangers",
+          "away": "Jagiellonia Bialystok",
+          "pick": "Home(DNB)Rangers",
+          "odds": "",
+          "league": "UEFA Europa League",
+          "time": "19:30"
+        },
+        {
+          "match": "Heart of Midlothian vs Benfica",
+          "home": "Heart of Midlothian",
+          "away": "Benfica",
+          "pick": "Home(DNB)Benfica",
+          "odds": "",
+          "league": "UEFA Europa League",
+          "time": "19:45"
+        },
+        {
+          "match": "CSKA Sofia vs Maccabi Tel Aviv",
+          "home": "CSKA Sofia",
+          "away": "Maccabi Tel Aviv",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "UEFA Europa League",
+          "time": "19:00"
+        },
+        {
+          "match": "DAC 1904 Dunajská Streda vs FC Twente",
+          "home": "DAC 1904 Dunajská Streda",
+          "away": "FC Twente",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "UEFA Conference League",
+          "time": "18:00"
+        },
+        {
+          "match": "FC Dinamo Minsk vs Braga",
+          "home": "FC Dinamo Minsk",
+          "away": "Braga",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "UEFA Conference League",
+          "time": "18:00"
+        },
+        {
+          "match": "FC Midtjylland vs Bohemians",
+          "home": "FC Midtjylland",
+          "away": "Bohemians",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "UEFA Conference League",
+          "time": "18:00"
+        },
+        {
+          "match": "Hammarby IF vs Raków Częstochowa",
+          "home": "Hammarby IF",
+          "away": "Raków Częstochowa",
+          "pick": "1X",
+          "odds": "",
+          "league": "UEFA Conference League",
+          "time": "18:00"
+        },
+        {
+          "match": "FC Drita vs SP Tre Fiori",
+          "home": "FC Drita",
+          "away": "SP Tre Fiori",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "UEFA Conference League",
+          "time": "19:00"
+        },
+        {
+          "match": "Motherwell FC vs HJK Helsinki",
+          "home": "Motherwell FC",
+          "away": "HJK Helsinki",
+          "pick": "1X",
+          "odds": "",
+          "league": "UEFA Conference League",
+          "time": "19:30"
+        },
+        {
+          "match": "FC Sion vs FC Noah Yerevan",
+          "home": "FC Sion",
+          "away": "FC Noah Yerevan",
+          "pick": "1X",
+          "odds": "",
+          "league": "UEFA Conference League",
+          "time": "19:15"
+        },
+        {
+          "match": "Shelbourne FC vs Ajax",
+          "home": "Shelbourne FC",
+          "away": "Ajax",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "UEFA Conference League",
+          "time": "19:45"
+        },
+        {
+          "match": "Hajduk Split vs Vilnius FK Zalgiris",
+          "home": "Hajduk Split",
+          "away": "Vilnius FK Zalgiris",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "UEFA Conference League",
+          "time": "20:00"
+        }
+      ]
     },
     {
       "source": "adibet",
@@ -1633,5 +1796,34 @@
       ]
     }
   ],
-  "intersections": []
+  "intersections": [
+    {
+      "match": "AC Omonia Nicosia vs Lincoln Red Imps",
+      "home": "AC Omonia Nicosia",
+      "away": "Lincoln Red Imps",
+      "pick": "Home(1)",
+      "sources": [
+        "allnigeriafootball",
+        "wp_tables"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "UEFA Europa League",
+      "time": "18:00"
+    },
+    {
+      "match": "FC Dinamo Minsk vs Braga",
+      "home": "FC Dinamo Minsk",
+      "away": "Braga",
+      "pick": "Away(2)",
+      "sources": [
+        "allnigeriafootball",
+        "wp_tables"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "UEFA Conference League",
+      "time": "18:00"
+    }
+  ]
 }
