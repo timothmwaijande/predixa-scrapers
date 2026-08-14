@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-14T18:50:57.526Z",
-  "started_at": "2026-08-14T18:50:38.596Z",
+  "generated_at": "2026-08-14T22:20:36.486Z",
+  "started_at": "2026-08-14T22:19:59.112Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
@@ -21,7 +21,7 @@
     },
     "wp_tables": {
       "status": "ok",
-      "count": 26
+      "count": 22
     }
   },
   "sources_detail": [
@@ -1729,42 +1729,6 @@
           "odds": "",
           "league": "",
           "time": ""
-        },
-        {
-          "match": "Versailles vs Le Puy",
-          "home": "Versailles",
-          "away": "Le Puy",
-          "pick": "1X",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Dag &amp; Red vs Farnham",
-          "home": "Dag &amp; Red",
-          "away": "Farnham",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Shandong Taishan vs Qingdao Hainiu",
-          "home": "Shandong Taishan",
-          "away": "Qingdao Hainiu",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Taberner C. vs Kumstat J.",
-          "home": "Taberner C.",
-          "away": "Kumstat J.",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "",
-          "time": ""
         }
       ]
     }
@@ -1798,20 +1762,6 @@
       "odds": "",
       "league": "Norway Eliteserien",
       "time": "18:00"
-    },
-    {
-      "match": "Shandong Taishan vs Qingdao Hainiu",
-      "home": "Shandong Taishan",
-      "away": "Qingdao Hainiu",
-      "pick": "Home(1)",
-      "sources": [
-        "allnigeriafootball",
-        "wp_tables"
-      ],
-      "source_count": 2,
-      "odds": "",
-      "league": "Chinese Super League",
-      "time": "12:35"
     }
   ]
 }
