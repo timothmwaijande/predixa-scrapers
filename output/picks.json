@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-14T10:56:28.561Z",
-  "started_at": "2026-08-14T10:56:09.382Z",
+  "generated_at": "2026-08-14T14:48:30.189Z",
+  "started_at": "2026-08-14T14:48:10.486Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
@@ -17,7 +17,7 @@
     },
     "bet_sites": {
       "status": "ok",
-      "count": 144
+      "count": 147
     },
     "wp_tables": {
       "status": "ok",
@@ -250,6 +250,78 @@
           "time": ""
         },
         {
+          "match": "D. Zagreb vs Rudes",
+          "home": "D. Zagreb",
+          "away": "Rudes",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Viborg vs Aarhus",
+          "home": "Viborg",
+          "away": "Aarhus",
+          "pick": "1X",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Honved vs Vasas",
+          "home": "Honved",
+          "away": "Vasas",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Haukar vs Hviti",
+          "home": "Haukar",
+          "away": "Hviti",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "BFC vs Ogre United",
+          "home": "BFC",
+          "away": "Ogre United",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Rosenborg vs Viking",
+          "home": "Rosenborg",
+          "away": "Viking",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Al Hilal vs Al",
+          "home": "Al Hilal",
+          "away": "Al",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Galatasaray vs Corum",
+          "home": "Galatasaray",
+          "away": "Corum",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
           "match": "Besiktas vs Hradec",
           "home": "Besiktas",
           "away": "Hradec",
@@ -322,73 +394,28 @@
           "time": ""
         },
         {
-          "match": "K. Almaty vs Levski",
-          "home": "K. Almaty",
-          "away": "Levski",
-          "pick": "Under 3.5",
+          "match": "D. Zagreb vs Rudes",
+          "home": "D. Zagreb",
+          "away": "Rudes",
+          "pick": "1 Ov 1.5",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Bodo/Glimt vs Royale U",
-          "home": "Bodo/Glimt",
-          "away": "Royale U",
+          "match": "Almere City vs Jong PSV",
+          "home": "Almere City",
+          "away": "Jong PSV",
           "pick": "Over 2.5",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Crvena Zvezda vs Beer Sheva",
-          "home": "Crvena Zvezda",
-          "away": "Beer Sheva",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Celje vs Ararat",
-          "home": "Celje",
-          "away": "Ararat",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Slovan vs Mjallby",
-          "home": "Slovan",
-          "away": "Mjallby",
-          "pick": "1X",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Sturm vs Fenerbahce",
-          "home": "Sturm",
-          "away": "Fenerbahce",
-          "pick": "X2",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Lyon vs Sparta Prague",
-          "home": "Lyon",
-          "away": "Sparta Prague",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Iberia vs Larne",
-          "home": "Iberia",
-          "away": "Larne",
-          "pick": "Home(1)",
+          "match": "Al Hilal vs Al Faisaly",
+          "home": "Al Hilal",
+          "away": "Al Faisaly",
+          "pick": "1 &amp; Ov 1.5",
           "odds": "",
           "league": "",
           "time": ""
@@ -1750,12 +1777,27 @@
       "pick": "Home(1)",
       "sources": [
         "allnigeriafootball",
+        "bet_sites",
         "wp_tables"
       ],
-      "source_count": 2,
+      "source_count": 3,
       "odds": "",
       "league": "Türkiye Süper Lig",
       "time": "19:30"
+    },
+    {
+      "match": "Rosenborg BK vs Viking FK",
+      "home": "Rosenborg BK",
+      "away": "Viking FK",
+      "pick": "Over 1.5",
+      "sources": [
+        "allnigeriafootball",
+        "bet_sites"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "Norway Eliteserien",
+      "time": "18:00"
     },
     {
       "match": "Shandong Taishan vs Qingdao Hainiu",
