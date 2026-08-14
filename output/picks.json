@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-14T07:21:19.076Z",
-  "started_at": "2026-08-14T07:20:41.074Z",
+  "generated_at": "2026-08-14T10:56:28.561Z",
+  "started_at": "2026-08-14T10:56:09.382Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
@@ -13,7 +13,7 @@
     },
     "zulubet": {
       "status": "ok",
-      "count": 0
+      "count": 1
     },
     "bet_sites": {
       "status": "ok",
@@ -189,7 +189,17 @@
     },
     {
       "source": "zulubet",
-      "picks": []
+      "picks": [
+        {
+          "match": "HOME team vs AWAY team",
+          "home": "HOME team",
+          "away": "AWAY team",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        }
+      ]
     },
     {
       "source": "bet_sites",
