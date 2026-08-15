@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-15T10:20:02.045Z",
-  "started_at": "2026-08-15T10:19:42.339Z",
+  "generated_at": "2026-08-15T14:19:53.383Z",
+  "started_at": "2026-08-15T14:19:30.228Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
@@ -17,7 +17,7 @@
     },
     "bet_sites": {
       "status": "ok",
-      "count": 147
+      "count": 150
     },
     "wp_tables": {
       "status": "ok",
@@ -322,6 +322,78 @@
           "time": ""
         },
         {
+          "match": "Plzen vs Zlin",
+          "home": "Plzen",
+          "away": "Zlin",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "KTP vs KaPa",
+          "home": "KTP",
+          "away": "KaPa",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Torino vs Carrarese",
+          "home": "Torino",
+          "away": "Carrarese",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Kairat vs Ulytau",
+          "home": "Kairat",
+          "away": "Ulytau",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Ordabasy vs Altai",
+          "home": "Ordabasy",
+          "away": "Altai",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Excelsior vs PSV",
+          "home": "Excelsior",
+          "away": "PSV",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Rio Ave vs FC Porto",
+          "home": "Rio Ave",
+          "away": "FC Porto",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Al Nassr vs Al Fateh",
+          "home": "Al Nassr",
+          "away": "Al Fateh",
+          "pick": "Over 2.5",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
           "match": "D. Zagreb vs Rudes",
           "home": "D. Zagreb",
           "away": "Rudes",
@@ -394,73 +466,28 @@
           "time": ""
         },
         {
-          "match": "Besiktas vs Hradec",
-          "home": "Besiktas",
-          "away": "Hradec",
+          "match": "Ordabasy vs Altai",
+          "home": "Ordabasy",
+          "away": "Altai",
           "pick": "Home(1)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Univ. Craiova vs KuPS",
-          "home": "Univ. Craiova",
-          "away": "KuPS",
-          "pick": "Home(1)",
+          "match": "Rio Ave vs FC Porto",
+          "home": "Rio Ave",
+          "away": "FC Porto",
+          "pick": "X2 &amp; Ov 1.5",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Hearts vs Benfica",
-          "home": "Hearts",
-          "away": "Benfica",
-          "pick": "Away(2)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Midtjylland vs Bohemians",
-          "home": "Midtjylland",
-          "away": "Bohemians",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Nordsjaelland vs Valur",
-          "home": "Nordsjaelland",
-          "away": "Valur",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "St. Gallen vs Sheriff",
-          "home": "St. Gallen",
-          "away": "Sheriff",
-          "pick": "Home(1)",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Sion vs Noah",
-          "home": "Sion",
-          "away": "Noah",
-          "pick": "Over 1.5",
-          "odds": "",
-          "league": "",
-          "time": ""
-        },
-        {
-          "match": "Shelbourne vs Ajax",
-          "home": "Shelbourne",
-          "away": "Ajax",
-          "pick": "Away(2)",
+          "match": "Al Nassr vs Al Fateh",
+          "home": "Al Nassr",
+          "away": "Al Fateh",
+          "pick": "1 &amp; Ov 1.5",
           "odds": "",
           "league": "",
           "time": ""
@@ -1895,5 +1922,48 @@
       ]
     }
   ],
-  "intersections": []
+  "intersections": [
+    {
+      "match": "FC Torino vs Carrarese Calcio",
+      "home": "FC Torino",
+      "away": "Carrarese Calcio",
+      "pick": "Home(1)",
+      "sources": [
+        "allnigeriafootball",
+        "bet_sites"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "Italy Coppa Italia",
+      "time": "20:15"
+    },
+    {
+      "match": "Excelsior Rotterdam vs PSV",
+      "home": "Excelsior Rotterdam",
+      "away": "PSV",
+      "pick": "Away(2)",
+      "sources": [
+        "bet_sites",
+        "wp_tables"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "",
+      "time": ""
+    },
+    {
+      "match": "Viktoria Plzen vs FC Zlin",
+      "home": "Viktoria Plzen",
+      "away": "FC Zlin",
+      "pick": "Home(1)",
+      "sources": [
+        "allnigeriafootball",
+        "bet_sites"
+      ],
+      "source_count": 2,
+      "odds": "",
+      "league": "Czechia 1. Liga",
+      "time": "19:00"
+    }
+  ]
 }
