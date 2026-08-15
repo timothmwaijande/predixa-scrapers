@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-08-15T06:34:23.730Z",
-  "started_at": "2026-08-15T06:34:02.851Z",
+  "generated_at": "2026-08-15T10:20:02.045Z",
+  "started_at": "2026-08-15T10:19:42.339Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
       "status": "ok",
-      "count": 1
+      "count": 25
     },
     "adibet": {
       "status": "ok",
@@ -29,10 +29,226 @@
       "source": "allnigeriafootball",
       "picks": [
         {
+          "match": "Alavés vs Getafe",
+          "home": "Alavés",
+          "away": "Getafe",
+          "pick": "Under 2.5",
+          "odds": "",
+          "league": "Spain LaLiga",
+          "time": "18:30"
+        },
+        {
+          "match": "Sevilla vs Rayo Vallecano",
+          "home": "Sevilla",
+          "away": "Rayo Vallecano",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Spain LaLiga",
+          "time": "20:30"
+        },
+        {
+          "match": "Udinese vs Calcio Padova",
+          "home": "Udinese",
+          "away": "Calcio Padova",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "Italy Coppa Italia",
+          "time": "17:30"
+        },
+        {
+          "match": "Venezia FC vs Modena FC",
+          "home": "Venezia FC",
+          "away": "Modena FC",
+          "pick": "Home(DNB)Venezia",
+          "odds": "",
+          "league": "Italy Coppa Italia",
+          "time": "19:45"
+        },
+        {
+          "match": "FC Torino vs Carrarese Calcio",
+          "home": "FC Torino",
+          "away": "Carrarese Calcio",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "Italy Coppa Italia",
+          "time": "20:15"
+        },
+        {
+          "match": "Morocco vs Algeria",
+          "home": "Morocco",
+          "away": "Algeria",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "AFCON, Women",
+          "time": "18:00"
+        },
+        {
+          "match": "KFUM Oslo vs Lillestroem SK",
+          "home": "KFUM Oslo",
+          "away": "Lillestroem SK",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "Norway Eliteserien",
+          "time": "15:00"
+        },
+        {
+          "match": "Willem II Tilburg vs NEC Nijmegen",
+          "home": "Willem II Tilburg",
+          "away": "NEC Nijmegen",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "Netherlands Eredivisie",
+          "time": "15:30"
+        },
+        {
+          "match": "FC Utrecht vs AZ Alkmaar",
+          "home": "FC Utrecht",
+          "away": "AZ Alkmaar",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "Netherlands Eredivisie",
+          "time": "17:45"
+        },
+        {
+          "match": "Excelsior Rotterdam vs PSV",
+          "home": "Excelsior Rotterdam",
+          "away": "PSV",
+          "pick": "Home(DNB)PSV",
+          "odds": "",
+          "league": "Netherlands Eredivisie",
+          "time": "19:00"
+        },
+        {
+          "match": "Fortuna Sittard vs SC Cambuur",
+          "home": "Fortuna Sittard",
+          "away": "SC Cambuur",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "Netherlands Eredivisie",
+          "time": "20:00"
+        },
+        {
+          "match": "Rio Ave FC vs Porto",
+          "home": "Rio Ave FC",
+          "away": "Porto",
+          "pick": "Home(DNB)Porto",
+          "odds": "",
+          "league": "Portugal Primeira Liga",
+          "time": "20:30"
+        },
+        {
+          "match": "Kasimpasa vs Trabzonspor",
+          "home": "Kasimpasa",
+          "away": "Trabzonspor",
+          "pick": "X2",
+          "odds": "",
+          "league": "Türkiye Süper Lig",
+          "time": "17:00"
+        },
+        {
+          "match": "Gençlerbirliği vs Fenerbahçe",
+          "home": "Gençlerbirliği",
+          "away": "Fenerbahçe",
+          "pick": "Home(DNB)Fenerbah e",
+          "odds": "",
+          "league": "Türkiye Süper Lig",
+          "time": "19:30"
+        },
+        {
+          "match": "Sparta Prague vs FK Teplice",
+          "home": "Sparta Prague",
+          "away": "FK Teplice",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "Czechia 1. Liga",
+          "time": "18:00"
+        },
+        {
+          "match": "Viktoria Plzen vs FC Zlin",
+          "home": "Viktoria Plzen",
+          "away": "FC Zlin",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "Czechia 1. Liga",
+          "time": "19:00"
+        },
+        {
+          "match": "Mjällby AIF vs IK Sirius",
+          "home": "Mjällby AIF",
+          "away": "IK Sirius",
+          "pick": "Over 1.5",
+          "odds": "",
+          "league": "Sweden Allsvenskan",
+          "time": "14:00"
+        },
+        {
+          "match": "San Lorenzo de Almagro vs Unión de Santa Fe",
+          "home": "San Lorenzo de Almagro",
+          "away": "Unión de Santa Fe",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Argentina Primera LPF",
+          "time": "18:30"
+        },
+        {
+          "match": "Estudiantes de La Plata vs Gimnasia y Esgrima La Plata",
+          "home": "Estudiantes de La Plata",
+          "away": "Gimnasia y Esgrima La Plata",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Argentina Primera LPF",
+          "time": "20:45"
+        },
+        {
+          "match": "Belgrano de Córdoba vs Independiente Rivadavia",
+          "home": "Belgrano de Córdoba",
+          "away": "Independiente Rivadavia",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Argentina Primera LPF",
+          "time": "23:00"
+        },
+        {
+          "match": "Criciuma SC vs Goias EC GO",
+          "home": "Criciuma SC",
+          "away": "Goias EC GO",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Brazil Brasileiro Serie B",
+          "time": "20:00"
+        },
+        {
+          "match": "Juventude RS vs Fortaleza EC CE",
+          "home": "Juventude RS",
+          "away": "Fortaleza EC CE",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Brazil Brasileiro Serie B",
+          "time": "22:30"
+        },
+        {
+          "match": "Al Nassr Club vs Al",
+          "home": "Al Nassr Club",
+          "away": "Al",
+          "pick": "Fateh SC 1",
+          "odds": "",
+          "league": "Saudi Pro League",
+          "time": "19:00"
+        },
+        {
+          "match": "Ludogorets vs Botev Plovdiv",
+          "home": "Ludogorets",
+          "away": "Botev Plovdiv",
+          "pick": "Home(DNB)Ludogorets",
+          "odds": "",
+          "league": "Bulgaria Parva Liga",
+          "time": "19:15"
+        },
+        {
           "match": "Racing Club Avellaneda vs CA Banfield",
           "home": "Racing Club Avellaneda",
           "away": "CA Banfield",
-          "pick": "Under 3.5",
+          "pick": "Under 3.5 Won",
           "odds": "",
           "league": "Argentina Primera LPF",
           "time": "00:30"
