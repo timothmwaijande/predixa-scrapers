@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install playwright google-api-python-client google-auth
-          python -m playwright install chromium
+          python -m playwright install --with-deps chromium
 
       - name: Run standings scraper
         id: standings
@@ -39,5 +39,5 @@ jobs:
           curl -s -X POST -A "Mozilla/5.0 (compatible; PREDIXA-Bot)" \
             -H "Content-Type: application/json" \
             -d @standings.json \
-            "https://predixa.co.tz/cron/fetch_standings.php?key=pred_f3cc603ea4f0e1a6038171dba59f41b601c0f815d1c1d580" || \
+            "https://predixa.co.tz/cron/fetch_standings.php?key=${{ secrets.CRON_KEY }}" || \
             echo "fetch_standings failed"

@@ -10,10 +10,23 @@ from googleapiclient.discovery import build
 from google.oauth2 import service_account
 
 # --- SkySports Scraper ---
-async def scrape_skysports_league(page_url):
+async def scrape_skysports_league(page_url, retries=2):
+    for attempt in range(retries + 1):
+        try:
+            return await _do_scrape(page_url)
+        except Exception as e:
+            if attempt < retries:
+                print(f"  Retry {attempt+1}/{retries} for {page_url}: {e}")
+                await asyncio.sleep(3)
+            else:
+                raise
+
+async def _do_scrape(page_url):
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
-        page = await browser.new_page()
+        page = await browser.new_page(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+        )
         print(f"➡️ Loading {page_url}...")
         await page.goto(page_url.strip(), timeout=60000)
         await page.wait_for_selector("table", timeout=30000)
