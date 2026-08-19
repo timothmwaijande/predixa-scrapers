@@ -2,7 +2,7 @@ name: ML Predict (XGBoost)
 
 on:
   schedule:
-    - cron: '30 7,13,19 * * *'
+    - cron: '30 8 * * *'
   workflow_dispatch:
 
 jobs:

@@ -2,9 +2,8 @@ name: Collect Match Stats
 
 on:
   schedule:
-    - cron: '0 6 * * *'    # Morning: collect yesterday + 1 backfill
-    - cron: '0 14 * * *'   # Afternoon: retry yesterday + 1 backfill
-    - cron: '0 22 * * *'   # Night: retry yesterday + 1 backfill
+    - cron: '0 6 * * *'    # Morning: collect yesterday
+    - cron: '0 18 * * *'   # Evening: retry yesterday
   workflow_dispatch:
     inputs:
       date:
