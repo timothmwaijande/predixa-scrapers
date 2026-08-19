@@ -5,11 +5,6 @@ require_once 'auth.php';
 require_once 'includes/sportsbook_ads.php';
 logPageVisit('index.php');
 
-if (isset($_SESSION['user_id'])) {
-    header("Location: dashboard");
-    exit;
-}
-
 function showOddsForPick($pv) {
     $pv = strtoupper(trim($pv));
     if (preg_match('/^(1|X|2|1X|X2|12|DC\s*1X|DC\s*X2|DC\s*12)$/', $pv)) return true;
