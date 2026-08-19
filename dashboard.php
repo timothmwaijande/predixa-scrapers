@@ -522,7 +522,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg-soft); color: var(
 <body>
 <header class="header">
 <div class="header-content">
-<div class="brand"><i class="fas fa-futbol me-2" style="color: #fff;"></i><span>PREDIXA</span></div>
+<a href="./" class="brand" style="text-decoration:none;color:#fff;"><i class="fas fa-futbol me-2" style="color: #fff;"></i><span>PREDIXA</span></a>
 <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
 <div class="header-actions" id="headerMenu">
 <?php $userPerms = getAdminPermissions($user['id']); $showAdmin = $user['id'] == 1 || $premium['is_super_admin'] || $userPerms === '*' || (is_array($userPerms) && count($userPerms) > 0); ?>
