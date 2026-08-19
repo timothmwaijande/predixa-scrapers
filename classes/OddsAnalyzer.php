@@ -167,8 +167,16 @@ class OddsAnalyzer {
             if ($matchTimeStr && strpos($matchTimeStr, ':') !== false) {
                 $parts = explode(':', $matchTimeStr);
                 $matchHour = (int)$parts[0];
-                $currentHour = (int)date('H');
-                if ($currentHour > $matchHour + 2) return null;
+                $matchMin = (int)($parts[1] ?? 0);
+                $matchTs = strtotime(date('Y-m-d') . ' ' . $matchTimeStr);
+                $now = time();
+                $hoursPast = ($now - $matchTs) / 3600;
+                if ($hoursPast > 2) {
+                    // Match time is >2h ago today — likely a stale pick from yesterday's source
+                    $yesterdayTs = strtotime('-1 day ' . date('Y-m-d') . ' ' . $matchTimeStr);
+                    $hoursPastYesterday = ($now - $yesterdayTs) / 3600;
+                    if ($hoursPastYesterday > 2) return null;
+                }
             }
 
             // Skip if match already has a result (already played)

@@ -3,7 +3,7 @@ require_once __DIR__ . '/../config.php';
 
 class BayesianModel {
     private $db;
-    private $priorStrength = 20;
+    private $priorStrength = 25;
     private $recencyHalfLife = 90;
     private $leaguePriors = [];
     private static $teamAliases = [];
@@ -359,8 +359,9 @@ class BayesianModel {
         $teamHA = $this->getTeamHomeAdvantage($homeTeam, $league);
         $effectiveHomeRate = $prior['home_win_rate'];
         $effectiveAwayRate = $prior['away_win_rate'];
-        if ($teamHA && $teamHA['total'] >= 5) {
-            $teamWeight = min(0.7, $teamHA['total'] / ($teamHA['total'] + 20));
+        if ($teamHA && $teamHA['total'] >= 8) {
+            // Reduced weight: team-specific HA was over-inflating home wins
+            $teamWeight = min(0.5, $teamHA['total'] / ($teamHA['total'] + 30));
             $effectiveHomeRate = $prior['home_win_rate'] * (1 - $teamWeight) + $teamHA['home_win_rate'] * $teamWeight;
             $effectiveAwayRate = $prior['away_win_rate'] * (1 - $teamWeight) + $teamHA['loss_rate'] * $teamWeight;
         }
@@ -385,12 +386,13 @@ class BayesianModel {
         if ($total > 0) { $postHome /= $total; $postDraw /= $total; $postAway /= $total; }
 
         if ($h2h['matches'] >= 3) {
+            // H2H blending: reduced from 0.2 to 0.1 — small-sample H2H data adds noise
             $h2hHome = $h2h['home_wins'] / max(1, $h2h['matches']);
-            $postHome = $postHome * 0.8 + $h2hHome * 0.2;
+            $postHome = $postHome * 0.9 + $h2hHome * 0.1;
             $h2hDraw = $h2h['draws'] / max(1, $h2h['matches']);
-            $postDraw = $postDraw * 0.8 + $h2hDraw * 0.2;
+            $postDraw = $postDraw * 0.9 + $h2hDraw * 0.1;
             $h2hAway = $h2h['away_wins'] / max(1, $h2h['matches']);
-            $postAway = $postAway * 0.8 + $h2hAway * 0.2;
+            $postAway = $postAway * 0.9 + $h2hAway * 0.1;
             $t2 = $postHome + $postDraw + $postAway;
             if ($t2 > 0) { $postHome /= $t2; $postDraw /= $t2; $postAway /= $t2; }
         }
@@ -528,7 +530,7 @@ class BayesianModel {
         ];
     }
 
-    public function storePrediction($homeTeam, $awayTeam, $league, $pred, $matchTime = null, $bookmakerOdds = null) {
+    public function storePrediction($homeTeam, $awayTeam, $league, $pred, $matchTime = null, $bookmakerOdds = null, $matchDate = null) {
         if (!$this->db) return false;
         $matchName = $homeTeam . ' vs ' . $awayTeam;
         $recPick = '';
@@ -557,14 +559,14 @@ class BayesianModel {
                      prob_1, prob_x, prob_2, prob_1x, prob_x2, prob_12,
                      over_25, under_25, prob_over_15, prob_under_15, prob_over_35, prob_under_35,
                      btts_yes, btts_no, expected_goals,
-                     confidence, recommended_pick,
+                     confidence, recommended_pick, result,
                      value_edge_1, value_edge_x, value_edge_2, value_pick,
                      market_odds_1, market_odds_x, market_odds_2)
-                VALUES (?, ?, ?, ?, CURDATE(), ?,
+                VALUES (?, ?, ?, ?, ?, ?,
                         ?, ?, ?, ?, ?, ?,
                         ?, ?, ?, ?, ?, ?,
                         ?, ?, ?,
-                        ?, ?,
+                        ?, ?, 'pending',
                         ?, ?, ?, ?,
                         ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
@@ -582,7 +584,7 @@ class BayesianModel {
                     market_odds_2 = VALUES(market_odds_2)
             ");
             return $stmt->execute([
-                $homeTeam, $awayTeam, $matchName, $league, $matchTime,
+                $homeTeam, $awayTeam, $matchName, $league, ($matchDate ?: date('Y-m-d')), $matchTime,
                 $pred['probs']['1'], $pred['probs']['X'], $pred['probs']['2'],
                 $pred['probs']['1X'], $pred['probs']['X2'], $pred['probs']['12'],
                 $pred['over_under']['over_25'], $pred['over_under']['under_25'],
@@ -604,14 +606,14 @@ class BayesianModel {
         if (!$this->db) return ['stored' => 0, 'skipped' => 0, 'errors' => 0];
         $stored = 0; $skipped = 0; $errors = 0;
 
-        // Get distinct matches from scraper_results + web_picks for today
+        // Get distinct matches from scraper_results + web_picks for today/tomorrow only
         $stmt = $this->db->query("
-            SELECT match_name, league, match_time FROM (
-                SELECT CONVERT(match_name USING utf8mb4) COLLATE utf8mb4_unicode_ci AS match_name, CONVERT(league USING utf8mb4) COLLATE utf8mb4_unicode_ci AS league, CONVERT(match_time USING utf8mb4) COLLATE utf8mb4_unicode_ci AS match_time FROM scraper_results WHERE DATE(detected_at) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+            SELECT match_name, league, match_time, match_date FROM (
+                SELECT CONVERT(match_name USING utf8mb4) COLLATE utf8mb4_unicode_ci AS match_name, CONVERT(league USING utf8mb4) COLLATE utf8mb4_unicode_ci AS league, CONVERT(match_time USING utf8mb4) COLLATE utf8mb4_unicode_ci AS match_time, DATE(detected_at) AS match_date FROM scraper_results WHERE DATE(detected_at) IN (CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 DAY))
                 UNION
-                SELECT CONVERT(match_name USING utf8mb4) COLLATE utf8mb4_unicode_ci, CONVERT(league USING utf8mb4) COLLATE utf8mb4_unicode_ci, CONVERT(match_time USING utf8mb4) COLLATE utf8mb4_unicode_ci FROM web_picks WHERE DATE(detected_at) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+                SELECT CONVERT(match_name USING utf8mb4) COLLATE utf8mb4_unicode_ci, CONVERT(league USING utf8mb4) COLLATE utf8mb4_unicode_ci, CONVERT(match_time USING utf8mb4) COLLATE utf8mb4_unicode_ci, DATE(detected_at) AS match_date FROM web_picks WHERE DATE(detected_at) IN (CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 DAY))
                 UNION
-                SELECT CONVERT(match_name USING utf8mb4) COLLATE utf8mb4_unicode_ci, CONVERT(league USING utf8mb4) COLLATE utf8mb4_unicode_ci, CAST(match_time AS CHAR) FROM admin_featured_picks WHERE DATE(created_at) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+                SELECT CONVERT(match_name USING utf8mb4) COLLATE utf8mb4_unicode_ci, CONVERT(league USING utf8mb4) COLLATE utf8mb4_unicode_ci, CAST(match_time AS CHAR), DATE(match_time) AS match_date FROM admin_featured_picks WHERE DATE(created_at) IN (CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 DAY))
             ) t LIMIT 100
         ");
 
@@ -620,7 +622,7 @@ class BayesianModel {
             if (!$resolved) { $skipped++; continue; }
             try {
                 $pred = $this->predict($resolved['resolved_home'], $resolved['resolved_away'], $m['league']);
-                $this->storePrediction($resolved['resolved_home'], $resolved['resolved_away'], $m['league'], $pred, $m['match_time']);
+                $this->storePrediction($resolved['resolved_home'], $resolved['resolved_away'], $m['league'], $pred, $m['match_time'], null, $m['match_date']);
                 $stored++;
             } catch (Exception $e) {
                 $errors++;
@@ -635,9 +637,11 @@ class BayesianModel {
         $settled = 0; $matched = 0; $unmatched = 0;
 
         try {
-            // Mark stale unmatched predictions older than 3 days as 'stale' so they don't clog the queue
-            $staleCutoff = date('Y-m-d', strtotime('-3 days'));
-            $this->db->exec("UPDATE bayesian_predictions SET result = 'stale', settled_at = NOW() WHERE result = 'pending' AND match_date < '$staleCutoff'");
+            // Mark stale unmatched predictions older than 5 days as 'stale' so they don't clog the queue
+            // Also catch empty-string results that slipped through (MySQL ENUM quirk requires CAST)
+            // Must be >= settlement window (3 days) + buffer for result delays
+            $staleCutoff = date('Y-m-d', strtotime('-5 days'));
+            $this->db->exec("UPDATE bayesian_predictions SET result = 'stale', settled_at = NOW() WHERE (result = 'pending' OR CAST(result AS CHAR) = '') AND match_date < '$staleCutoff'");
 
             // Process newest predictions first (ORDER BY match_date DESC) — prevents old unmatched rows from blocking recent settles
             $stmt = $this->db->query("
@@ -645,7 +649,7 @@ class BayesianModel {
                        prob_1, prob_x, prob_2, over_25, under_25,
                        btts_yes, btts_no, recommended_pick
                 FROM bayesian_predictions
-                WHERE result = 'pending'
+                WHERE result = 'pending' OR CAST(result AS CHAR) = ''
                 ORDER BY match_date DESC
                 LIMIT 500
             ");
@@ -669,9 +673,9 @@ class BayesianModel {
                     $q->execute([$bp['home_team'], $bp['away_team'], $bp['away_team'], $bp['home_team'], $bp['match_date']]);
                     $matchRow = $q->fetch();
                 }
-                // Fallback: ±1 day by team_id
+                // Fallback: ±3 day by team_id (matches can be stored with wrong date if batch predict runs late)
                 if (!$matchRow && $homeId && $awayId) {
-                    $q = $this->db->prepare("SELECT home_score, away_score FROM match_results WHERE ((home_team_id = ? AND away_team_id = ?) OR (home_team_id = ? AND away_team_id = ?)) AND match_date BETWEEN DATE_SUB(?, INTERVAL 1 DAY) AND DATE_ADD(?, INTERVAL 1 DAY) AND home_score IS NOT NULL AND away_score IS NOT NULL ORDER BY ABS(DATEDIFF(match_date, ?)) ASC LIMIT 1");
+                    $q = $this->db->prepare("SELECT home_score, away_score FROM match_results WHERE ((home_team_id = ? AND away_team_id = ?) OR (home_team_id = ? AND away_team_id = ?)) AND match_date BETWEEN DATE_SUB(?, INTERVAL 3 DAY) AND DATE_ADD(?, INTERVAL 3 DAY) AND home_score IS NOT NULL AND away_score IS NOT NULL ORDER BY ABS(DATEDIFF(match_date, ?)) ASC LIMIT 1");
                     $q->execute([$homeId, $awayId, $awayId, $homeId, $bp['match_date'], $bp['match_date'], $bp['match_date']]);
                     $matchRow = $q->fetch();
                 }
@@ -1249,7 +1253,9 @@ class BayesianModel {
         $picks = [];
         $bestOdds = max($ph, $pd, $pa);
         $bestLabel = $ph === $bestOdds ? '1' : ($pd === $bestOdds ? 'X' : '2');
-        if ($bestOdds > 0.40) $picks[] = ['type' => $bestLabel, 'prob' => round($bestOdds * 100, 1)];
+        // Single-outcome picks need strong conviction: >48% in a 3-way market (baseline 33.3%)
+        // Previously 40% — too low, letting in weak home-win picks that tanked accuracy
+        if ($bestOdds > 0.48) $picks[] = ['type' => $bestLabel, 'prob' => round($bestOdds * 100, 1)];
 
         foreach ([['1X', $ph + $pd], ['X2', $pd + $pa], ['12', $ph + $pa]] as $c) {
             if ($c[1] > 0.75) $picks[] = ['type' => $c[0], 'prob' => round($c[1] * 100, 1)];
