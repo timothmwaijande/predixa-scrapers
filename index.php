@@ -2,11 +2,18 @@
 session_start();
 require_once 'config.php';
 require_once 'auth.php';
+require_once 'includes/sportsbook_ads.php';
 logPageVisit('index.php');
 
 if (isset($_SESSION['user_id'])) {
     header("Location: dashboard");
     exit;
+}
+
+function showOddsForPick($pv) {
+    $pv = strtoupper(trim($pv));
+    if (preg_match('/^(1|X|2|1X|X2|12|DC\s*1X|DC\s*X2|DC\s*12)$/', $pv)) return true;
+    return false;
 }
 
 $previewPicks = [];
@@ -174,6 +181,8 @@ try { $approvedSlips = getApprovedSlips(); } catch (Exception $e) {}
         </div>
     </nav>
 
+    <?php renderSportsbookAd('hp1', 'bar'); ?>
+
     <section class="hero-section">
         <div class="container">
             <div class="row align-items-center">
@@ -289,7 +298,9 @@ try { $approvedSlips = getApprovedSlips(); } catch (Exception $e) {}
                             <div class="pick-card">
                                 <div class="pick-header">
                                     <div class="pick-match"><?= htmlspecialchars($pick['match_name'] ?? 'Match Name Hidden') ?></div>
+                                    <?php if (showOddsForPick($pick['pick_value'] ?? '')): ?>
                                     <div class="pick-odds"><?= number_format($pick['odds'] ?? 1.00, 2) ?></div>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="pick-meta">
 <span><?= htmlspecialchars($pick['league'] ?? '') ?></span>
@@ -460,7 +471,7 @@ try { $approvedSlips = getApprovedSlips(); } catch (Exception $e) {}
                     <span class="badge mb-2" style="background:#06B6D4;color:#000;"><i class="fas fa-star me-1"></i>Free Daily Pick / Chaguo la Bure la Leo</span>
                     <p class="text-white-50 small mb-1"><?= htmlspecialchars($freeDailyPick['match_name']) ?></p>
                     <p class="text-muted small mb-1"><?= htmlspecialchars($freeDailyPick['league']) ?> — <?= htmlspecialchars($freeDailyPick['match_time']) ?></p>
-                    <p class="small mb-0" style="color:#06B6D4;"><i class="fas fa-check-circle me-1"></i>Pick: <strong><?= htmlspecialchars($freeDailyPick['pick_value']) ?></strong> @ <?= htmlspecialchars($freeDailyPick['odds']) ?> <span class="text-muted">— <?= date('M d', strtotime($freeDailyPick['detected_at'])) ?></span></p>
+                    <p class="small mb-0" style="color:#06B6D4;"><i class="fas fa-check-circle me-1"></i>Pick: <strong><?= htmlspecialchars($freeDailyPick['pick_value']) ?></strong><?php if (showOddsForPick($freeDailyPick['pick_value'] ?? '')): ?> @ <?= htmlspecialchars($freeDailyPick['odds']) ?><?php endif; ?> <span class="text-muted">— <?= date('M d', strtotime($freeDailyPick['detected_at'])) ?></span></p>
                 </div>
                 <div class="col-md-4 text-md-end">
                     <p class="small text-muted mb-0">Today's free pick. <a href="#" data-bs-toggle="modal" data-bs-target="#signupModal" style="color:#06B6D4;font-weight:600;">Join free</a> for more.</p>
@@ -469,6 +480,8 @@ try { $approvedSlips = getApprovedSlips(); } catch (Exception $e) {}
         </div>
     </section>
     <?php endif; ?>
+
+    <?php renderSportsbookAdWidget('hp2', null, 4); ?>
 
     <?php if (!empty($approvedSlips)): ?>
     <!-- Winning Slips Carousel -->
