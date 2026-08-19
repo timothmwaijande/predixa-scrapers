@@ -101,6 +101,12 @@ if (function_exists('getSportsbookAds')) {
 // Rollover teaser count for premium upsell
 $rolloverCount = 0;
 try { $rolloverCount = count(getAvailableRolloverPicks()); } catch (Exception $e) {}
+
+function showOddsForPick($pv) {
+    $pv = strtoupper(trim($pv));
+    if (preg_match('/^(1|X|2|1X|X2|12|DC\s*1X|DC\s*X2|DC\s*12)$/', $pv)) return true;
+    return false;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
@@ -267,7 +273,7 @@ try { $rolloverCount = count(getAvailableRolloverPicks()); } catch (Exception $e
                     <span class="badge-free mb-2"><i class="fas fa-star me-1"></i>FREE PICK OF THE DAY</span>
                     <p class="text-white mb-1 fw-bold" style="font-size:0.95rem;"><?= htmlspecialchars($freeDailyPick['match_name']) ?></p>
                     <p class="text-muted small mb-1"><?= htmlspecialchars($freeDailyPick['league']) ?> — <?= htmlspecialchars($freeDailyPick['match_time']) ?></p>
-                    <p class="small mb-0" style="color:#06B6D4;"><i class="fas fa-check-circle me-1"></i>Pick: <strong><?= htmlspecialchars($freeDailyPick['pick_value']) ?></strong> @ <?= htmlspecialchars($freeDailyPick['odds']) ?></p>
+                    <p class="small mb-0" style="color:#06B6D4;"><i class="fas fa-check-circle me-1"></i>Pick: <strong><?= htmlspecialchars($freeDailyPick['pick_value']) ?></strong><?php if (showOddsForPick($freeDailyPick['pick_value'] ?? '')): ?> @ <?= htmlspecialchars($freeDailyPick['odds']) ?><?php endif; ?></p>
                 </div>
                 <div class="col-md-4 text-md-end">
                     <a href="premium" class="btn btn-outline-premium btn-sm">Get More Free Picks Daily <i class="fas fa-arrow-right ms-1"></i></a>
@@ -324,7 +330,9 @@ try { $rolloverCount = count(getAvailableRolloverPicks()); } catch (Exception $e
                         </div>
                         <div class="tip-pick">
                             <span class="tip-pick-value"><i class="fas fa-check-circle"></i><?= htmlspecialchars($pick['pick_value'] ?? '') ?></span>
+                            <?php if (showOddsForPick($pick['pick_value'] ?? '')): ?>
                             <span class="tip-odds"><?= number_format($pick['odds'] ?? 1.00, 2) ?></span>
+                            <?php endif; ?>
                         </div>
                         <div class="tip-winrate">Win rate: <strong><?= (int)($pick['win_rate_low'] ?? 0) ?>%</strong></div>
                         <?php if ($bestBookie && function_exists('sportsbookAdReady') && sportsbookAdReady($bestBookie)):
