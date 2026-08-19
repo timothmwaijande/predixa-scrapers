@@ -7,32 +7,55 @@ on:
     - cron: '0 22 * * *'   # Night: retry yesterday + 1 backfill
   workflow_dispatch:
     inputs:
+      date:
+        description: 'Date to collect (YYYY-MM-DD, default: yesterday)'
+        required: false
+        default: ''
+        type: string
       mode:
         description: 'Collection mode'
         required: false
-        default: 'full'
+        default: 'sofascore'
         type: choice
         options:
-          - full
+          - sofascore
           - backfill
-          - target
 
 jobs:
   collect-stats:
     runs-on: ubuntu-latest
     steps:
-      - name: Determine mode
-        id: mode
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install curl_cffi
+
+      - name: Determine date
+        id: date
         run: |
-          if [ "${{ github.event_name }}" = "schedule" ]; then
-            echo "mode=full" >> $GITHUB_OUTPUT
+          if [ -n "${{ inputs.date }}" ]; then
+            echo "target_date=${{ inputs.date }}" >> $GITHUB_OUTPUT
           else
-            echo "mode=${{ inputs.mode || 'full' }}" >> $GITHUB_OUTPUT
+            echo "target_date=$(date -u -d 'yesterday' +%Y-%m-%d)" >> $GITHUB_OUTPUT
           fi
 
-      - name: Trigger stats collection
+      - name: Run Sofascore scraper
         run: |
-          MODE="${{ steps.mode.outputs.mode }}"
-          echo "Running in $MODE mode - collecting yesterday + 1 backfill"
-          curl -s "https://predixa.co.tz/cron/run_stats.php?key=${{ secrets.STATS_SECRET_KEY }}&mode=$MODE" || echo "Collection failed"
+          DATE="${{ steps.date.outputs.date }}"
+          echo "Collecting stats for $DATE"
+          python cron/scrape_sofascore_stats.py "$DATE" \
+            --post "https://predixa.co.tz/cron/receive_sofascore_stats.php" \
+            --key "${{ secrets.STATS_SECRET_KEY }}"
+        continue-on-error: true
+
+      - name: Also trigger backfill via PHP (if backfill mode)
+        if: inputs.mode == 'backfill'
+        run: |
+          curl -s "https://predixa.co.tz/cron/run_stats.php?key=${{ secrets.STATS_SECRET_KEY }}&mode=backfill" || echo "Backfill trigger failed"
         continue-on-error: true
