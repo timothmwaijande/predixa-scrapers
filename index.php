@@ -104,7 +104,7 @@ try { $rolloverCount = count(getAvailableRolloverPicks()); } catch (Exception $e
 
 function showOddsForPick($pv) {
     $pv = strtoupper(trim($pv));
-    if (preg_match('/^(1|X|2|1X|X2|12|DC\s*1X|DC\s*X2|DC\s*12)$/', $pv)) return true;
+    if (preg_match('/^(1|X|2)$/', $pv)) return true;
     return false;
 }
 ?>
