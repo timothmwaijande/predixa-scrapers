@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-08-18T22:20:58.844Z",
-  "started_at": "2026-08-18T22:20:34.511Z",
+  "generated_at": "2026-08-19T06:39:32.893Z",
+  "started_at": "2026-08-19T06:39:13.362Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
       "status": "ok",
-      "count": 13
+      "count": 3
     },
     "adibet": {
       "status": "ok",
@@ -21,49 +21,13 @@
     },
     "wp_tables": {
       "status": "ok",
-      "count": 4
+      "count": 24
     }
   },
   "sources_detail": [
     {
       "source": "allnigeriafootball",
       "picks": [
-        {
-          "match": "Fenerbahçe vs Lyon",
-          "home": "Fenerbahçe",
-          "away": "Lyon",
-          "pick": "1X",
-          "odds": "",
-          "league": "UEFA Champions League",
-          "time": "20:00"
-        },
-        {
-          "match": "Dinamo Zagreb vs Viking FK",
-          "home": "Dinamo Zagreb",
-          "away": "Viking FK",
-          "pick": "1X",
-          "odds": "",
-          "league": "UEFA Champions League",
-          "time": "20:00"
-        },
-        {
-          "match": "Levski Sofia vs AEK Athens",
-          "home": "Levski Sofia",
-          "away": "AEK Athens",
-          "pick": "Under 3.5",
-          "odds": "",
-          "league": "UEFA Champions League",
-          "time": "20:00"
-        },
-        {
-          "match": "Independiente Rivadavia vs Fluminense FC",
-          "home": "Independiente Rivadavia",
-          "away": "Fluminense FC",
-          "pick": "Under 3.5",
-          "odds": "",
-          "league": "CONMEBOL Libertadores",
-          "time": "23:00"
-        },
         {
           "match": "CD Tolima vs Independiente del Valle",
           "home": "CD Tolima",
@@ -83,15 +47,6 @@
           "time": "01:30"
         },
         {
-          "match": "Shanghai Shenhua vs Beijing Guoan",
-          "home": "Shanghai Shenhua",
-          "away": "Beijing Guoan",
-          "pick": "Over 2.5",
-          "odds": "",
-          "league": "Chinese Super League",
-          "time": "12:35"
-        },
-        {
           "match": "Goias EC GO vs EC Juventude RS",
           "home": "Goias EC GO",
           "away": "EC Juventude RS",
@@ -99,51 +54,6 @@
           "odds": "",
           "league": "Brazil Brasileiro Serie B",
           "time": "01:35"
-        },
-        {
-          "match": "Heidenheim vs Bayern Munich",
-          "home": "Heidenheim",
-          "away": "Bayern Munich",
-          "pick": "Over 2.5",
-          "odds": "",
-          "league": "Club Friendly Games",
-          "time": "17:00"
-        },
-        {
-          "match": "Fountain Gate FC vs Mashujaa FC",
-          "home": "Fountain Gate FC",
-          "away": "Mashujaa FC",
-          "pick": "Under 3.5",
-          "odds": "",
-          "league": "Tanzania Premier League",
-          "time": "14:00"
-        },
-        {
-          "match": "Namungo FC vs Geita Gold FC",
-          "home": "Namungo FC",
-          "away": "Geita Gold FC",
-          "pick": "Under 3.5",
-          "odds": "",
-          "league": "Tanzania Premier League",
-          "time": "17:00"
-        },
-        {
-          "match": "Nassaji Mazandaran vs Esteghlal FC",
-          "home": "Nassaji Mazandaran",
-          "away": "Esteghlal FC",
-          "pick": "Under 3.5",
-          "odds": "",
-          "league": "Iran Pro League",
-          "time": "16:45"
-        },
-        {
-          "match": "Internacional RS vs Clube do Remo PA",
-          "home": "Internacional RS",
-          "away": "Clube do Remo PA",
-          "pick": "Home(DNB)Internacional Won",
-          "odds": "",
-          "league": "Brazil Brasileiro Serie A",
-          "time": "00:00"
         }
       ]
     },
@@ -885,36 +795,216 @@
       "source": "wp_tables",
       "picks": [
         {
-          "match": "Ramnicu Valcea vs Chindia Targoviste",
-          "home": "Ramnicu Valcea",
-          "away": "Chindia Targoviste",
-          "pick": "X2",
+          "match": "NEC vs Bodo Glimt",
+          "home": "NEC",
+          "away": "Bodo Glimt",
+          "pick": "Draw(X)",
+          "odds": "",
+          "league": "Champions League Qualifications",
+          "time": ""
+        },
+        {
+          "match": "Celtic vs LASK",
+          "home": "Celtic",
+          "away": "LASK",
+          "pick": "Draw(X)",
+          "odds": "",
+          "league": "Champions League Qualifications",
+          "time": ""
+        },
+        {
+          "match": "Atletico Madrid vs Malaga",
+          "home": "Atletico Madrid",
+          "away": "Malaga",
+          "pick": "Draw(X)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Shanghai Shenhua vs Beijing Guoan",
-          "home": "Shanghai Shenhua",
-          "away": "Beijing Guoan",
+          "match": "Beer Sheva vs Sabah",
+          "home": "Beer Sheva",
+          "away": "Sabah",
           "pick": "1X",
           "odds": "",
-          "league": "",
+          "league": "Champions League Qualifications",
           "time": ""
         },
         {
-          "match": "Ludogorets II vs Vihren",
-          "home": "Ludogorets II",
-          "away": "Vihren",
-          "pick": "X2",
+          "match": "Atletico Madrid vs Malaga",
+          "home": "Atletico Madrid",
+          "away": "Malaga",
+          "pick": "Home(1)",
           "odds": "",
           "league": "",
           "time": ""
         },
         {
-          "match": "Moller E. vs Ivanov I.",
-          "home": "Moller E.",
-          "away": "Ivanov I.",
+          "match": "NEC vs Bodo Glimt",
+          "home": "NEC",
+          "away": "Bodo Glimt",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "Champions League Qualifications",
+          "time": ""
+        },
+        {
+          "match": "Celtic vs LASK",
+          "home": "Celtic",
+          "away": "LASK",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "Champions League Qualifications",
+          "time": ""
+        },
+        {
+          "match": "Celtic vs LASK",
+          "home": "Celtic",
+          "away": "LASK",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "Champions League Qualifications",
+          "time": ""
+        },
+        {
+          "match": "Atletico Madrid vs Malaga",
+          "home": "Atletico Madrid",
+          "away": "Malaga",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Slovan Bratislava vs Celje",
+          "home": "Slovan Bratislava",
+          "away": "Celje",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "Champions League Qualifications",
+          "time": ""
+        },
+        {
+          "match": "Beer Sheva vs Sabah",
+          "home": "Beer Sheva",
+          "away": "Sabah",
+          "pick": "1X",
+          "odds": "",
+          "league": "Champions League Qualifications",
+          "time": ""
+        },
+        {
+          "match": "Atletico Madrid vs Malaga",
+          "home": "Atletico Madrid",
+          "away": "Malaga",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "NEC vs Bodo Glimt",
+          "home": "NEC",
+          "away": "Bodo Glimt",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "Champions League Qualifications",
+          "time": ""
+        },
+        {
+          "match": "Celtic vs LASK",
+          "home": "Celtic",
+          "away": "LASK",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "Champions League Qualifications",
+          "time": ""
+        },
+        {
+          "match": "Celtic vs LASK",
+          "home": "Celtic",
+          "away": "LASK",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "Champions League Qualifications",
+          "time": ""
+        },
+        {
+          "match": "Atletico Madrid vs Malaga",
+          "home": "Atletico Madrid",
+          "away": "Malaga",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Slovan Bratislava vs Celje",
+          "home": "Slovan Bratislava",
+          "away": "Celje",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "Champions League Qualifications",
+          "time": ""
+        },
+        {
+          "match": "NEC vs Bodo Glimt",
+          "home": "NEC",
+          "away": "Bodo Glimt",
+          "pick": "Draw(X)",
+          "odds": "",
+          "league": "Champions League Qualifications",
+          "time": ""
+        },
+        {
+          "match": "Celtic vs LASK",
+          "home": "Celtic",
+          "away": "LASK",
+          "pick": "Draw(X)",
+          "odds": "",
+          "league": "Champions League Qualifications",
+          "time": ""
+        },
+        {
+          "match": "Atletico Madrid vs Malaga",
+          "home": "Atletico Madrid",
+          "away": "Malaga",
+          "pick": "Draw(X)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Selfoss vs Kari",
+          "home": "Selfoss",
+          "away": "Kari",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Zakynthos vs Kifisia",
+          "home": "Zakynthos",
+          "away": "Kifisia",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Avro vs Workington",
+          "home": "Avro",
+          "away": "Workington",
+          "pick": "Away(2)",
+          "odds": "",
+          "league": "",
+          "time": ""
+        },
+        {
+          "match": "Senn N. vs Mietusch L.",
+          "home": "Senn N.",
+          "away": "Mietusch L.",
           "pick": "Home(1)",
           "odds": "",
           "league": "",
@@ -923,20 +1013,5 @@
       ]
     }
   ],
-  "intersections": [
-    {
-      "match": "Levski Sofia vs AEK Athens",
-      "home": "Levski Sofia",
-      "away": "AEK Athens",
-      "pick": "Under 3.5",
-      "sources": [
-        "allnigeriafootball",
-        "bet_sites"
-      ],
-      "source_count": 2,
-      "odds": "",
-      "league": "UEFA Champions League",
-      "time": "20:00"
-    }
-  ]
+  "intersections": []
 }
