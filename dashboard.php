@@ -390,6 +390,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg-soft); color: var(
 .header { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; padding: 1rem 0; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 1000; }
 .header-content { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; display: flex; justify-content: space-between; align-items: center; }
 .brand { font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; }
+.brand a { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #fff; }
 .header-actions { display: flex; gap: 1rem; align-items: center; }
 .badge-trial { background: #FBBF24; color: #000; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
 .badge-parlay { background: #F59E0B; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
@@ -522,7 +523,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg-soft); color: var(
 <body>
 <header class="header">
 <div class="header-content">
-<a href="./" class="brand" style="text-decoration:none;color:#fff;"><i class="fas fa-futbol me-2" style="color: #fff;"></i><span>PREDIXA</span></a>
+<div class="brand"><a href="index"><i class="fas fa-futbol me-2" style="color: #fff;"></i><span>PREDIXA</span></a></div>
 <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
 <div class="header-actions" id="headerMenu">
 <?php $userPerms = getAdminPermissions($user['id']); $showAdmin = $user['id'] == 1 || $premium['is_super_admin'] || $userPerms === '*' || (is_array($userPerms) && count($userPerms) > 0); ?>
