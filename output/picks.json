@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-08-19T06:39:32.893Z",
-  "started_at": "2026-08-19T06:39:13.362Z",
+  "generated_at": "2026-08-19T10:25:29.478Z",
+  "started_at": "2026-08-19T10:25:10.983Z",
   "min_agreement": 2,
   "sources": {
     "allnigeriafootball": {
       "status": "ok",
-      "count": 3
+      "count": 23
     },
     "adibet": {
       "status": "ok",
@@ -29,10 +29,190 @@
       "source": "allnigeriafootball",
       "picks": [
         {
+          "match": "Atlético Madrid vs Málaga CF",
+          "home": "Atlético Madrid",
+          "away": "Málaga CF",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "Spain LaLiga",
+          "time": "20:00"
+        },
+        {
+          "match": "Celtic vs LASK Linz",
+          "home": "Celtic",
+          "away": "LASK Linz",
+          "pick": "1X",
+          "odds": "",
+          "league": "UEFA Champions League",
+          "time": "20:00"
+        },
+        {
+          "match": "Hapoel Be&#8217;er Sheva vs Sabah",
+          "home": "Hapoel Be&#8217;er Sheva",
+          "away": "Sabah",
+          "pick": "1X",
+          "odds": "",
+          "league": "UEFA Champions League",
+          "time": "20:00"
+        },
+        {
+          "match": "NEC Nijmegen vs Bodoe/Glimt",
+          "home": "NEC Nijmegen",
+          "away": "Bodoe/Glimt",
+          "pick": "(Handicap 2:0) NEC",
+          "odds": "",
+          "league": "UEFA Champions League",
+          "time": "20:00"
+        },
+        {
+          "match": "Slovan Bratislava vs NK Celje",
+          "home": "Slovan Bratislava",
+          "away": "NK Celje",
+          "pick": "1X",
+          "odds": "",
+          "league": "UEFA Champions League",
+          "time": "20:00"
+        },
+        {
+          "match": "Cerro Porteno vs Palmeiras SP",
+          "home": "Cerro Porteno",
+          "away": "Palmeiras SP",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "CONMEBOL Libertadores",
+          "time": "23:00"
+        },
+        {
+          "match": "Coquimbo Unido vs CA Platense",
+          "home": "Coquimbo Unido",
+          "away": "CA Platense",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "CONMEBOL Libertadores",
+          "time": "23:00"
+        },
+        {
+          "match": "Flamengo RJ vs Cruzeiro MG",
+          "home": "Flamengo RJ",
+          "away": "Cruzeiro MG",
+          "pick": "1X",
+          "odds": "",
+          "league": "CONMEBOL Libertadores",
+          "time": "01:30"
+        },
+        {
+          "match": "Shanghai Port vs Dalian Yingbo",
+          "home": "Shanghai Port",
+          "away": "Dalian Yingbo",
+          "pick": "Home(DNB)Shanghai Port",
+          "odds": "",
+          "league": "Chinese Super League",
+          "time": "12:35"
+        },
+        {
+          "match": "Cuiabá EC MT vs Operário Ferroviário",
+          "home": "Cuiabá EC MT",
+          "away": "Operário Ferroviário",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Brazil Brasileiro Serie B",
+          "time": "00:30"
+        },
+        {
+          "match": "Botafogo FC SP vs Criciúma SC",
+          "home": "Botafogo FC SP",
+          "away": "Criciúma SC",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Brazil Brasileiro Série B",
+          "time": "01:30"
+        },
+        {
+          "match": "Barcelona vs AL Ahly SC (EGY)",
+          "home": "Barcelona",
+          "away": "AL Ahly SC (EGY)",
+          "pick": "Over 2.5",
+          "odds": "",
+          "league": "Club Friendly Games",
+          "time": "19:00"
+        },
+        {
+          "match": "Atlético Mineiro MG vs Red Bull Bragantino",
+          "home": "Atlético Mineiro MG",
+          "away": "Red Bull Bragantino",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "CONMEBOL Sudamericana",
+          "time": "23:00"
+        },
+        {
+          "match": "Independiente Santa Fe vs River Plate (ARG)",
+          "home": "Independiente Santa Fe",
+          "away": "River Plate (ARG)",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "CONMEBOL Sudamericana",
+          "time": "01:30"
+        },
+        {
+          "match": "Montevideo City Torque vs CA Tigre",
+          "home": "Montevideo City Torque",
+          "away": "CA Tigre",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "CONMEBOL Sudamericana",
+          "time": "01:30"
+        },
+        {
+          "match": "Chacarita Juniors vs CA Guemes",
+          "home": "Chacarita Juniors",
+          "away": "CA Guemes",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Argentina Primera Nacional",
+          "time": "19:00"
+        },
+        {
+          "match": "Mamelodi Sundowns vs Marumo Gallants",
+          "home": "Mamelodi Sundowns",
+          "away": "Marumo Gallants",
+          "pick": "Home(1)",
+          "odds": "",
+          "league": "South Africa Premiership",
+          "time": "18:30"
+        },
+        {
+          "match": "Mbeya City FC vs Dodoma FC",
+          "home": "Mbeya City FC",
+          "away": "Dodoma FC",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Tanzania Premier League",
+          "time": "12:00"
+        },
+        {
+          "match": "Pamba Jiji SC vs Simba SC",
+          "home": "Pamba Jiji SC",
+          "away": "Simba SC",
+          "pick": "Under 3.5",
+          "odds": "",
+          "league": "Tanzania Premier League",
+          "time": "14:15"
+        },
+        {
+          "match": "Fajr Sepasi vs Sanat Naft Abadan",
+          "home": "Fajr Sepasi",
+          "away": "Sanat Naft Abadan",
+          "pick": "Under 2.5",
+          "odds": "",
+          "league": "Iran Pro League",
+          "time": "17:00"
+        },
+        {
           "match": "CD Tolima vs Independiente del Valle",
           "home": "CD Tolima",
           "away": "Independiente del Valle",
-          "pick": "Under 3.5",
+          "pick": "Under 3.5 Won",
           "odds": "",
           "league": "CONMEBOL Libertadores",
           "time": "01:30"
@@ -41,7 +221,7 @@
           "match": "Universidad Católica vs Estudiantes de La Plata",
           "home": "Universidad Católica",
           "away": "Estudiantes de La Plata",
-          "pick": "Under 3.5",
+          "pick": "Under 3.5 Won",
           "odds": "",
           "league": "CONMEBOL Libertadores",
           "time": "01:30"
@@ -50,7 +230,7 @@
           "match": "Goias EC GO vs EC Juventude RS",
           "home": "Goias EC GO",
           "away": "EC Juventude RS",
-          "pick": "Under 3.5",
+          "pick": "Under 3.5 Won",
           "odds": "",
           "league": "Brazil Brasileiro Serie B",
           "time": "01:35"
