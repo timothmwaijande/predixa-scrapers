@@ -44,6 +44,7 @@ jobs:
           fi
           echo "Collecting stats for $DATE"
           python cron/scrape_sofascore_stats.py "$DATE" \
+            --fresh \
             --post "https://predixa.co.tz/cron/receive_sofascore_stats.php" \
             --key "${{ secrets.STATS_SECRET_KEY }}"
         continue-on-error: true
