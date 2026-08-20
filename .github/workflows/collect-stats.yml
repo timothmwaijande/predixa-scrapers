@@ -46,7 +46,7 @@ jobs:
 
       - name: Run Sofascore scraper
         run: |
-          DATE="${{ steps.date.outputs.date }}"
+          DATE="${{ steps.date.outputs.target_date }}"
           echo "Collecting stats for $DATE"
           python cron/scrape_sofascore_stats.py "$DATE" \
             --post "https://predixa.co.tz/cron/receive_sofascore_stats.php" \
