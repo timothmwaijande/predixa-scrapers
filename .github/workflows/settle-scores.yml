@@ -1,0 +1,49 @@
+name: Settle Scores
+
+on:
+  schedule:
+    - cron: '0 7,19 * * *'
+  workflow_dispatch:
+
+jobs:
+  settle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: package.json
+
+      - name: Install deps
+        run: npm install
+
+      - name: Scrape scores (API-Football + SportyBet)
+        id: scores
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+        run: |
+          node scrape_scores.js > matches.json
+          echo "count=$(node -e "console.log(JSON.parse(require('fs').readFileSync('matches.json','utf8')).matches.length)")" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Post scores to predixa.co.tz (fetch_scores)
+        if: steps.scores.outputs.count > 0
+        run: |
+          curl -s -X POST -A "Mozilla/5.0 (compatible; PREDIXA-Bot)" \
+            -H "Content-Type: application/json" \
+            -d @matches.json \
+            "https://predixa.co.tz/cron/fetch_scores.php?key=${{ secrets.CRON_KEY }}" || \
+            echo "fetch_scores failed"
+
+      - name: Wait for DB write
+        if: steps.scores.outputs.count > 0
+        run: sleep 5
+
+      - name: Settle pending picks
+        run: |
+          curl -s -X POST -A "Mozilla/5.0 (compatible; PREDIXA-Bot)" \
+            -d '{"trigger":"settle"}' \
+            "https://predixa.co.tz/cron/settle_picks.php?key=${{ secrets.CRON_KEY }}" || \
+            echo "settle_picks failed"

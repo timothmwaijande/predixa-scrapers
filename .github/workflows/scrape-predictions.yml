@@ -1,0 +1,38 @@
+name: Scrape Predictions & Intersection
+
+on:
+  schedule:
+    - cron: '0 6,18 * * *'
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: package.json
+
+      - name: Install deps
+        run: npm install
+
+      - name: Run scrapers
+        run: node run_all.js
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: scraped-picks
+          path: output/picks.json
+          retention-days: 7
+
+      - name: Post intersection to predixa.co.tz
+        run: |
+          curl -s -X POST -A "Mozilla/5.0 (compatible; PREDIXA-Bot)" \
+            -H "Content-Type: application/json" \
+            -d @output/picks.json \
+            "https://predixa.co.tz/cron/receiver.php?key=${{ secrets.CRON_KEY }}"
+        continue-on-error: true
