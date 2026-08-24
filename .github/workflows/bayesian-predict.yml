@@ -1,0 +1,21 @@
+name: Bayesian Predict
+
+on:
+  schedule:
+    - cron: '0 7,13,19 * * *'
+  workflow_dispatch:
+
+jobs:
+  bayesian-predict:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Bayesian Predict
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" -L \
+            "https://predixa.co.tz/cron/bayesian_predict.php?key=${{ secrets.CRON_KEY }}" \
+            --max-time 120)
+          echo "HTTP Status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "FAILED with status $STATUS"
+            exit 1
+          fi

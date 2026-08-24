@@ -1,0 +1,21 @@
+name: Track Record
+
+on:
+  schedule:
+    - cron: '45 6,10,14,18,22 * * *'
+  workflow_dispatch:
+
+jobs:
+  track-record:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Track Record
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" -L \
+            "https://predixa.co.tz/cron/track-record.php?key=${{ secrets.CRON_KEY }}" \
+            --max-time 120)
+          echo "HTTP Status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "FAILED with status $STATUS"
+            exit 1
+          fi

@@ -1,0 +1,21 @@
+name: Risk Tier Calibration
+
+on:
+  schedule:
+    - cron: '15 7,19 * * *'
+  workflow_dispatch:
+
+jobs:
+  calibrate-risk-tiers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Risk Tier Calibration
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" -L \
+            "https://predixa.co.tz/cron/calibrate_risk_tiers.php?key=${{ secrets.CRON_KEY }}" \
+            --max-time 120)
+          echo "HTTP Status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "FAILED with status $STATUS"
+            exit 1
+          fi

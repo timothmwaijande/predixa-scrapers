@@ -1,0 +1,21 @@
+name: Signal Engine
+
+on:
+  schedule:
+    - cron: '30 7,13,19 * * *'
+  workflow_dispatch:
+
+jobs:
+  signal-engine:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Signal Engine
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" -L \
+            "https://predixa.co.tz/cron/signal_engine.php?key=${{ secrets.CRON_KEY }}" \
+            --max-time 120)
+          echo "HTTP Status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "FAILED with status $STATUS"
+            exit 1
+          fi
