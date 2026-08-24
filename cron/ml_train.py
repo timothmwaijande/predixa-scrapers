@@ -252,6 +252,14 @@ def main():
         print(f"  Too few samples ({data['stats']['training_count']} < {MIN_SAMPLES}), skipping")
         sys.exit(0)
 
+    # Build Bayesian prediction lookup for upcoming matches
+    bayes_map = {}
+    for bp in data.get("bayesian_upcoming", []):
+        h = normalize_team(bp.get("home_team", ""))
+        a = normalize_team(bp.get("away_team", ""))
+        bayes_map[h + "|" + a] = bp
+        bayes_map[a + "|" + h] = bp  # both orientations
+
     # 2. Build feature matrix
     print("Building feature matrix...")
     results_df = pd.DataFrame(data["training"])
@@ -289,14 +297,20 @@ def main():
         parts = m["match_name"].split(" vs ", 1)
         if len(parts) != 2:
             continue
+        home_raw = parts[0].strip()
+        away_raw = parts[1].strip()
+        # Look up Bayesian prediction for this match
+        h_n = normalize_team(home_raw)
+        a_n = normalize_team(away_raw)
+        bp = bayes_map.get(h_n + "|" + a_n)
         mm = {
-            "home_team": parts[0].strip(),
-            "away_team": parts[1].strip(),
+            "home_team": home_raw,
+            "away_team": away_raw,
             "league": m.get("league", ""),
             "match_date": datetime.now().strftime("%Y-%m-%d"),
-            "bayes_prob_1": None,
-            "bayes_prob_x": None,
-            "bayes_prob_2": None,
+            "bayes_prob_1": bp.get("bayes_prob_1") if bp else None,
+            "bayes_prob_x": bp.get("bayes_prob_x") if bp else None,
+            "bayes_prob_2": bp.get("bayes_prob_2") if bp else None,
         }
         upcoming_results.append(mm)
 

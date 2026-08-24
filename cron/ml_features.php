@@ -67,6 +67,16 @@ try {
         $filtered[] = $m;
     }
 
+    // 2b. Bayesian predictions for upcoming matches (for train/serve consistency)
+    $bayesUpcoming = $db->query("
+        SELECT bp.match_name, bp.home_team, bp.away_team,
+               bp.prob_1 as bayes_prob_1, bp.prob_x as bayes_prob_x, bp.prob_2 as bayes_prob_2,
+               bp.confidence as bayes_confidence
+        FROM bayesian_predictions bp
+        WHERE bp.match_date IN (CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 DAY))
+          AND bp.prob_1 IS NOT NULL
+    ")->fetchAll(PDO::FETCH_ASSOC);
+
     // 3. League standings
     $standings = $db->query("
         SELECT team, league, position, points, played, goal_diff
@@ -95,11 +105,13 @@ try {
         'generated_at' => date('Y-m-d H:i:s'),
         'training' => $training,
         'upcoming' => $filtered,
+        'bayesian_upcoming' => $bayesUpcoming,
         'standings' => $standings,
         'priors' => $priors,
         'stats' => [
             'training_count' => count($training),
             'upcoming_count' => count($filtered),
+            'bayesian_upcoming_count' => count($bayesUpcoming),
             'standings_count' => count($standings),
             'league_count' => count($priors),
         ],
