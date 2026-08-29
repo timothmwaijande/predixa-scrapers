@@ -72,8 +72,10 @@ async function scrapeAPIFootball() {
   const allMatches = [];
   const today = new Date();
 
-  // Fetch today and yesterday (2 requests, covers the settlement window)
-  for (let i = 0; i <= 1; i++) {
+  // Fetch the last 3 days (3 requests). The wider lookback lets late/missed
+  // fixtures get re-captured on a subsequent run, keeping match_results complete
+  // so bayesian settlement can settle every pending pick automatically.
+  for (let i = 0; i <= 2; i++) {
     const d = new Date(today);
     d.setDate(d.getDate() - i);
     const dateStr = d.toISOString().slice(0, 10);
@@ -187,40 +189,54 @@ async function scrapeSoccer24() {
 
 async function scrape() {
   const allMatches = [];
+  const sourceStats = [];
 
   // 1. Try API-Football first (most comprehensive)
   try {
     const apiMatches = await scrapeAPIFootball();
     allMatches.push(...apiMatches);
+    sourceStats.push(['api-football', apiMatches.length]);
   } catch (e) {
     console.error('[api-football] Error:', e.message);
+    sourceStats.push(['api-football', -1]);
   }
 
   // 2. Try SportyBet (good fallback, different team names)
   try {
     const sportyMatches = await scrapeSportyBet();
     allMatches.push(...sportyMatches);
+    sourceStats.push(['sportybet', sportyMatches.length]);
   } catch (e) {
     console.error('[sportybet] Error:', e.message);
+    sourceStats.push(['sportybet', -1]);
   }
 
   // 3. Try Soccer24 (limited but different names)
   try {
     const soccer24Matches = await scrapeSoccer24();
     allMatches.push(...soccer24Matches);
+    sourceStats.push(['soccer24', soccer24Matches.length]);
   } catch (e) {
     console.error('[soccer24] Error:', e.message);
+    sourceStats.push(['soccer24', -1]);
   }
 
   const unique = deduplicate(allMatches);
   console.error(`[total] ${unique.length} unique finished matches from ${allMatches.length} raw`);
-  return unique;
+  return { matches: unique, apiCount: (sourceStats.find(s => s[0] === 'api-football') || [0, 0])[1] };
 }
 
 if (require.main === module) {
-  scrape().then(m => {
-    console.log(JSON.stringify({ matches: m }));
-    console.error(`Total: ${m.length} finished matches`);
+  scrape().then(({ matches, apiCount }) => {
+    console.log(JSON.stringify({ matches }));
+    console.error(`Total: ${matches.length} finished matches`);
+    // Fail loudly if the primary comprehensive source produced no finished
+    // matches (e.g. API-Football quota/429/403). Alerts in GitHub Actions
+    // instead of silently letting match_results go stale and picks stay pending.
+    if (apiCount <= 0) {
+      console.error('[fatal] API-Football returned no finished matches — feed may be down or quota exhausted');
+      process.exit(2);
+    }
   }).catch(e => {
     console.error('Fatal Error:', e.message);
     process.exit(1);
