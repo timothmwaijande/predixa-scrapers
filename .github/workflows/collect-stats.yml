@@ -18,6 +18,7 @@ on:
         type: choice
         options:
           - sofascore
+          - espn
           - backfill
 
 jobs:
@@ -35,19 +36,50 @@ jobs:
       - name: Install dependencies
         run: pip install curl_cffi
 
-      - name: Run Sofascore scraper
+      - name: Compute date
         run: |
           if [ -n "${{ inputs.date }}" ]; then
-            DATE="${{ inputs.date }}"
+            echo "DATE=${{ inputs.date }}" >> "$GITHUB_ENV"
           else
-            DATE=$(python3 -c "from datetime import datetime, timedelta; print((datetime.utcnow() - timedelta(days=1)).strftime('%Y-%m-%d'))")
+            echo "DATE=$(python3 -c "from datetime import datetime, timedelta; print((datetime.utcnow() - timedelta(days=1)).strftime('%Y-%m-%d'))")" >> "$GITHUB_ENV"
           fi
           echo "Collecting stats for $DATE"
+
+      - name: Run Sofascore scraper (primary)
+        if: inputs.mode != 'espn'
+        continue-on-error: true
+        run: |
           python cron/scrape_sofascore_stats.py "$DATE" \
             --fresh \
             --post "https://predixa.co.tz/cron/receive_sofascore_stats.php" \
-            --key "${{ secrets.STATS_SECRET_KEY }}"
-        continue-on-error: true
+            --key "${{ secrets.STATS_SECRET_KEY }}" \
+            || true
+
+      - name: ESPN fallback (if Sofascore collected nothing)
+        if: ${{ always() }}
+        run: |
+          if [ "${{ inputs.mode }}" = "espn" ]; then
+            RUN=1
+          else
+            N=$(python3 - "$DATE" <<'EOF'
+import json, sys
+try:
+    print(json.load(open(f"sofascore_stats_{sys.argv[1]}.json")).get("stats_collected", 0))
+except Exception:
+    print(0)
+EOF
+            )
+            echo "Sofascore collected: $N"
+            if [ "$N" -gt 0 ]; then RUN=0; else RUN=1; fi
+          fi
+          if [ "$RUN" = "1" ]; then
+            echo "Running ESPN scraper for $DATE"
+            python cron/scrape_espn_stats.py "$DATE" \
+              --post "https://predixa.co.tz/cron/receive_sofascore_stats.php" \
+              --key "${{ secrets.STATS_SECRET_KEY }}"
+          else
+            echo "Sofascore already delivered data; skipping ESPN."
+          fi
 
       - name: Also trigger backfill via PHP (if backfill mode)
         if: inputs.mode == 'backfill'
