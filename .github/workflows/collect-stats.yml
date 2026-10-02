@@ -61,14 +61,7 @@ jobs:
           if [ "${{ inputs.mode }}" = "espn" ]; then
             RUN=1
           else
-            N=$(python3 - "$DATE" <<'EOF'
-import json, sys
-try:
-    print(json.load(open(f"sofascore_stats_{sys.argv[1]}.json")).get("stats_collected", 0))
-except Exception:
-    print(0)
-EOF
-            )
+            N=$(python3 -c "import json,sys; print(json.load(open(f'sofascore_stats_{sys.argv[1]}.json')).get('stats_collected',0))" "$DATE" 2>/dev/null || echo 0)
             echo "Sofascore collected: $N"
             if [ "$N" -gt 0 ]; then RUN=0; else RUN=1; fi
           fi
