@@ -1,0 +1,147 @@
+name: Email Campaigns
+
+# Timing rationale (GitHub cron is always UTC; Predixa operates on EAT = UTC+3):
+#
+#   bayesian-predict.yml  07:00 / 13:00 / 19:00 UTC  =  10:00 / 16:00 / 22:00 EAT  (generates picks)
+#   signal-engine.yml     07:30 / 13:30 / 19:30 UTC  =  10:30 / 16:30 / 22:30 EAT
+#   scrape-predictions    06:00 / 18:00 UTC           =  09:00 / 21:00 EAT
+#
+#   06:15 UTC (09:15 EAT) -> opt-in requests. Mid-morning, before the day's pick runs,
+#                            so confirmation mail never competes with briefing mail.
+#   14:30 UTC (17:30 EAT) -> match briefing. Sent 90 minutes after the 13:00 UTC pick run,
+#                            which is the run that generates picks for evening kickoffs.
+#                            Members get the picks in time to act on them.
+#
+# Set SCHEDLED_MODE to 'dry' to make every automatic run a preview that sends nothing.
+
+on:
+  schedule:
+    - cron: '15 6 * * *'
+    - cron: '30 14 * * *'
+  workflow_dispatch:
+    inputs:
+      campaign:
+        description: 'Campaign to run'
+        required: true
+        type: choice
+        default: optin_request
+        options:
+          - optin_request
+          - weekly_briefing
+      mode:
+        description: 'dry = preview only (sends nothing)'
+        required: true
+        type: choice
+        default: dry
+        options:
+          - dry
+          - live
+      cap:
+        description: 'Max emails this run (leave blank for campaign default)'
+        required: false
+        type: string
+
+concurrency:
+  group: email-campaigns
+  cancel-in-progress: false
+
+env:
+  SCHEDULED_MODE: live
+  CAMPAIGN_BASE_URL: https://predixa.co.tz/cron
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Determine campaign and mode
+        id: plan
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_CAMPAIGN: ${{ inputs.campaign }}
+          INPUT_MODE: ${{ inputs.mode }}
+          INPUT_CAP: ${{ inputs.cap }}
+          SCHEDULED_MODE: ${{ env.SCHEDULED_MODE }}
+        run: |
+          if [ "$EVENT_NAME" = "schedule" ]; then
+            HOUR=$(date -u +%H)
+            if [ "$HOUR" = "06" ]; then
+              CAMPAIGN="optin_request"
+            else
+              CAMPAIGN="weekly_briefing"
+            fi
+            MODE="$SCHEDULED_MODE"
+            CAP=""
+          else
+            CAMPAIGN="$INPUT_CAMPAIGN"
+            MODE="$INPUT_MODE"
+            CAP="$INPUT_CAP"
+          fi
+          echo "campaign=$CAMPAIGN" >> "$GITHUB_OUTPUT"
+          echo "mode=$MODE"       >> "$GITHUB_OUTPUT"
+          echo "cap=$CAP"         >> "$GITHUB_OUTPUT"
+          {
+            echo "## Email campaign run"
+            echo ""
+            echo "| Field | Value |"
+            echo "| --- | --- |"
+            echo "| Trigger | \`$EVENT_NAME\` |"
+            echo "| Campaign | \`$CAMPAIGN\` |"
+            echo "| Mode | \`$MODE\` |"
+            if [ -n "$CAP" ]; then echo "| Cap override | $CAP |"; fi
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Run campaign
+        env:
+          CAMPAIGN: ${{ steps.plan.outputs.campaign }}
+          MODE: ${{ steps.plan.outputs.mode }}
+          CAP: ${{ steps.plan.outputs.cap }}
+          CRON_KEY: ${{ secrets.CRON_KEY }}
+        run: |
+          if [ -z "$CRON_KEY" ]; then
+            echo "::error::Repository secret CRON_KEY is not set (it is already used by the other workflows)."
+            exit 1
+          fi
+
+          URL="${CAMPAIGN_BASE_URL}/${CAMPAIGN}.php"
+          ARGS="dry_run=1"
+          if [ "$MODE" = "live" ]; then
+            ARGS="dry_run=0"
+          fi
+          if [ -n "$CAP" ]; then
+            ARGS="${ARGS}&cap=${CAP}"
+          fi
+
+          echo "Calling $URL?$ARGS"
+          HTTP_CODE=$(curl --silent --show-error --location \
+            --max-time 2400 \
+            --write-out '%{http_code}' \
+            --output report.json \
+            --header "X-CRON-KEY: $CRON_KEY" \
+            "${URL}?${ARGS}" || echo "000")
+
+          echo "HTTP $HTTP_CODE"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::Campaign endpoint returned HTTP $HTTP_CODE"
+            cat report.json 2>/dev/null || true
+            exit 1
+          fi
+
+          cat report.json
+
+      - name: Summarise result
+        if: always()
+        run: |
+          if [ -f report.json ]; then
+            {
+              echo "### Result"
+              echo ""
+              echo '```json'
+              head -c 6000 report.json
+              echo ""
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No report produced." >> "$GITHUB_STEP_SUMMARY"
+          fi
