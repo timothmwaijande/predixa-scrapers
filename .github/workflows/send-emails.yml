@@ -12,7 +12,7 @@ name: Email Campaigns
 #                            which is the run that generates picks for evening kickoffs.
 #                            Members get the picks in time to act on them.
 #
-# Set SCHEDLED_MODE to 'dry' to make every automatic run a preview that sends nothing.
+# Set SCHEDULED_MODE to 'dry' to make every automatic run a preview that sends nothing.
 
 on:
   schedule:
@@ -77,9 +77,21 @@ jobs:
             MODE="$INPUT_MODE"
             CAP="$INPUT_CAP"
           fi
+
+          # campaign name -> actual cron script filename
+          case "$CAMPAIGN" in
+            optin_request)   SCRIPT="send_optin_requests.php" ;;
+            weekly_briefing) SCRIPT="send_weekly_briefing.php" ;;
+            *)
+              echo "::error::Unknown campaign '$CAMPAIGN'"
+              exit 1
+              ;;
+          esac
+
           echo "campaign=$CAMPAIGN" >> "$GITHUB_OUTPUT"
-          echo "mode=$MODE"       >> "$GITHUB_OUTPUT"
-          echo "cap=$CAP"         >> "$GITHUB_OUTPUT"
+          echo "script=$SCRIPT"     >> "$GITHUB_OUTPUT"
+          echo "mode=$MODE"         >> "$GITHUB_OUTPUT"
+          echo "cap=$CAP"           >> "$GITHUB_OUTPUT"
           {
             echo "## Email campaign run"
             echo ""
@@ -94,7 +106,7 @@ jobs:
 
       - name: Run campaign
         env:
-          CAMPAIGN: ${{ steps.plan.outputs.campaign }}
+          SCRIPT: ${{ steps.plan.outputs.script }}
           MODE: ${{ steps.plan.outputs.mode }}
           CAP: ${{ steps.plan.outputs.cap }}
           CRON_KEY: ${{ secrets.CRON_KEY }}
@@ -104,27 +116,44 @@ jobs:
             exit 1
           fi
 
-          URL="${CAMPAIGN_BASE_URL}/${CAMPAIGN}.php"
-          ARGS="dry_run=1"
-          if [ "$MODE" = "live" ]; then
-            ARGS="dry_run=0"
+          # The cron scripts treat dry_run as a PRESENCE flag (isset($_GET['dry_run'])),
+          # so it must be omitted entirely for live - passing dry_run=0 would still preview.
+          ARGS=""
+          if [ "$MODE" != "live" ]; then
+            ARGS="dry_run=1"
           fi
           if [ -n "$CAP" ]; then
-            ARGS="${ARGS}&cap=${CAP}"
+            if [ -n "$ARGS" ]; then
+              ARGS="${ARGS}&cap=${CAP}"
+            else
+              ARGS="cap=${CAP}"
+            fi
           fi
 
-          echo "Calling $URL?$ARGS"
+          URL="${CAMPAIGN_BASE_URL}/${SCRIPT}"
+          if [ -n "$ARGS" ]; then
+            REQUEST="${URL}?${ARGS}"
+          else
+            REQUEST="${URL}"
+          fi
+
+          echo "Calling $REQUEST"
           HTTP_CODE=$(curl --silent --show-error --location \
             --max-time 2400 \
             --write-out '%{http_code}' \
             --output report.json \
             --header "X-CRON-KEY: $CRON_KEY" \
-            "${URL}?${ARGS}" || echo "000")
+            "$REQUEST" || echo "000")
 
           echo "HTTP $HTTP_CODE"
           if [ "$HTTP_CODE" != "200" ]; then
             echo "::error::Campaign endpoint returned HTTP $HTTP_CODE"
             cat report.json 2>/dev/null || true
+            exit 1
+          fi
+
+          if [ "$MODE" != "live" ] && grep -q '"dry_run"[[:space:]]*:[[:space:]]*false' report.json; then
+            echo "::error::Dry run requested but server reported dry_run=false - refusing to treat as preview."
             exit 1
           fi
 
