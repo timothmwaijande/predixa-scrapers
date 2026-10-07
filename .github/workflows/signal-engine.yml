@@ -13,7 +13,7 @@ jobs:
       - name: Run Signal Engine
         run: |
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" -L \
-            "https://predixa.co.tz/cron/signal_engine.php?key=${{ secrets.CRON_KEY }}" \
+            "https://predixa.co.tz/cron/signal_engine?key=${{ secrets.CRON_KEY }}" \
             --max-time 120)
           echo "HTTP Status: $STATUS"
           if [ "$STATUS" != "200" ]; then

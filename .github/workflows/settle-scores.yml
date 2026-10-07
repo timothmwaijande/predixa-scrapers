@@ -34,7 +34,7 @@ jobs:
           curl -s -X POST -A "Mozilla/5.0 (compatible; PREDIXA-Bot)" \
             -H "Content-Type: application/json" \
             -d @matches.json \
-            "https://predixa.co.tz/cron/fetch_scores.php?key=${{ secrets.CRON_KEY }}" || \
+            "https://predixa.co.tz/cron/fetch_scores?key=${{ secrets.CRON_KEY }}" || \
             echo "fetch_scores failed"
 
       - name: Wait for DB write
@@ -45,5 +45,5 @@ jobs:
         run: |
           curl -s -X POST -A "Mozilla/5.0 (compatible; PREDIXA-Bot)" \
             -d '{"trigger":"settle"}' \
-            "https://predixa.co.tz/cron/settle_picks.php?key=${{ secrets.CRON_KEY }}" || \
+            "https://predixa.co.tz/cron/settle_picks?key=${{ secrets.CRON_KEY }}" || \
             echo "settle_picks failed"

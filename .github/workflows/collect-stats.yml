@@ -51,7 +51,7 @@ jobs:
         run: |
           python cron/scrape_sofascore_stats.py "$DATE" \
             --fresh \
-            --post "https://predixa.co.tz/cron/receive_sofascore_stats.php" \
+            --post "https://predixa.co.tz/cron/receive_sofascore_stats" \
             --key "${{ secrets.STATS_SECRET_KEY }}" \
             || true
 
@@ -68,7 +68,7 @@ jobs:
           if [ "$RUN" = "1" ]; then
             echo "Running ESPN scraper for $DATE"
             python cron/scrape_espn_stats.py "$DATE" \
-              --post "https://predixa.co.tz/cron/receive_sofascore_stats.php" \
+              --post "https://predixa.co.tz/cron/receive_sofascore_stats" \
               --key "${{ secrets.STATS_SECRET_KEY }}"
           else
             echo "Sofascore already delivered data; skipping ESPN."
@@ -77,5 +77,5 @@ jobs:
       - name: Also trigger backfill via PHP (if backfill mode)
         if: inputs.mode == 'backfill'
         run: |
-          curl -s "https://predixa.co.tz/cron/run_stats.php?key=${{ secrets.STATS_SECRET_KEY }}&mode=backfill" || echo "Backfill trigger failed"
+          curl -s "https://predixa.co.tz/cron/run_stats?key=${{ secrets.STATS_SECRET_KEY }}&mode=backfill" || echo "Backfill trigger failed"
         continue-on-error: true

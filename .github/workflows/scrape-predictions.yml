@@ -36,5 +36,5 @@ jobs:
           curl -s -X POST -A "Mozilla/5.0 (compatible; PREDIXA-Bot)" \
             -H "Content-Type: application/json" \
             -d @output/picks.json \
-            "https://predixa.co.tz/cron/receiver.php?key=${{ secrets.CRON_KEY }}"
+            "https://predixa.co.tz/cron/receiver?key=${{ secrets.CRON_KEY }}"
         continue-on-error: true

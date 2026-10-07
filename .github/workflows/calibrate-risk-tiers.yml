@@ -12,7 +12,7 @@ jobs:
       - name: Run Risk Tier Calibration
         run: |
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" -L \
-            "https://predixa.co.tz/cron/calibrate_risk_tiers.php?key=${{ secrets.CRON_KEY }}" \
+            "https://predixa.co.tz/cron/calibrate_risk_tiers?key=${{ secrets.CRON_KEY }}" \
             --max-time 120)
           echo "HTTP Status: $STATUS"
           if [ "$STATUS" != "200" ]; then
