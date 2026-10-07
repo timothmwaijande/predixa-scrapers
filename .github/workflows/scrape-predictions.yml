@@ -2,7 +2,9 @@ name: Scrape Predictions & Intersection
 
 on:
   schedule:
-    - cron: '0 6,18 * * *'
+    # Morning 06:00 UTC (09:00 EAT); evening moved to 14:30 UTC (17:30 EAT) to land inside the hot window.
+    - cron: '0 6 * * *'
+    - cron: '30 14 * * *'
   workflow_dispatch:
 
 jobs:

@@ -1,8 +1,7 @@
 name: Track Record
 
 on:
-  schedule:
-    - cron: '45 6,10,14,18,22 * * *'
+  # Disabled: Account A (prediction_sites) runs Track Record at the same clock; keep a single source.
   workflow_dispatch:
 
 jobs:
