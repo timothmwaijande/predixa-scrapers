@@ -1,0 +1,17 @@
+name: Temp BoT Probe
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: getMe
+        env:
+          BOTTOKEN: 8574131009:AAEGjkH6eZt8XWvWVnTnN16fJUhvY1UY2cQ
+        run: |
+          echo "--- getMe ---"
+          curl -s -m 20 "https://api.telegram.org/bot${BOTTOKEN}/getMe" | tee bot.json
+          echo ""
+          echo "--- channel membership ---"
+          curl -s -m 20 "https://api.telegram.org/bot${BOTTOKEN}/getChatMember?chat_id=%40Predixatz&user_id=@Predixabot" | tee chat.json
