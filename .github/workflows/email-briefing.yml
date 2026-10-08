@@ -5,12 +5,13 @@ name: Email Weekly Briefing
 # (GitHub Actions delays schedule runs, so the old hour-based routing could
 # accidentally select the wrong campaign).
 #
-#   14:30 UTC = 17:30 EAT  -> match briefing. Sent 90 minutes after the 13:00 UTC
-#                            pick run, which generates picks for evening kickoffs.
+#   10:00 UTC = 13:00 EAT  -> match briefing. Sent 3 hours after the 07:00 UTC
+#                            Bayesian pick run and 1 hour before the 14:00 EAT
+#                            kickoffs of the popular leagues.
 
 on:
   schedule:
-    - cron: '30 14 * * *'
+    - cron: '0 10 * * *'
   workflow_dispatch:
     inputs:
       mode:
