@@ -9,13 +9,20 @@ local IP (403 challenge/ban).
 The output JSON is identical in shape to scrape_sofascore_stats.py and is
 posted to the same receiver (receive_sofascore_stats.php).
 
+By default it scrapes the catch-all `soccer/all` scoreboard so that days with
+no matches in the curated league list (midweek / international windows) are
+still covered. Use `--listed` to restore the old behaviour of only the
+curated 17 leagues.
+
 Usage:
     python scrape_espn_stats.py [YYYY-MM-DD]
-    python scrape_espn_stats.py 2026-09-29 --post https://predixa.co.tz/cron/receive_sofascore_stats.php --key stats_cron_pred_xxx
-    python scrape_espn_stats.py --league 17
+    python scrape_espn_stats.py 2026-09-29 --post https://predixa.co.tz/cron/receive_sofascore_stats --key stats_cron_pred_xxx
+    python scrape_espn_stats.py 2026-10-07 --listed          # only curated leagues
+    python scrape_espn_stats.py --league 17                  # only one curated league
 """
 
 import json
+import os
 import random
 import sys
 import time
@@ -53,10 +60,30 @@ LEAGUES = [
     ("caf.nations", 270, "Africa Cup of Nations"),
     ("caf.nations_qual", 1848, "Africa Cup of Nations Qualifiers"),
 ]
+LEAGUE_BY_SLUG = {slug: (tid, name) for slug, tid, name in LEAGUES}
 
+# Competitions we never want (college / youth / reserve). Extra terms can be
+# appended at run time with the ESPN_EXCLUDE env var (comma separated).
+DEFAULT_EXCLUDE_KEYWORDS = [
+    "ncaa", "college", "youth", "reserve", "academy",
+    "u17", "u18", "u19", "u20", "u21", "u23",
+]
+EXCLUDE_KEYWORDS = DEFAULT_EXCLUDE_KEYWORDS + [
+    k.strip().lower() for k in os.environ.get("ESPN_EXCLUDE", "").split(",") if k.strip()
+]
+
+DEFAULT_SLUG = "all"
+SCOREBOARD_LIMIT = 1000
 REQUEST_DELAY = 1.2
 request_count = 0
 TARGET_DATE = None
+
+
+def is_excluded(text):
+    if not text:
+        return False
+    t = text.lower()
+    return any(k in t for k in EXCLUDE_KEYWORDS)
 
 
 def http_get_json(url, retries=2):
@@ -147,7 +174,29 @@ def team_stats_side(comp, box_team):
     }
 
 
-def extract_match(league, event):
+def resolve_league(summary, event):
+    """Return (league_name, sofascore_tid) for a match."""
+    lslug = None
+    if summary:
+        lg = (summary.get("header") or {}).get("league") or {}
+        lslug = lg.get("slug")
+        if lslug in LEAGUE_BY_SLUG:
+            tid, name = LEAGUE_BY_SLUG[lslug]
+            return name, tid
+        name = lg.get("name") or lg.get("midsizeName")
+        if name:
+            return name, None
+    # Fallback: derive from the event's season slug (e.g. "2026-brasileiro-serie-a").
+    se = (event.get("season") or {}).get("slug") or ""
+    if se:
+        parts = [p for p in se.split("-") if not p.isdigit()]
+        if parts:
+            return " ".join(parts).title(), None
+    return "Unknown", None
+
+
+def extract_match(league_tuple, event, slug):
+    """league_tuple = (slug, tid, name) for curated mode, else None for all-mode."""
     comp = event.get("competitions", [])[0]
     status = comp.get("status", {}).get("type", {})
     if status.get("state") != "post" or not status.get("completed"):
@@ -157,7 +206,6 @@ def extract_match(league, event):
         return None
 
     event_id = comp.get("id") or event.get("id")
-    slug = league[0]
     summary = http_get_json(
         f"https://site.api.espn.com/apis/site/v2/sports/soccer/{slug}/summary?event={event_id}"
     )
@@ -186,11 +234,16 @@ def extract_match(league, event):
     home_name = (home.get("team") or {}).get("displayName") or home.get("id")
     away_name = (away.get("team") or {}).get("displayName") or away.get("id")
 
+    if league_tuple:
+        _, league_tid, league_name = league_tuple
+    else:
+        league_name, league_tid = resolve_league(summary, event)
+
     result = {
         "sofascore_event_id": int(event_id),
         "match_date": TARGET_DATE,
-        "league_name": league[2],
-        "league_id_sofa": league[1],
+        "league_name": league_name,
+        "league_id_sofa": league_tid,
         "home_team": home_name,
         "away_team": away_name,
         "home_score": to_int(home.get("score")),
@@ -201,45 +254,18 @@ def extract_match(league, event):
     for prefix, side_stats in (("home", h), ("away", a)):
         for k, v in side_stats.items():
             result[f"{prefix}_{k}"] = v
-    result["raw_statistics"] = json.dumps({"scoreboard": home.get("statistics"), "boxscore": [b.get("statistics") for b in box_teams.values()]})
+    result["raw_statistics"] = json.dumps({
+        "scoreboard": home.get("statistics"),
+        "boxscore": [b.get("statistics") for b in box_teams.values()],
+    })
     return result
 
 
-def main():
-    global request_count, TARGET_DATE
-
-    target_date = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("-") else datetime.now().strftime("%Y-%m-%d")
-    post_url = None
-    post_key = None
-    league_filter = None
-
-    args = sys.argv[1:]
-    i = 0
-    while i < len(args):
-        if args[i] == "--post" and i + 1 < len(args):
-            post_url = args[i + 1]
-            i += 2
-        elif args[i] == "--key" and i + 1 < len(args):
-            post_key = args[i + 1]
-            i += 2
-        elif args[i] == "--league" and i + 1 < len(args):
-            league_filter = int(args[i + 1])
-            i += 2
-        else:
-            i += 1
-
+def scrape_listed(ymd, target_date, league_filter):
     leagues = [l for l in LEAGUES if league_filter is None or l[1] == league_filter]
-    ymd = target_date.replace("-", "")
-    TARGET_DATE = target_date
-
-    print("=== ESPN Stats Scraper ===")
-    print(f"Date: {target_date}")
     print(f"Leagues: {len(leagues)}")
     print()
-
-    all_results = []
-    total_checked = 0
-
+    results = []
     for slug, tid, name in leagues:
         sb = http_get_json(f"https://site.api.espn.com/apis/site/v2/sports/soccer/{slug}/scoreboard?dates={ymd}")
         time.sleep(REQUEST_DELAY * random.uniform(0.7, 1.3))
@@ -253,17 +279,93 @@ def main():
             continue
         print(f"[{name}] {len(finished)} finished events on {target_date}")
         for event in finished:
-            total_checked += 1
-            m = extract_match((slug, tid, name), event)
+            m = extract_match((slug, tid, name), event, slug)
             if not m:
                 continue
-            print(f"  [{m['sofascore_event_id']}] {m['home_team']} {m['home_score']}-{m['away_score']} {m['away_team']}")
-            all_results.append(m)
+            print(f"  [{m['sofascore_event_id']}] {m['home_team']} {m['home_score']}-{m['away_score']} {m['away_team']} ({m['league_name']})")
+            results.append(m)
+    return results
+
+
+def scrape_all(ymd, target_date, apply_filter=True):
+    print(f"Fetching catch-all scoreboard (soccer/{DEFAULT_SLUG}, limit={SCOREBOARD_LIMIT})...")
+    sb = http_get_json(
+        f"https://site.api.espn.com/apis/site/v2/sports/soccer/{DEFAULT_SLUG}/scoreboard?dates={ymd}&limit={SCOREBOARD_LIMIT}"
+    )
+    time.sleep(REQUEST_DELAY * random.uniform(0.7, 1.3))
+    events = (sb or {}).get("events") or []
+    finished = [e for e in events if e.get("competitions") and
+                e["competitions"][0].get("status", {}).get("type", {}).get("state") == "post"]
+    print(f"Finished events on {target_date}: {len(finished)} / {len(events)}")
+    print()
+    results = []
+    skipped = 0
+    for event in finished:
+        season_slug = (event.get("season") or {}).get("slug") or ""
+        if apply_filter and is_excluded(season_slug):
+            skipped += 1
+            continue
+        m = extract_match(None, event, DEFAULT_SLUG)
+        if not m:
+            continue
+        if apply_filter and is_excluded(m["league_name"]):
+            skipped += 1
+            continue
+        print(f"  [{m['sofascore_event_id']}] {m['home_team']} {m['home_score']}-{m['away_score']} {m['away_team']} ({m['league_name']})")
+        results.append(m)
+    if skipped:
+        print(f"Skipped {skipped} excluded events (college/youth/reserve)")
+    return results
+
+
+def main():
+    global request_count, TARGET_DATE
+
+    target_date = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("-") else datetime.now().strftime("%Y-%m-%d")
+    post_url = None
+    post_key = None
+    league_filter = None
+    listed_only = False
+    no_filter = False
+
+    args = sys.argv[1:]
+    i = 0
+    while i < len(args):
+        if args[i] == "--post" and i + 1 < len(args):
+            post_url = args[i + 1]
+            i += 2
+        elif args[i] == "--key" and i + 1 < len(args):
+            post_key = args[i + 1]
+            i += 2
+        elif args[i] == "--league" and i + 1 < len(args):
+            league_filter = int(args[i + 1])
+            i += 2
+        elif args[i] == "--listed":
+            listed_only = True
+            i += 1
+        elif args[i] == "--no-filter":
+            no_filter = True
+            i += 1
+        else:
+            i += 1
+
+    ymd = target_date.replace("-", "")
+    TARGET_DATE = target_date
+
+    print("=== ESPN Stats Scraper ===")
+    print(f"Date: {target_date}")
+    print(f"Mode: {'listed (curated leagues)' if (listed_only or league_filter is not None) else 'all soccer competitions'}")
+    print()
+
+    if listed_only or league_filter is not None:
+        all_results = scrape_listed(ymd, target_date, league_filter)
+    else:
+        all_results = scrape_all(ymd, target_date, apply_filter=not no_filter)
 
     output = {
         "date": target_date,
         "source": "espn",
-        "total_events_checked": total_checked,
+        "total_events_checked": len(all_results),
         "stats_collected": len(all_results),
         "requests_made": request_count,
         "matches": all_results,

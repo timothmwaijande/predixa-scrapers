@@ -55,7 +55,7 @@ jobs:
             --key "${{ secrets.STATS_SECRET_KEY }}" \
             || true
 
-      - name: ESPN fallback (if Sofascore collected nothing)
+      - name: ESPN fallback (all competitions) if Sofascore collected nothing
         if: ${{ always() }}
         run: |
           if [ "${{ inputs.mode }}" = "espn" ]; then
@@ -66,7 +66,7 @@ jobs:
             if [ "$N" -gt 0 ]; then RUN=0; else RUN=1; fi
           fi
           if [ "$RUN" = "1" ]; then
-            echo "Running ESPN scraper for $DATE"
+            echo "Running ESPN scraper (all competitions) for $DATE"
             python cron/scrape_espn_stats.py "$DATE" \
               --post "https://predixa.co.tz/cron/receive_sofascore_stats" \
               --key "${{ secrets.STATS_SECRET_KEY }}"
@@ -74,7 +74,22 @@ jobs:
             echo "Sofascore already delivered data; skipping ESPN."
           fi
 
-      - name: Also trigger backfill via PHP (if backfill mode)
+      - name: Self-heal recent gaps (backfill empty days)
+        if: ${{ always() && inputs.mode != 'espn' }}
+        continue-on-error: true
+        run: |
+          MISSING=$(curl -s "https://predixa.co.tz/cron/missing_stat_dates?key=${{ secrets.STATS_SECRET_KEY }}&days=7&max=5" || echo '{"dates":[]}')
+          echo "Missing dates: $MISSING"
+          DATES=$(echo "$MISSING" | python3 -c "import sys,json; print(' '.join(json.load(sys.stdin).get('dates',[])))" 2>/dev/null || echo "")
+          if [ -z "$DATES" ]; then echo "No gaps to backfill."; exit 0; fi
+          for D in $DATES; do
+            echo "=== Backfilling $D ==="
+            python cron/scrape_espn_stats.py "$D" \
+              --post "https://predixa.co.tz/cron/receive_sofascore_stats" \
+              --key "${{ secrets.STATS_SECRET_KEY }}" || true
+          done
+
+      - name: Also trigger API-Football backfill (only if backfill mode)
         if: inputs.mode == 'backfill'
         run: |
           curl -s "https://predixa.co.tz/cron/run_stats?key=${{ secrets.STATS_SECRET_KEY }}&mode=backfill" || echo "Backfill trigger failed"
