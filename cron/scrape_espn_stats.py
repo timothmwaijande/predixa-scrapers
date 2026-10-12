@@ -59,6 +59,16 @@ LEAGUES = [
     ("mex.1", 11621, "Liga MX, Apertura"),
     ("caf.nations", 270, "Africa Cup of Nations"),
     ("caf.nations_qual", 1848, "Africa Cup of Nations Qualifiers"),
+    # Mid-tier European leagues the "all" scoreboard omits (so their fixtures
+    # would otherwise only appear sporadically and never settle). sofascore tid
+    # left None — only ESPN's own slug is used here.
+    ("nor.1", None, "Norwegian Eliteserien"),
+    ("swe.1", None, "Swedish Allsvenskan"),
+    ("den.1", None, "Danish Superliga"),
+    ("aut.1", None, "Austrian Bundesliga"),
+    ("gre.1", None, "Greek Super League"),
+    ("sco.1", None, "Scottish Premiership"),
+    ("bra.1", None, "Brazilian Serie A"),
 ]
 LEAGUE_BY_SLUG = {slug: (tid, name) for slug, tid, name in LEAGUES}
 
@@ -261,7 +271,7 @@ def extract_match(league_tuple, event, slug):
     return result
 
 
-def scrape_listed(ymd, target_date, league_filter):
+def scrape_listed(ymd, target_date, league_filter, seen=None):
     leagues = [l for l in LEAGUES if league_filter is None or l[1] == league_filter]
     print(f"Leagues: {len(leagues)}")
     print()
@@ -279,6 +289,11 @@ def scrape_listed(ymd, target_date, league_filter):
             continue
         print(f"[{name}] {len(finished)} finished events on {target_date}")
         for event in finished:
+            if seen is not None:
+                comp = event.get("competitions", [{}])[0]
+                eid = comp.get("id") or event.get("id")
+                if eid in seen:
+                    continue
             m = extract_match((slug, tid, name), event, slug)
             if not m:
                 continue
@@ -359,8 +374,20 @@ def main():
 
     if listed_only or league_filter is not None:
         all_results = scrape_listed(ymd, target_date, league_filter)
+    elif no_filter:
+        # Pure unfiltered scan (only used for diagnostics).
+        all_results = scrape_all(ymd, target_date, apply_filter=False)
     else:
-        all_results = scrape_all(ymd, target_date, apply_filter=not no_filter)
+        # Default: catch-all scoreboard PLUS the curated league list. ESPN's
+        # "all" tab omits mid-tier leagues (Eliteserien, Allsvenskan, Danish
+        # Superliga, ...) so their fixtures would only appear sporadically and
+        # the pending picks that depend on them would never settle.
+        all_results = scrape_all(ymd, target_date, apply_filter=True)
+        seen = {m["sofascore_event_id"] for m in all_results}
+        extra = scrape_listed(ymd, target_date, None, seen=seen)
+        if extra:
+            print(f"\n>>> {len(extra)} extra matches from curated leagues not on the catch-all scoreboard")
+            all_results.extend(extra)
 
     output = {
         "date": target_date,
