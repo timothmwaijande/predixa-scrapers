@@ -41,6 +41,14 @@ jobs:
         if: steps.scores.outputs.count > 0
         run: sleep 5
 
+      - name: Sync stats scores into match_results (bridge)
+        run: |
+          FROM=$(date -u -d '-3 days' +%F)
+          TO=$(date -u +%F)
+          curl -s -A "Mozilla/5.0 (compatible; PREDIXA-Bot)" \
+            "https://predixa.co.tz/cron/sync_stats_scores?key=${{ secrets.CRON_KEY }}&date_from=$FROM&date_to=$TO" || \
+            echo "sync_stats_scores failed"
+
       - name: Settle pending picks
         run: |
           curl -s -X POST -A "Mozilla/5.0 (compatible; PREDIXA-Bot)" \
