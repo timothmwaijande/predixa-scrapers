@@ -373,7 +373,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description="Scrape football injury data from SportsGambler")
     parser.add_argument("--json", action="store_true", help="Print records as a JSON array to stdout")
     parser.add_argument("--leagues", type=int, default=None, help="Limit to the first N leagues")
-    parser.add_argument("--formats", nargs="+", default=["json"],
+    parser.add_argument("--formats", nargs="+", default=["json", "google_sheets"],
                         choices=["json", "csv", "sqlite", "google_sheets"], help="Output sinks")
     parser.add_argument("--sheet-name", default=None,
                         help=f"Base name of the injuries tab (default: {SHEET_BASE_NAME})")
