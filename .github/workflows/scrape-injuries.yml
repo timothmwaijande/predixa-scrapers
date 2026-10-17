@@ -1,0 +1,56 @@
+name: Scrape Football Injuries
+
+on:
+  schedule:
+    # 05:20 UTC — offset 20 min after "Scrape League Standings" (05:00) so the
+    # two jobs don't contend for the same Google Sheets service account.
+    - cron: '20 5 * * *'
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4 google-api-python-client google-auth
+
+      - name: Prepare Google Sheets credentials (optional)
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: |
+          if [ -n "$GOOGLE_CREDENTIALS" ]; then
+            printf '%s' "$GOOGLE_CREDENTIALS" > cron/google_credentials.json
+            echo "GOOGLE_CREDENTIALS_PATH=$PWD/cron/google_credentials.json" >> "$GITHUB_ENV"
+            echo "Google Sheets export enabled"
+          else
+            echo "No GOOGLE_CREDENTIALS secret set — Google Sheets export disabled"
+          fi
+
+      - name: Run injuries scraper
+        id: injuries
+        run: |
+          python cron/scrape_injuries.py --json --formats json google_sheets > injuries.json
+          echo "count=$(python -c "import json; print(len(json.load(open('injuries.json'))))")" >> "$GITHUB_OUTPUT"
+
+      - name: Upload injuries artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: football-injuries
+          path: injuries.json
+          retention-days: 7
+
+      - name: Post injuries to predixa.co.tz
+        if: steps.injuries.outputs.count > 0
+        run: |
+          curl -s -X POST -A "Mozilla/5.0 (compatible; PREDIXA-Bot)" \
+            -H "Content-Type: application/json" \
+            -d @injuries.json \
+            "https://predixa.co.tz/cron/fetch_injuries?key=${{ secrets.CRON_KEY }}" || \
+            echo "fetch_injuries failed"
